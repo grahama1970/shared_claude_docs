@@ -1,0 +1,818 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Real ArangoDB Handlers for GRANGER Integration
+
+This module provides real handlers that use the actual ArangoDB module
+functionality for document storage, search, graph operations, and memory management.
+
+External Dependencies:
+- python-arango: https://github.com/arangodb/python-arango
+- numpy: For embeddings
+- Custom ArangoDB module from experiments/arangodb
+
+Example Usage:
+>>> from real_arangodb_handlers import ArangoDocumentHandler
+>>> handler = ArangoDocumentHandler()
+>>> result = handler.handle({"operation": "create", "data": {"title": "Test"}})
+>>> print(f"Created document: {result['_key']}")
+"""
+
+import os
+import sys
+import time
+import json
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Tuple
+from pathlib import Path
+
+# Add ArangoDB module to path
+sys.path.insert(0, '/home/graham/workspace/experiments/arangodb/src')
+
+# Import ArangoDB functionality
+try:
+    from arangodb.core.arango_setup import (
+        connect_arango,
+        ensure_database,
+        ensure_collection,
+        ensure_graph,
+        ensure_memory_agent_collections
+    )
+    from arangodb.core.db_operations import (
+        create_document,
+        get_document,
+        update_document,
+        delete_document,
+        query_documents,
+        create_relationship
+    )
+    from arangodb.core.search.bm25_search import bm25_search
+    from arangodb.core.search.semantic_search import semantic_search
+    from arangodb.core.search.hybrid_search import hybrid_search
+    from arangodb.core.memory.memory_agent import MemoryAgent
+    from arangodb.core.constants import (
+        ARANGO_DB_NAME,
+        COLLECTION_NAME,
+        MEMORY_COLLECTION,
+        MEMORY_EDGE_COLLECTION
+    )
+    ARANGODB_AVAILABLE = True
+except ImportError as e:
+    print(f"WARNING: ArangoDB module import error: {e}")
+    ARANGODB_AVAILABLE = False
+
+
+class BaseArangoHandler:
+    """Base class for ArangoDB handlers"""
+    
+    def __init__(self):
+        self.client = None
+        self.db = None
+        self._connected = False
+        
+    def connect(self) -> bool:
+        """Establish connection to ArangoDB"""
+        if self._connected and self.db:
+            return True
+            
+        try:
+            # Use environment variables
+            os.environ['ARANGO_HOST'] = os.getenv('ARANGO_HOST', 'http://localhost:8529')
+            os.environ['ARANGO_USER'] = os.getenv('ARANGO_USER', 'root')
+            os.environ['ARANGO_PASSWORD'] = os.getenv('ARANGO_PASSWORD', 'openSesame')
+            
+            self.client = connect_arango()
+            self.db = ensure_database(self.client)  # Takes only client, uses constants
+            self._connected = True
+            return True
+        except Exception as e:
+            print(f"ArangoDB connection error: {e}")
+            return False
+    
+    def ensure_connection(self):
+        """Ensure database connection is active"""
+        if not self._connected:
+            self.connect()
+
+
+class ArangoDocumentHandler(BaseArangoHandler):
+    """Handler for document CRUD operations"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle document operations
+        
+        Args:
+            params: Dictionary with:
+                - operation: create, read, update, delete, query
+                - collection: Collection name (optional, defaults to documents)
+                - data: Document data (for create/update)
+                - key: Document key (for read/update/delete)
+                - query: AQL query or filter (for query)
+                
+        Returns:
+            Operation result
+        """
+        if not ARANGODB_AVAILABLE:
+            return {"error": "ArangoDB module not available"}
+            
+        self.ensure_connection()
+        if not self.db:
+            return {"error": "Database connection failed"}
+            
+        operation = params.get("operation", "")
+        collection_name = params.get("collection", COLLECTION_NAME)
+        
+        try:
+            # Ensure collection exists
+            ensure_collection(self.db, collection_name)
+            collection = self.db[collection_name]
+            
+            if operation == "create":
+                data = params.get("data", {})
+                # Add timestamp
+                data["created_at"] = datetime.now().isoformat()
+                
+                result = create_document(
+                    self.db,
+                    collection_name,
+                    data,
+                    ensure_embedding=params.get("ensure_embedding", True)
+                )
+                return result or {"error": "Document creation failed"}
+                
+            elif operation == "read":
+                key = params.get("key")
+                if not key:
+                    return {"error": "Document key required"}
+                    
+                result = get_document(self.db, collection_name, key)
+                return result or {"error": "Document not found"}
+                
+            elif operation == "update":
+                key = params.get("key")
+                data = params.get("data", {})
+                if not key:
+                    return {"error": "Document key required"}
+                    
+                # Add update timestamp
+                data["updated_at"] = datetime.now().isoformat()
+                
+                result = update_document(
+                    self.db,
+                    collection_name,
+                    key,
+                    data,
+                    ensure_embedding=params.get("ensure_embedding", True)
+                )
+                return result or {"error": "Update failed"}
+                
+            elif operation == "delete":
+                key = params.get("key")
+                if not key:
+                    return {"error": "Document key required"}
+                    
+                result = delete_document(self.db, collection_name, key)
+                return {"deleted": result, "key": key}
+                
+            elif operation == "query":
+                query_filter = params.get("query", {})
+                limit = params.get("limit", 10)
+                
+                results = query_documents(
+                    self.db,
+                    collection_name,
+                    filter_dict=query_filter,
+                    limit=limit
+                )
+                
+                return {
+                    "count": len(results),
+                    "documents": results
+                }
+                
+            else:
+                return {"error": f"Unknown operation: {operation}"}
+                
+        except Exception as e:
+            return {"error": str(e)}
+
+
+class ArangoSearchHandler(BaseArangoHandler):
+    """Handler for search operations (BM25, semantic, hybrid)"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle search operations
+        
+        Args:
+            params: Dictionary with:
+                - search_type: bm25, semantic, or hybrid
+                - query: Search query
+                - collection: Collection to search (optional)
+                - limit: Maximum results (default: 10)
+                - filters: Additional filters
+                
+        Returns:
+            Search results
+        """
+        if not ARANGODB_AVAILABLE:
+            return {"error": "ArangoDB module not available"}
+            
+        self.ensure_connection()
+        if not self.db:
+            return {"error": "Database connection failed"}
+            
+        search_type = params.get("search_type", "hybrid")
+        query = params.get("query", "")
+        collection_name = params.get("collection", COLLECTION_NAME)
+        limit = params.get("limit", 10)
+        filters = params.get("filters", {})
+        
+        try:
+            start_time = time.time()
+            
+            if search_type == "bm25":
+                results = bm25_search(
+                    self.db,
+                    query,
+                    collection_name=collection_name,
+                    limit=limit,
+                    filters=filters
+                )
+                
+            elif search_type == "semantic":
+                results = semantic_search(
+                    self.db,
+                    query,
+                    collection_name=collection_name,
+                    limit=limit,
+                    filters=filters
+                )
+                
+            elif search_type == "hybrid":
+                results = hybrid_search(
+                    self.db,
+                    query,
+                    collection_name=collection_name,
+                    limit=limit,
+                    filters=filters
+                )
+                
+            else:
+                return {"error": f"Unknown search type: {search_type}"}
+                
+            duration = time.time() - start_time
+            
+            return {
+                "query": query,
+                "search_type": search_type,
+                "result_count": len(results),
+                "results": results,
+                "search_time": duration
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
+
+
+class ArangoGraphHandler(BaseArangoHandler):
+    """Handler for graph operations"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle graph operations
+        
+        Args:
+            params: Dictionary with:
+                - operation: create_edge, traverse, shortest_path, neighbors
+                - from_key: Source document key
+                - to_key: Target document key (for create_edge)
+                - edge_type: Type of relationship
+                - depth: Traversal depth (for traverse/neighbors)
+                - direction: outbound, inbound, or any
+                
+        Returns:
+            Graph operation result
+        """
+        if not ARANGODB_AVAILABLE:
+            return {"error": "ArangoDB module not available"}
+            
+        self.ensure_connection()
+        if not self.db:
+            return {"error": "Database connection failed"}
+            
+        operation = params.get("operation", "")
+        
+        try:
+            # Ensure graph exists
+            graph_name = params.get("graph", "knowledge_graph")
+            ensure_graph(self.db, graph_name)
+            
+            if operation == "create_edge":
+                from_key = params.get("from_key")
+                to_key = params.get("to_key")
+                edge_type = params.get("edge_type", "relates_to")
+                edge_data = params.get("edge_data", {})
+                
+                if not from_key or not to_key:
+                    return {"error": "Both from_key and to_key required"}
+                
+                result = create_relationship(
+                    self.db,
+                    from_key,
+                    to_key,
+                    edge_type,
+                    properties=edge_data
+                )
+                
+                return {
+                    "edge_created": True,
+                    "from": from_key,
+                    "to": to_key,
+                    "type": edge_type,
+                    "edge_key": result.get("_key") if result else None
+                }
+                
+            elif operation == "traverse":
+                start_key = params.get("from_key")
+                depth = params.get("depth", 2)
+                direction = params.get("direction", "outbound")
+                
+                if not start_key:
+                    return {"error": "from_key required for traversal"}
+                
+                # Execute traversal query
+                query = f"""
+                FOR v, e, p IN 1..{depth} {direction.upper()} 
+                    '{COLLECTION_NAME}/{start_key}' 
+                    GRAPH '{graph_name}'
+                    RETURN {{
+                        vertex: v,
+                        edge: e,
+                        path_length: LENGTH(p.edges)
+                    }}
+                """
+                
+                cursor = self.db.aql.execute(query)
+                results = list(cursor)
+                
+                return {
+                    "start_key": start_key,
+                    "depth": depth,
+                    "direction": direction,
+                    "node_count": len(results),
+                    "nodes": results
+                }
+                
+            elif operation == "neighbors":
+                node_key = params.get("from_key")
+                direction = params.get("direction", "any")
+                
+                if not node_key:
+                    return {"error": "from_key required"}
+                
+                # Get immediate neighbors
+                query = f"""
+                FOR v, e IN 1..1 {direction.upper()} 
+                    '{COLLECTION_NAME}/{node_key}' 
+                    GRAPH '{graph_name}'
+                    RETURN {{
+                        neighbor: v,
+                        edge_type: e.type,
+                        edge_data: e
+                    }}
+                """
+                
+                cursor = self.db.aql.execute(query)
+                neighbors = list(cursor)
+                
+                return {
+                    "node_key": node_key,
+                    "neighbor_count": len(neighbors),
+                    "neighbors": neighbors
+                }
+                
+            elif operation == "shortest_path":
+                from_key = params.get("from_key")
+                to_key = params.get("to_key")
+                
+                if not from_key or not to_key:
+                    return {"error": "Both from_key and to_key required"}
+                
+                query = f"""
+                FOR path IN OUTBOUND SHORTEST_PATH 
+                    '{COLLECTION_NAME}/{from_key}' 
+                    TO '{COLLECTION_NAME}/{to_key}' 
+                    GRAPH '{graph_name}'
+                    RETURN path
+                """
+                
+                cursor = self.db.aql.execute(query)
+                paths = list(cursor)
+                
+                if paths:
+                    path = paths[0]
+                    return {
+                        "path_found": True,
+                        "length": len(path.get("edges", [])),
+                        "path": path
+                    }
+                else:
+                    return {
+                        "path_found": False,
+                        "from": from_key,
+                        "to": to_key
+                    }
+                    
+            else:
+                return {"error": f"Unknown graph operation: {operation}"}
+                
+        except Exception as e:
+            return {"error": str(e)}
+
+
+class ArangoMemoryHandler(BaseArangoHandler):
+    """Handler for memory agent operations"""
+    
+    def __init__(self):
+        super().__init__()
+        self.memory_agent = None
+        
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle memory operations
+        
+        Args:
+            params: Dictionary with:
+                - operation: store_message, get_conversation, search_memory
+                - conversation_id: Conversation identifier
+                - message: Message data (for store_message)
+                - query: Search query (for search_memory)
+                - limit: Result limit
+                
+        Returns:
+            Memory operation result
+        """
+        if not ARANGODB_AVAILABLE:
+            return {"error": "ArangoDB module not available"}
+            
+        self.ensure_connection()
+        if not self.db:
+            return {"error": "Database connection failed"}
+            
+        try:
+            # Initialize memory agent if needed
+            if not self.memory_agent:
+                ensure_memory_agent_collections(self.db)
+                self.memory_agent = MemoryAgent(self.db)
+            
+            operation = params.get("operation", "")
+            
+            if operation == "store_message":
+                conversation_id = params.get("conversation_id", "default")
+                message = params.get("message", {})
+                
+                # Ensure message has required fields
+                if "role" not in message:
+                    message["role"] = "user"
+                if "content" not in message:
+                    return {"error": "Message content required"}
+                
+                # Store message
+                result = self.memory_agent.add_message(
+                    conversation_id=conversation_id,
+                    role=message["role"],
+                    content=message["content"],
+                    metadata=message.get("metadata", {})
+                )
+                
+                return {
+                    "stored": True,
+                    "message_id": result.get("_key") if result else None,
+                    "conversation_id": conversation_id
+                }
+                
+            elif operation == "get_conversation":
+                conversation_id = params.get("conversation_id", "default")
+                limit = params.get("limit", 50)
+                
+                messages = self.memory_agent.get_conversation_messages(
+                    conversation_id=conversation_id,
+                    limit=limit
+                )
+                
+                return {
+                    "conversation_id": conversation_id,
+                    "message_count": len(messages),
+                    "messages": messages
+                }
+                
+            elif operation == "search_memory":
+                query = params.get("query", "")
+                limit = params.get("limit", 10)
+                
+                # Search across all conversations
+                results = self.memory_agent.search_messages(
+                    query=query,
+                    limit=limit
+                )
+                
+                return {
+                    "query": query,
+                    "result_count": len(results),
+                    "results": results
+                }
+                
+            elif operation == "get_context":
+                conversation_id = params.get("conversation_id", "default")
+                message_count = params.get("message_count", 5)
+                
+                context = self.memory_agent.get_context(
+                    conversation_id=conversation_id,
+                    last_n_messages=message_count
+                )
+                
+                return {
+                    "conversation_id": conversation_id,
+                    "context": context
+                }
+                
+            else:
+                return {"error": f"Unknown memory operation: {operation}"}
+                
+        except Exception as e:
+            return {"error": str(e)}
+
+
+class ArangoPaperHandler(BaseArangoHandler):
+    """Handler for ArXiv paper storage and retrieval"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle paper-specific operations
+        
+        Args:
+            params: Dictionary with:
+                - operation: store_paper, find_similar, get_citations
+                - paper_data: Paper information (for store_paper)
+                - paper_id: Paper identifier
+                - similarity_threshold: For finding similar papers
+                
+        Returns:
+            Paper operation result
+        """
+        if not ARANGODB_AVAILABLE:
+            return {"error": "ArangoDB module not available"}
+            
+        self.ensure_connection()
+        if not self.db:
+            return {"error": "Database connection failed"}
+            
+        operation = params.get("operation", "")
+        
+        try:
+            # Ensure papers collection exists
+            papers_collection = ensure_collection(self.db, "arxiv_papers")
+            citations_collection = ensure_collection(self.db, "paper_citations", edge=True)
+            
+            if operation == "store_paper":
+                paper_data = params.get("paper_data", {})
+                
+                # Validate required fields
+                if "arxiv_id" not in paper_data:
+                    return {"error": "arxiv_id required"}
+                
+                # Add metadata
+                paper_data["stored_at"] = datetime.now().isoformat()
+                paper_data["_key"] = paper_data["arxiv_id"].replace("/", "_")
+                
+                # Store with embeddings
+                result = create_document(
+                    self.db,
+                    "arxiv_papers",
+                    paper_data,
+                    document_key=paper_data["_key"],
+                    ensure_embedding=True
+                )
+                
+                return {
+                    "stored": True,
+                    "paper_key": result.get("_key") if result else None,
+                    "arxiv_id": paper_data["arxiv_id"]
+                }
+                
+            elif operation == "find_similar":
+                paper_id = params.get("paper_id")
+                limit = params.get("limit", 10)
+                threshold = params.get("similarity_threshold", 0.7)
+                
+                if not paper_id:
+                    return {"error": "paper_id required"}
+                
+                # Get the paper
+                source_paper = get_document(self.db, "arxiv_papers", paper_id)
+                if not source_paper:
+                    return {"error": "Paper not found"}
+                
+                # Find similar papers using semantic search
+                similar = semantic_search(
+                    self.db,
+                    source_paper.get("title", "") + " " + source_paper.get("abstract", ""),
+                    collection_name="arxiv_papers",
+                    limit=limit + 1  # Include source paper
+                )
+                
+                # Filter out source paper and apply threshold
+                results = []
+                for paper in similar:
+                    if paper.get("_key") != paper_id:
+                        score = paper.get("_score", 0)
+                        if score >= threshold:
+                            results.append(paper)
+                
+                return {
+                    "source_paper": paper_id,
+                    "similar_count": len(results),
+                    "similar_papers": results[:limit]
+                }
+                
+            elif operation == "add_citation":
+                from_paper = params.get("from_paper")
+                to_paper = params.get("to_paper")
+                citation_type = params.get("citation_type", "cites")
+                
+                if not from_paper or not to_paper:
+                    return {"error": "Both from_paper and to_paper required"}
+                
+                # Create citation edge
+                edge_data = {
+                    "_from": f"arxiv_papers/{from_paper}",
+                    "_to": f"arxiv_papers/{to_paper}",
+                    "type": citation_type,
+                    "created_at": datetime.now().isoformat()
+                }
+                
+                citations_collection.insert(edge_data)
+                
+                return {
+                    "citation_added": True,
+                    "from": from_paper,
+                    "to": to_paper,
+                    "type": citation_type
+                }
+                
+            elif operation == "get_citations":
+                paper_id = params.get("paper_id")
+                direction = params.get("direction", "outbound")  # papers this cites
+                
+                if not paper_id:
+                    return {"error": "paper_id required"}
+                
+                # Query citations
+                if direction == "outbound":
+                    query = """
+                    FOR paper IN OUTBOUND @start_id paper_citations
+                        RETURN paper
+                    """
+                else:
+                    query = """
+                    FOR paper IN INBOUND @start_id paper_citations
+                        RETURN paper
+                    """
+                
+                cursor = self.db.aql.execute(
+                    query,
+                    bind_vars={"start_id": f"arxiv_papers/{paper_id}"}
+                )
+                
+                citations = list(cursor)
+                
+                return {
+                    "paper_id": paper_id,
+                    "direction": direction,
+                    "citation_count": len(citations),
+                    "citations": citations
+                }
+                
+            else:
+                return {"error": f"Unknown paper operation: {operation}"}
+                
+        except Exception as e:
+            return {"error": str(e)}
+
+
+class ArangoBatchHandler(BaseArangoHandler):
+    """Handler for batch operations"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process multiple ArangoDB operations in batch
+        
+        Args:
+            params: Dictionary with:
+                - operations: List of operations to perform
+                - transaction: Whether to run as transaction
+                
+        Returns:
+            Batch operation results
+        """
+        operations = params.get("operations", [])
+        use_transaction = params.get("transaction", False)
+        
+        results = []
+        handlers = {
+            "document": ArangoDocumentHandler(),
+            "search": ArangoSearchHandler(),
+            "graph": ArangoGraphHandler(),
+            "memory": ArangoMemoryHandler(),
+            "paper": ArangoPaperHandler()
+        }
+        
+        # Ensure all handlers share the same connection
+        self.ensure_connection()
+        for handler in handlers.values():
+            if isinstance(handler, BaseArangoHandler):
+                handler.client = self.client
+                handler.db = self.db
+                handler._connected = self._connected
+        
+        start_time = time.time()
+        
+        try:
+            for op in operations:
+                handler_type = op.get("handler")
+                op_params = op.get("params", {})
+                
+                if handler_type in handlers:
+                    try:
+                        result = handlers[handler_type].handle(op_params)
+                        results.append({
+                            "handler": handler_type,
+                            "success": "error" not in result,
+                            "result": result
+                        })
+                    except Exception as e:
+                        results.append({
+                            "handler": handler_type,
+                            "success": False,
+                            "error": str(e)
+                        })
+                else:
+                    results.append({
+                        "handler": handler_type,
+                        "success": False,
+                        "error": f"Unknown handler type: {handler_type}"
+                    })
+            
+            duration = time.time() - start_time
+            
+            return {
+                "total_operations": len(operations),
+                "successful": sum(1 for r in results if r["success"]),
+                "failed": sum(1 for r in results if not r["success"]),
+                "batch_time": duration,
+                "results": results
+            }
+            
+        except Exception as e:
+            return {
+                "error": str(e),
+                "results": results
+            }
+
+
+if __name__ == "__main__":
+    # Test basic functionality
+    print("Testing ArangoDB Handlers...")
+    
+    # Test document handler
+    doc_handler = ArangoDocumentHandler()
+    result = doc_handler.handle({
+        "operation": "create",
+        "data": {
+            "title": "Test Document",
+            "content": "This is a test document for ArangoDB handlers"
+        }
+    })
+    
+    if "error" in result:
+        print(f"Document creation failed: {result['error']}")
+    else:
+        print(f"Document created: {result.get('_key')}")
+    
+    # Test search handler
+    search_handler = ArangoSearchHandler()
+    result = search_handler.handle({
+        "search_type": "hybrid",
+        "query": "test document",
+        "limit": 5
+    })
+    
+    print(f"\nSearch results: {result.get('result_count', 0)} documents found")

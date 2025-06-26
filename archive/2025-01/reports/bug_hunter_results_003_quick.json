@@ -1,0 +1,13 @@
+{
+  "task": "003_arxiv_quick",
+  "timestamp": "2025-06-09 09:46:04",
+  "bugs_found": [
+    "Using deprecated Search.results() method - should use Client.results()",
+    "No rate limiting on large requests"
+  ],
+  "critical_findings": [
+    "ArXiv searches can timeout without proper handling",
+    "Deprecated API (Search.results) still in use",
+    "Need to use Client.results() instead"
+  ]
+}

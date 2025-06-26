@@ -1,0 +1,1257 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: api_doc_generator_interaction.py
+Purpose: Intelligent API documentation generation with multi-framework support
+
+External Dependencies:
+- pydantic: https://docs.pydantic.dev/ - Data validation and OpenAPI schema generation
+- jinja2: https://jinja.palletsprojects.com/ - Template rendering for documentation
+- openapi-spec-validator: https://github.com/p1c2u/openapi-spec-validator - OpenAPI validation
+- markdown: https://python-markdown.github.io/ - Markdown processing
+
+Example Usage:
+>>> from api_doc_generator_interaction import APIDocGeneratorInteraction
+>>> generator = APIDocGeneratorInteraction()
+>>> docs = generator.generate_documentation("src/api", framework="fastapi")
+>>> print(docs['openapi']['info']['title'])
+'My API'
+"""
+
+import ast
+import inspect
+import json
+import re
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
+from jinja2 import Template
+from loguru import logger
+from pydantic import BaseModel, Field
+
+
+class APIEndpoint(BaseModel):
+    """Model for API endpoint documentation"""
+    path: str
+    method: str
+    summary: str
+    description: str = ""
+    parameters: List[Dict[str, Any]] = Field(default_factory=list)
+    request_body: Optional[Dict[str, Any]] = None
+    responses: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    tags: List[str] = Field(default_factory=list)
+    security: List[Dict[str, Any]] = Field(default_factory=list)
+    examples: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class DocumentationConfig(BaseModel):
+    """Configuration for documentation generation"""
+    title: str = "API Documentation"
+    version: str = "1.0.0"
+    description: str = ""
+    base_url: str = "http://localhost:8000"
+    contact: Dict[str, str] = Field(default_factory=dict)
+    license: Dict[str, str] = Field(default_factory=dict)
+    servers: List[Dict[str, str]] = Field(default_factory=list)
+    security_schemes: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+
+
+class DocumentationExtractor:
+    """Extract documentation from source code"""
+    
+    def __init__(self):
+        self.type_mappings = {
+            'str': 'string',
+            'int': 'integer',
+            'float': 'number',
+            'bool': 'boolean',
+            'list': 'array',
+            'dict': 'object',
+            'datetime': 'string',
+            'date': 'string',
+            'UUID': 'string',
+            'Any': 'object'
+        }
+    
+    def extract_from_fastapi(self, app_path: Path) -> List[APIEndpoint]:
+        """Extract endpoints from FastAPI application"""
+        endpoints = []
+        
+        try:
+            # Parse the FastAPI app module
+            with open(app_path, 'r') as f:
+                tree = ast.parse(f.read())
+            
+            # Find route decorators
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    for decorator in node.decorator_list:
+                        if self._is_route_decorator(decorator):
+                            endpoint = self._extract_fastapi_endpoint(node, decorator)
+                            if endpoint:
+                                endpoints.append(endpoint)
+        
+        except Exception as e:
+            logger.error(f"Error extracting FastAPI endpoints: {e}")
+        
+        return endpoints
+    
+    def extract_from_flask(self, app_path: Path) -> List[APIEndpoint]:
+        """Extract endpoints from Flask application"""
+        endpoints = []
+        
+        try:
+            with open(app_path, 'r') as f:
+                tree = ast.parse(f.read())
+            
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    for decorator in node.decorator_list:
+                        if self._is_flask_route(decorator):
+                            endpoint = self._extract_flask_endpoint(node, decorator)
+                            if endpoint:
+                                endpoints.append(endpoint)
+        
+        except Exception as e:
+            logger.error(f"Error extracting Flask endpoints: {e}")
+        
+        return endpoints
+    
+    def extract_from_django(self, urls_path: Path) -> List[APIEndpoint]:
+        """Extract endpoints from Django REST Framework"""
+        endpoints = []
+        
+        try:
+            # Parse Django URL patterns
+            with open(urls_path, 'r') as f:
+                content = f.read()
+            
+            # Extract URL patterns
+            pattern = r"path\('([^']+)',\s*(\w+)\.as_view\(\)"
+            matches = re.findall(pattern, content)
+            
+            for path, view_name in matches:
+                endpoint = APIEndpoint(
+                    path=f"/{path}",
+                    method="GET",  # Default, would need view inspection
+                    summary=f"{view_name} endpoint",
+                    description=f"Django REST endpoint: {view_name}"
+                )
+                endpoints.append(endpoint)
+        
+        except Exception as e:
+            logger.error(f"Error extracting Django endpoints: {e}")
+        
+        return endpoints
+    
+    def _is_route_decorator(self, decorator: ast.AST) -> bool:
+        """Check if decorator is a FastAPI route decorator"""
+        if isinstance(decorator, ast.Attribute):
+            return decorator.attr in ['get', 'post', 'put', 'delete', 'patch', 'options', 'head']
+        elif isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute):
+            return decorator.func.attr in ['get', 'post', 'put', 'delete', 'patch', 'options', 'head']
+        return False
+    
+    def _is_flask_route(self, decorator: ast.AST) -> bool:
+        """Check if decorator is a Flask route decorator"""
+        if isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute):
+            return decorator.func.attr == 'route'
+        return False
+    
+    def _extract_fastapi_endpoint(self, func: Union[ast.FunctionDef, ast.AsyncFunctionDef], decorator: ast.AST) -> Optional[APIEndpoint]:
+        """Extract endpoint details from FastAPI function"""
+        try:
+            # Get HTTP method
+            method = None
+            if isinstance(decorator, ast.Attribute):
+                method = decorator.attr
+            elif isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute):
+                method = decorator.func.attr
+            
+            if not method:
+                return None
+            
+            # Get path
+            path = "/"
+            if isinstance(decorator, ast.Call) and decorator.args:
+                arg = decorator.args[0]
+                if isinstance(arg, ast.Str):
+                    path = arg.s
+                elif isinstance(arg, ast.Constant):
+                    path = arg.value
+            elif isinstance(decorator, ast.Attribute):
+                # For decorators like @app.get without parentheses, default path is "/"
+                path = "/"
+            
+            # Get function docstring
+            docstring = ast.get_docstring(func) or ""
+            lines = docstring.strip().split('\n')
+            summary = lines[0] if lines else func.name.replace('_', ' ').title()
+            description = '\n'.join(lines[1:]).strip() if len(lines) > 1 else ""
+            
+            # Extract parameters from function arguments
+            parameters = self._extract_parameters(func)
+            
+            # Add path parameters
+            path_params = re.findall(r'{(\w+)}', path)
+            for param_name in path_params:
+                # Check if already in parameters
+                if not any(p['name'] == param_name for p in parameters):
+                    parameters.append({
+                        "name": param_name,
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "string"}
+                    })
+            
+            # Extract response model
+            responses = self._extract_responses(func)
+            
+            # Extract tags from path
+            tags = []
+            if path != "/" and "/" in path:
+                parts = path.strip("/").split("/")
+                if parts:
+                    tags.append(parts[0].title())
+            
+            return APIEndpoint(
+                path=path,
+                method=method.upper(),
+                summary=summary,
+                description=description,
+                parameters=parameters,
+                responses=responses,
+                tags=tags
+            )
+        
+        except Exception as e:
+            logger.error(f"Error extracting FastAPI endpoint: {e}")
+            return None
+    
+    def _extract_flask_endpoint(self, func: Union[ast.FunctionDef, ast.AsyncFunctionDef], decorator: ast.AST) -> Optional[APIEndpoint]:
+        """Extract endpoint details from Flask function"""
+        try:
+            # Get path from decorator
+            path = "/"
+            methods = ["GET"]
+            
+            for keyword in decorator.keywords:
+                if keyword.arg == 'methods' and isinstance(keyword.value, ast.List):
+                    methods = [elt.s if isinstance(elt, ast.Str) else elt.value 
+                              for elt in keyword.value.elts]
+            
+            if decorator.args and isinstance(decorator.args[0], (ast.Str, ast.Constant)):
+                path = decorator.args[0].s if isinstance(decorator.args[0], ast.Str) else decorator.args[0].value
+            
+            # Get docstring
+            docstring = ast.get_docstring(func) or ""
+            summary = docstring.split('\n')[0] if docstring else func.name.replace('_', ' ').title()
+            
+            endpoints = []
+            for method in methods:
+                # Extract tags from path
+                tags = []
+                if path != "/" and "/" in path:
+                    parts = path.strip("/").split("/")
+                    if parts:
+                        tags.append(parts[0].title())
+                
+                endpoints.append(APIEndpoint(
+                    path=path,
+                    method=method,
+                    summary=summary,
+                    description=docstring,
+                    tags=tags
+                ))
+            
+            return endpoints[0] if len(endpoints) == 1 else None
+        
+        except Exception as e:
+            logger.error(f"Error extracting Flask endpoint: {e}")
+            return None
+    
+    def _extract_parameters(self, func: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> List[Dict[str, Any]]:
+        """Extract function parameters"""
+        parameters = []
+        
+        # Get the starting index (skip 'self' for methods)
+        start_idx = 0
+        if func.args.args:
+            first_arg = func.args.args[0]
+            if first_arg.arg in ['self', 'cls']:
+                start_idx = 1
+        
+        # Calculate which args have defaults
+        num_args = len(func.args.args) - start_idx
+        num_defaults = len(func.args.defaults)
+        required_count = num_args - num_defaults
+        
+        for i, arg in enumerate(func.args.args[start_idx:]):
+            # Skip special parameters that FastAPI handles
+            if arg.arg in ['request', 'response', 'db']:
+                continue
+                
+            param = {
+                "name": arg.arg,
+                "in": "query",
+                "required": i < required_count,
+                "schema": {"type": "string"}  # Default type
+            }
+            
+            # Try to extract type from annotation
+            if arg.annotation:
+                param["schema"]["type"] = self._get_openapi_type(arg.annotation)
+            
+            parameters.append(param)
+        
+        return parameters
+    
+    def _extract_responses(self, func: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> Dict[str, Dict[str, Any]]:
+        """Extract response information"""
+        responses = {
+            "200": {
+                "description": "Successful response",
+                "content": {
+                    "application/json": {
+                        "schema": {"type": "object"}
+                    }
+                }
+            }
+        }
+        
+        # Try to extract return type annotation
+        if func.returns:
+            response_type = self._get_openapi_type(func.returns)
+            responses["200"]["content"]["application/json"]["schema"]["type"] = response_type
+        
+        return responses
+    
+    def _get_openapi_type(self, annotation: ast.AST) -> str:
+        """Convert Python type annotation to OpenAPI type"""
+        if isinstance(annotation, ast.Name):
+            return self.type_mappings.get(annotation.id, "object")
+        elif isinstance(annotation, ast.Subscript):
+            if isinstance(annotation.value, ast.Name) and annotation.value.id == "List":
+                return "array"
+            elif isinstance(annotation.value, ast.Name) and annotation.value.id == "Dict":
+                return "object"
+        return "object"
+
+
+class OpenAPIGenerator:
+    """Generate OpenAPI/Swagger specifications"""
+    
+    def __init__(self, config: DocumentationConfig):
+        self.config = config
+    
+    def generate_spec(self, endpoints: List[APIEndpoint]) -> Dict[str, Any]:
+        """Generate complete OpenAPI specification"""
+        spec = {
+            "openapi": "3.0.3",
+            "info": {
+                "title": self.config.title,
+                "version": self.config.version,
+                "description": self.config.description
+            },
+            "servers": self.config.servers or [{"url": self.config.base_url}],
+            "paths": {},
+            "components": {
+                "schemas": {},
+                "securitySchemes": self.config.security_schemes
+            },
+            "tags": []
+        }
+        
+        # Add contact and license if provided
+        if self.config.contact:
+            spec["info"]["contact"] = self.config.contact
+        if self.config.license:
+            spec["info"]["license"] = self.config.license
+        
+        # Group endpoints by path
+        paths = {}
+        tags = set()
+        
+        for endpoint in endpoints:
+            if endpoint.path not in paths:
+                paths[endpoint.path] = {}
+            
+            paths[endpoint.path][endpoint.method.lower()] = {
+                "summary": endpoint.summary,
+                "description": endpoint.description,
+                "parameters": endpoint.parameters,
+                "responses": endpoint.responses,
+                "tags": endpoint.tags
+            }
+            
+            if endpoint.request_body:
+                paths[endpoint.path][endpoint.method.lower()]["requestBody"] = endpoint.request_body
+            
+            if endpoint.security:
+                paths[endpoint.path][endpoint.method.lower()]["security"] = endpoint.security
+            
+            tags.update(endpoint.tags)
+        
+        spec["paths"] = paths
+        spec["tags"] = [{"name": tag} for tag in sorted(tags)]
+        
+        return spec
+    
+    def validate_spec(self, spec: Dict[str, Any]) -> Tuple[bool, List[str]]:
+        """Validate OpenAPI specification"""
+        errors = []
+        
+        # Basic validation
+        if "openapi" not in spec:
+            errors.append("Missing 'openapi' field")
+        if "info" not in spec:
+            errors.append("Missing 'info' field")
+        if "paths" not in spec:
+            errors.append("Missing 'paths' field")
+        
+        # Validate paths
+        for path, methods in spec.get("paths", {}).items():
+            if not path.startswith("/"):
+                errors.append(f"Path '{path}' must start with '/'")
+            
+            for method, operation in methods.items():
+                if method not in ["get", "post", "put", "delete", "patch", "options", "head"]:
+                    errors.append(f"Invalid HTTP method '{method}' for path '{path}'")
+                
+                if "responses" not in operation:
+                    errors.append(f"Missing 'responses' for {method.upper()} {path}")
+        
+        return len(errors) == 0, errors
+    
+    def export_postman_collection(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert OpenAPI spec to Postman collection"""
+        collection = {
+            "info": {
+                "name": spec["info"]["title"],
+                "description": spec["info"].get("description", ""),
+                "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+            },
+            "item": []
+        }
+        
+        # Convert paths to Postman requests
+        for path, methods in spec.get("paths", {}).items():
+            folder = {
+                "name": path,
+                "item": []
+            }
+            
+            for method, operation in methods.items():
+                request = {
+                    "name": operation.get("summary", f"{method.upper()} {path}"),
+                    "request": {
+                        "method": method.upper(),
+                        "url": {
+                            "raw": f"{self.config.base_url}{path}",
+                            "host": [self.config.base_url.replace("http://", "").replace("https://", "")],
+                            "path": path.strip("/").split("/")
+                        },
+                        "description": operation.get("description", "")
+                    }
+                }
+                
+                # Add parameters
+                if operation.get("parameters"):
+                    request["request"]["url"]["query"] = []
+                    for param in operation["parameters"]:
+                        if param.get("in") == "query":
+                            request["request"]["url"]["query"].append({
+                                "key": param["name"],
+                                "value": "",
+                                "description": param.get("description", "")
+                            })
+                
+                folder["item"].append(request)
+            
+            collection["item"].append(folder)
+        
+        return collection
+
+
+class ExampleGenerator:
+    """Generate code examples for API endpoints"""
+    
+    def __init__(self, base_url: str = "http://localhost:8000"):
+        self.base_url = base_url
+        self.templates = {
+            "python": self._python_template,
+            "javascript": self._javascript_template,
+            "curl": self._curl_template
+        }
+    
+    def generate_examples(self, endpoint: APIEndpoint, languages: List[str] = None) -> Dict[str, str]:
+        """Generate code examples for multiple languages"""
+        if languages is None:
+            languages = ["python", "javascript", "curl"]
+        
+        examples = {}
+        for lang in languages:
+            if lang in self.templates:
+                examples[lang] = self.templates[lang](endpoint)
+        
+        return examples
+    
+    def _python_template(self, endpoint: APIEndpoint) -> str:
+        """Generate Python code example"""
+        template = """import requests
+
+url = "{{ base_url }}{{ path }}"
+{% if params %}
+params = {
+{% for param in params %}
+    "{{ param.name }}": "value"{% if not loop.last %},{% endif %}
+{% endfor %}
+}
+{% endif %}
+{% if headers %}
+headers = {
+{% for key, value in headers.items() %}
+    "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+}
+{% endif %}
+{% if body %}
+data = {
+    # Add request body here
+}
+{% endif %}
+
+response = requests.{{ method }}(
+    url{% if params %},
+    params=params{% endif %}{% if headers %},
+    headers=headers{% endif %}{% if body %},
+    json=data{% endif %}
+)
+
+print(response.json())"""
+        
+        t = Template(template)
+        return t.render(
+            base_url=self.base_url,
+            path=endpoint.path,
+            method=endpoint.method.lower(),
+            params=[p for p in endpoint.parameters if p.get("in") == "query"],
+            headers={"Authorization": "Bearer <token>"} if endpoint.security else None,
+            body=endpoint.request_body is not None
+        )
+    
+    def _javascript_template(self, endpoint: APIEndpoint) -> str:
+        """Generate JavaScript code example"""
+        template = """const url = '{{ base_url }}{{ path }}';
+{% if params %}
+const params = new URLSearchParams({
+{% for param in params %}
+    {{ param.name }}: 'value'{% if not loop.last %},{% endif %}
+{% endfor %}
+});
+{% endif %}
+{% if headers %}
+const headers = {
+{% for key, value in headers.items() %}
+    '{{ key }}': '{{ value }}'{% if not loop.last %},{% endif %}
+{% endfor %}
+};
+{% endif %}
+{% if body %}
+const data = {
+    // Add request body here
+};
+{% endif %}
+
+fetch({% if params %}url + '?' + params{% else %}url{% endif %}, {
+    method: '{{ method }}',
+{% if headers %}
+    headers: headers,
+{% endif %}
+{% if body %}
+    body: JSON.stringify(data),
+{% endif %}
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));"""
+        
+        t = Template(template)
+        return t.render(
+            base_url=self.base_url,
+            path=endpoint.path,
+            method=endpoint.method,
+            params=[p for p in endpoint.parameters if p.get("in") == "query"],
+            headers={"Authorization": "Bearer <token>", "Content-Type": "application/json"} 
+                    if endpoint.security else {"Content-Type": "application/json"} if endpoint.request_body else None,
+            body=endpoint.request_body is not None
+        )
+    
+    def _curl_template(self, endpoint: APIEndpoint) -> str:
+        """Generate cURL command example"""
+        template = """curl -X {{ method }} "{{ base_url }}{{ path }}{% if params %}?{% for param in params %}{{ param.name }}=value{% if not loop.last %}&{% endif %}{% endfor %}{% endif %}" \\
+{% for key, value in headers.items() %}
+  -H "{{ key }}: {{ value }}" \\
+{% endfor %}
+{% if body %}
+  -d '{
+    # Add request body here
+  }'
+{% endif %}"""
+        
+        headers = {}
+        if endpoint.security:
+            headers["Authorization"] = "Bearer <token>"
+        if endpoint.request_body:
+            headers["Content-Type"] = "application/json"
+        
+        t = Template(template)
+        return t.render(
+            base_url=self.base_url,
+            path=endpoint.path,
+            method=endpoint.method,
+            params=[p for p in endpoint.parameters if p.get("in") == "query"],
+            headers=headers,
+            body=endpoint.request_body is not None
+        )
+
+
+class DocumentationRenderer:
+    """Render documentation in various formats"""
+    
+    def __init__(self):
+        self.markdown_template = """# {{ title }}
+
+{{ description }}
+
+**Version:** {{ version }}  
+**Base URL:** {{ base_url }}
+
+## Table of Contents
+
+{% for tag in tags %}
+- [{{ tag }}](#{{ tag | lower | replace(' ', '-') }})
+{% endfor %}
+
+## Authentication
+
+{{ auth_description }}
+
+## Endpoints
+
+{% for tag in tags %}
+### {{ tag }}
+
+{% for endpoint in endpoints_by_tag[tag] %}
+#### {{ endpoint.method }} {{ endpoint.path }}
+
+{{ endpoint.summary }}
+
+{{ endpoint.description }}
+
+**Parameters:**
+
+{% if endpoint.parameters %}
+| Name | Type | In | Required | Description |
+|------|------|-----|----------|-------------|
+{% for param in endpoint.parameters %}
+| {{ param.name }} | {{ param.schema.type }} | {{ param.in }} | {{ param.required }} | {{ param.description | default('') }} |
+{% endfor %}
+{% else %}
+No parameters
+{% endif %}
+
+**Responses:**
+
+{% for code, response in endpoint.responses.items() %}
+- **{{ code }}**: {{ response.description }}
+{% endfor %}
+
+**Example Request:**
+
+```python
+{{ examples[endpoint.path + endpoint.method]['python'] }}
+```
+
+---
+
+{% endfor %}
+{% endfor %}
+
+## Models
+
+{{ models_section }}
+
+## Error Codes
+
+{{ error_codes_section }}
+"""
+    
+    def render_markdown(self, spec: Dict[str, Any], endpoints: List[APIEndpoint], 
+                       examples: Dict[str, Dict[str, str]]) -> str:
+        """Render documentation as Markdown"""
+        # Group endpoints by tag
+        endpoints_by_tag = {}
+        for endpoint in endpoints:
+            for tag in endpoint.tags or ["General"]:
+                if tag not in endpoints_by_tag:
+                    endpoints_by_tag[tag] = []
+                endpoints_by_tag[tag].append(endpoint)
+        
+        # Prepare examples lookup
+        examples_lookup = {}
+        for endpoint in endpoints:
+            key = endpoint.path + endpoint.method
+            if key in examples:
+                examples_lookup[key] = examples[key]
+        
+        t = Template(self.markdown_template)
+        return t.render(
+            title=spec["info"]["title"],
+            description=spec["info"].get("description", ""),
+            version=spec["info"]["version"],
+            base_url=spec["servers"][0]["url"] if spec.get("servers") else "",
+            tags=sorted(endpoints_by_tag.keys()),
+            endpoints_by_tag=endpoints_by_tag,
+            examples=examples_lookup,
+            auth_description=self._render_auth_section(spec),
+            models_section=self._render_models_section(spec),
+            error_codes_section=self._render_error_codes()
+        )
+    
+    def render_html(self, markdown_content: str) -> str:
+        """Convert Markdown to HTML with styling"""
+        html_template = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            margin-top: 40px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        h4 {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .method-get { background-color: #61affe; }
+        .method-post { background-color: #49cc90; }
+        .method-put { background-color: #fca130; }
+        .method-delete { background-color: #f93e3e; }
+        .method-patch { background-color: #50e3c2; }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li:before {
+            content: "▸ ";
+            color: #3498db;
+            font-weight: bold;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    {{ content }}
+</body>
+</html>"""
+        
+        # Convert markdown to HTML (simplified version)
+        import markdown
+        html_content = markdown.markdown(markdown_content, extensions=['tables', 'fenced_code'])
+        
+        # Add method styling
+        html_content = re.sub(
+            r'<h4>(\w+)\s+(/[^<]+)</h4>',
+            lambda m: f'<h4><span class="method method-{m.group(1).lower()}">{m.group(1)}</span>{m.group(2)}</h4>',
+            html_content
+        )
+        
+        t = Template(html_template)
+        return t.render(content=html_content)
+    
+    def _render_auth_section(self, spec: Dict[str, Any]) -> str:
+        """Render authentication section"""
+        if not spec.get("components", {}).get("securitySchemes"):
+            return "No authentication required."
+        
+        auth_text = []
+        for name, scheme in spec["components"]["securitySchemes"].items():
+            if scheme.get("type") == "http" and scheme.get("scheme") == "bearer":
+                auth_text.append(f"**{name}**: Bearer token authentication. Include `Authorization: Bearer <token>` header.")
+            elif scheme.get("type") == "apiKey":
+                location = scheme.get("in", "header")
+                auth_text.append(f"**{name}**: API key authentication. Include `{scheme.get('name')}` in {location}.")
+            elif scheme.get("type") == "oauth2":
+                auth_text.append(f"**{name}**: OAuth2 authentication. See OAuth2 flow documentation.")
+        
+        return "\n\n".join(auth_text) if auth_text else "No authentication required."
+    
+    def _render_models_section(self, spec: Dict[str, Any]) -> str:
+        """Render models/schemas section"""
+        schemas = spec.get("components", {}).get("schemas", {})
+        if not schemas:
+            return "No models defined."
+        
+        models_text = []
+        for name, schema in schemas.items():
+            model_text = f"**{name}**\n\n"
+            if schema.get("description"):
+                model_text += f"{schema['description']}\n\n"
+            
+            if schema.get("properties"):
+                model_text += "| Property | Type | Required | Description |\n"
+                model_text += "|----------|------|----------|-------------|\n"
+                
+                required = schema.get("required", [])
+                for prop_name, prop_schema in schema["properties"].items():
+                    prop_type = prop_schema.get("type", "any")
+                    prop_desc = prop_schema.get("description", "")
+                    is_required = "Yes" if prop_name in required else "No"
+                    model_text += f"| {prop_name} | {prop_type} | {is_required} | {prop_desc} |\n"
+            
+            models_text.append(model_text)
+        
+        return "\n\n".join(models_text)
+    
+    def _render_error_codes(self) -> str:
+        """Render common error codes section"""
+        return """| Code | Description |
+|------|-------------|
+| 400 | Bad Request - Invalid parameters |
+| 401 | Unauthorized - Authentication required |
+| 403 | Forbidden - Access denied |
+| 404 | Not Found - Resource not found |
+| 422 | Unprocessable Entity - Validation error |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error - Server error |
+| 503 | Service Unavailable - Service temporarily unavailable |"""
+
+
+class APIDocGeneratorInteraction:
+    """Main interaction class for API documentation generation"""
+    
+    def __init__(self, config: Optional[DocumentationConfig] = None):
+        self.config = config or DocumentationConfig()
+        self.extractor = DocumentationExtractor()
+        self.openapi_generator = OpenAPIGenerator(self.config)
+        self.example_generator = ExampleGenerator(self.config.base_url)
+        self.renderer = DocumentationRenderer()
+    
+    def generate_documentation(self, 
+                             source_path: Union[str, Path],
+                             framework: str = "fastapi",
+                             output_formats: List[str] = None) -> Dict[str, Any]:
+        """Generate complete API documentation"""
+        logger.info(f"Generating documentation for {framework} from {source_path}")
+        
+        source_path = Path(source_path)
+        if output_formats is None:
+            output_formats = ["openapi", "markdown", "html"]
+        
+        # Extract endpoints based on framework
+        endpoints = []
+        if framework == "fastapi":
+            endpoints = self.extractor.extract_from_fastapi(source_path)
+        elif framework == "flask":
+            endpoints = self.extractor.extract_from_flask(source_path)
+        elif framework == "django":
+            endpoints = self.extractor.extract_from_django(source_path)
+        else:
+            raise ValueError(f"Unsupported framework: {framework}")
+        
+        logger.info(f"Extracted {len(endpoints)} endpoints")
+        
+        # Generate OpenAPI spec
+        openapi_spec = self.openapi_generator.generate_spec(endpoints)
+        
+        # Validate spec
+        is_valid, errors = self.openapi_generator.validate_spec(openapi_spec)
+        if not is_valid:
+            logger.warning(f"OpenAPI spec validation errors: {errors}")
+        
+        # Generate examples
+        examples = {}
+        for endpoint in endpoints:
+            key = endpoint.path + endpoint.method
+            examples[key] = self.example_generator.generate_examples(endpoint)
+        
+        # Generate outputs
+        result = {
+            "endpoints": endpoints,
+            "validation": {"valid": is_valid, "errors": errors}
+        }
+        
+        if "openapi" in output_formats:
+            result["openapi"] = openapi_spec
+        
+        if "markdown" in output_formats:
+            result["markdown"] = self.renderer.render_markdown(openapi_spec, endpoints, examples)
+        
+        if "html" in output_formats:
+            result["html"] = self.renderer.render_html(result.get("markdown", ""))
+        
+        if "postman" in output_formats:
+            result["postman"] = self.openapi_generator.export_postman_collection(openapi_spec)
+        
+        return result
+    
+    def update_documentation(self, 
+                           source_path: Union[str, Path],
+                           existing_spec: Dict[str, Any],
+                           framework: str = "fastapi") -> Dict[str, Any]:
+        """Update existing documentation with changes"""
+        logger.info("Updating existing documentation")
+        
+        # Generate new documentation
+        new_docs = self.generate_documentation(source_path, framework)
+        
+        # Compare and identify changes
+        changes = self._detect_changes(existing_spec, new_docs["openapi"])
+        
+        # Merge changes
+        updated_spec = self._merge_specs(existing_spec, new_docs["openapi"], changes)
+        
+        return {
+            "openapi": updated_spec,
+            "changes": changes,
+            "change_count": len(changes)
+        }
+    
+    def _detect_changes(self, old_spec: Dict[str, Any], new_spec: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Detect changes between specifications"""
+        changes = []
+        
+        # Check for new endpoints
+        old_paths = set()
+        new_paths = set()
+        
+        for path, methods in old_spec.get("paths", {}).items():
+            for method in methods:
+                old_paths.add(f"{method.upper()} {path}")
+        
+        for path, methods in new_spec.get("paths", {}).items():
+            for method in methods:
+                new_paths.add(f"{method.upper()} {path}")
+        
+        # New endpoints
+        for endpoint in new_paths - old_paths:
+            changes.append({
+                "type": "added",
+                "endpoint": endpoint,
+                "description": "New endpoint added"
+            })
+        
+        # Removed endpoints
+        for endpoint in old_paths - new_paths:
+            changes.append({
+                "type": "removed",
+                "endpoint": endpoint,
+                "description": "Endpoint removed"
+            })
+        
+        # Modified endpoints
+        for endpoint in old_paths & new_paths:
+            method, path = endpoint.split(" ", 1)
+            old_op = old_spec["paths"][path][method.lower()]
+            new_op = new_spec["paths"][path][method.lower()]
+            
+            if old_op != new_op:
+                changes.append({
+                    "type": "modified",
+                    "endpoint": endpoint,
+                    "description": "Endpoint modified"
+                })
+        
+        return changes
+    
+    def _merge_specs(self, old_spec: Dict[str, Any], new_spec: Dict[str, Any], 
+                     changes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Merge specifications preserving custom documentation"""
+        merged = old_spec.copy()
+        
+        # Update version
+        version_parts = merged["info"]["version"].split(".")
+        version_parts[-1] = str(int(version_parts[-1]) + 1)
+        merged["info"]["version"] = ".".join(version_parts)
+        
+        # Apply changes
+        for change in changes:
+            if change["type"] == "added":
+                method, path = change["endpoint"].split(" ", 1)
+                if path not in merged["paths"]:
+                    merged["paths"][path] = {}
+                merged["paths"][path][method.lower()] = new_spec["paths"][path][method.lower()]
+            
+            elif change["type"] == "removed":
+                method, path = change["endpoint"].split(" ", 1)
+                if path in merged["paths"] and method.lower() in merged["paths"][path]:
+                    del merged["paths"][path][method.lower()]
+                    if not merged["paths"][path]:
+                        del merged["paths"][path]
+            
+            elif change["type"] == "modified":
+                method, path = change["endpoint"].split(" ", 1)
+                # Preserve custom descriptions but update structure
+                old_op = merged["paths"][path][method.lower()]
+                new_op = new_spec["paths"][path][method.lower()]
+                
+                # Keep custom descriptions if they exist
+                if old_op.get("description") and len(old_op["description"]) > len(new_op.get("description", "")):
+                    new_op["description"] = old_op["description"]
+                
+                merged["paths"][path][method.lower()] = new_op
+        
+        return merged
+    
+    def generate_sdk_hints(self, openapi_spec: Dict[str, Any], language: str = "python") -> str:
+        """Generate SDK generation hints"""
+        sdk_hints = {
+            "python": {
+                "generator": "openapi-python-client",
+                "command": "openapi-python-client generate --path openapi.json",
+                "example": """# Generated SDK usage
+from my_api_client import Client
+from my_api_client.api.default import get_users
+
+client = Client(base_url="http://localhost:8000")
+users = get_users.sync(client=client)
+"""
+            },
+            "typescript": {
+                "generator": "openapi-typescript-codegen",
+                "command": "openapi --input openapi.json --output ./sdk --name MyApiClient",
+                "example": """// Generated SDK usage
+import { MyApiClient } from './sdk';
+
+const client = new MyApiClient({
+    BASE: 'http://localhost:8000'
+});
+
+const users = await client.default.getUsers();
+"""
+            },
+            "go": {
+                "generator": "oapi-codegen",
+                "command": "oapi-codegen -package api openapi.json > api.go",
+                "example": """// Generated SDK usage
+package main
+
+import "github.com/myapi/client"
+
+func main() {
+    client := client.NewClient("http://localhost:8000")
+    users, _ := client.GetUsers()
+}
+"""
+            }
+        }
+        
+        hints = sdk_hints.get(language, {})
+        if not hints:
+            return f"No SDK hints available for {language}"
+        
+        return f"""## SDK Generation for {language.title()}
+
+**Recommended Generator:** {hints['generator']}
+
+**Installation & Generation:**
+```bash
+{hints['command']}
+```
+
+**Usage Example:**
+```{language}
+{hints['example']}
+```
+"""
+
+
+# Validation
+if __name__ == "__main__":
+    # Test with sample FastAPI-style code
+    test_code = '''
+from fastapi import FastAPI, Query
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+
+@app.get("/users")
+async def get_users(limit: int = Query(10, description="Number of users to return")):
+    """Get list of users
+    
+    Returns a paginated list of users from the system.
+    """
+    return {"users": [], "total": 0}
+
+@app.post("/users")
+async def create_user(user: User):
+    """Create a new user"""
+    return {"id": 1, "name": user.name, "email": user.email}
+
+@app.get("/users/{user_id}")
+async def get_user(user_id: int):
+    """Get user by ID
+    
+    Retrieves detailed information about a specific user.
+    """
+    return {"id": user_id, "name": "Test User", "email": "test@example.com"}
+'''
+    
+    # Save test code
+    test_path = Path("/tmp/test_api.py")
+    test_path.write_text(test_code)
+    
+    # Test documentation generation
+    config = DocumentationConfig(
+        title="Test API",
+        version="1.0.0",
+        description="A test API for validation"
+    )
+    
+    generator = APIDocGeneratorInteraction(config)
+    
+    try:
+        # Generate documentation
+        docs = generator.generate_documentation(
+            test_path,
+            framework="fastapi",
+            output_formats=["openapi", "markdown", "html", "postman"]
+        )
+        
+        # Validate results
+        assert "openapi" in docs, "OpenAPI spec not generated"
+        assert docs["openapi"]["info"]["title"] == "Test API", "Wrong API title"
+        assert len(docs["endpoints"]) == 3, f"Expected 3 endpoints, got {len(docs['endpoints'])}"
+        
+        # Check endpoints
+        paths = [e.path for e in docs["endpoints"]]
+        assert "/users" in paths, "Missing /users endpoint"
+        assert "/users/{user_id}" in paths, "Missing /users/{user_id} endpoint"
+        
+        # Check validation
+        assert docs["validation"]["valid"], f"Validation failed: {docs['validation']['errors']}"
+        
+        # Check markdown generation
+        assert "markdown" in docs, "Markdown not generated"
+        assert "# Test API" in docs["markdown"], "Markdown missing title"
+        assert "GET /users" in docs["markdown"], "Markdown missing endpoint"
+        
+        # Check HTML generation
+        assert "html" in docs, "HTML not generated"
+        assert "<title>API Documentation</title>" in docs["html"], "HTML missing title"
+        
+        # Check Postman collection
+        assert "postman" in docs, "Postman collection not generated"
+        assert docs["postman"]["info"]["name"] == "Test API", "Wrong Postman collection name"
+        
+        # Test example generation
+        example_gen = ExampleGenerator()
+        examples = example_gen.generate_examples(docs["endpoints"][0])
+        assert "python" in examples, "Python example not generated"
+        assert "javascript" in examples, "JavaScript example not generated"
+        assert "curl" in examples, "cURL example not generated"
+        
+        # Test SDK hints
+        sdk_hints = generator.generate_sdk_hints(docs["openapi"], "python")
+        assert "openapi-python-client" in sdk_hints, "SDK hints missing generator"
+        
+        print("✅ API Documentation Generator validation passed")
+        print(f"📄 Generated documentation for {len(docs['endpoints'])} endpoints")
+        print(f"📋 Output formats: {list(docs.keys())}")
+        
+    except Exception as e:
+        logger.error(f"Validation failed: {e}")
+        raise
+    finally:
+        # Cleanup
+        if test_path.exists():
+            test_path.unlink()

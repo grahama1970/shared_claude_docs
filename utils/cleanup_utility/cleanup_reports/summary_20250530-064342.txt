@@ -1,0 +1,16 @@
+Enhanced Cleanup Summary v3 (Git-Safe) - 2025-05-30 06:43:49
+======================================================================
+Total: 11 | Success: 0 | Failed: 0 | Issues: 3 | Skipped: 8
+Total Fixes Applied: 0
+======================================================================
+sparta........................ issues......... 4 issues, 0 fixes
+marker........................ skipped........ 0 issues, 0 fixes
+arangodb...................... skipped........ 0 issues, 0 fixes
+youtube_transcripts........... issues......... 3 issues, 0 fixes
+claude_max_proxy.............. skipped........ 0 issues, 0 fixes
+arxiv-mcp-server.............. skipped........ 0 issues, 0 fixes
+claude-module-communicator.... skipped........ 0 issues, 0 fixes
+claude-test-reporter.......... skipped........ 0 issues, 0 fixes
+unsloth_wip................... issues......... 2 issues, 0 fixes
+marker-ground-truth........... skipped........ 0 issues, 0 fixes
+mcp-screenshot................ skipped........ 0 issues, 0 fixes

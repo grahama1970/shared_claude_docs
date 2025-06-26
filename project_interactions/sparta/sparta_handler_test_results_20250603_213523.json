@@ -1,0 +1,68 @@
+{
+  "test_run": {
+    "timestamp": "2025-06-03T21:35:23.729540",
+    "sparta_available": true,
+    "total_duration": 2.1947827339172363,
+    "summary": {
+      "total": 5,
+      "successful": 2,
+      "failed": 3
+    }
+  },
+  "results": [
+    {
+      "handler": "SPARTADownloadHandler",
+      "success": false,
+      "duration": 0.0001773834228515625,
+      "resources_downloaded": 0,
+      "failures": 0,
+      "error": null
+    },
+    {
+      "handler": "SPARTAMissionSearchHandler",
+      "success": false,
+      "duration": 0.22217035293579102,
+      "missions_found": 0,
+      "sample_mission": null,
+      "error": null
+    },
+    {
+      "handler": "SPARTACVESearchHandler",
+      "success": true,
+      "duration": 0.5872223377227783,
+      "vulnerabilities_found": 5,
+      "severity_distribution": {
+        "UNKNOWN": 5
+      },
+      "sample_cve": {
+        "id": "CVE-2015-2875",
+        "description": "Absolute path traversal vulnerability on Seagate GoFlex Satellite, Seagate Wireless Mobile Storage, Seagate Wireless Plus Mobile Storage, and LaCie FUEL devices with firmware before 3.4.1.105 allows remote attackers to read arbitrary files via a full pathname in a download request during a Wi-Fi session.",
+        "published_date": "2015-12-31T05:59:03.720",
+        "last_modified": "2025-04-12T10:46:40.837",
+        "cvss": {},
+        "references": [
+          "https://www.kb.cert.org/vuls/id/903500",
+          "https://www.kb.cert.org/vuls/id/GWAN-9ZGTUH",
+          "https://www.kb.cert.org/vuls/id/GWAN-A26L3F",
+          "https://www.kb.cert.org/vuls/id/903500",
+          "https://www.kb.cert.org/vuls/id/GWAN-9ZGTUH"
+        ]
+      },
+      "error": null
+    },
+    {
+      "handler": "test_mitre_handler",
+      "success": false,
+      "error": "MitreDataManager.__init__() missing 1 required positional argument: 'cache_dir'"
+    },
+    {
+      "handler": "SPARTAModuleHandler",
+      "success": true,
+      "duration": 1.3847761154174805,
+      "action": "search_space_missions",
+      "module_response": true,
+      "data_received": true,
+      "error": null
+    }
+  ]
+}

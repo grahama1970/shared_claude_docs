@@ -1,0 +1,8 @@
+[
+  {
+    "bug": "SPARTA module import failure",
+    "error": "No module named 'sparta'",
+    "severity": "CRITICAL",
+    "impact": "Cannot use SPARTA functionality"
+  }
+]

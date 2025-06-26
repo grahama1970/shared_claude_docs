@@ -1,0 +1,239 @@
+{
+  "project": "Granger Level 1",
+  "summary": {
+    "total": 5,
+    "passed": 4,
+    "failed": 1,
+    "success_rate": 80.0
+  },
+  "results": [
+    {
+      "interaction_name": "arxiv_to_marker_pipeline",
+      "level": "Two module pipeline",
+      "success": true,
+      "duration": 0.05491137504577637,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "module1_output": {
+            "success": true,
+            "papers": [
+              {
+                "id": "1234",
+                "title": "Paper about reinforcement learning"
+              }
+            ],
+            "pdf_path": "mock.pdf"
+          },
+          "module2_output": {
+            "success": true,
+            "content": "Extracted content from mock.pdf",
+            "metadata": {
+              "pages": 10,
+              "tables": 2
+            }
+          },
+          "pipeline_result": {
+            "success": true,
+            "content": "Extracted content from mock.pdf",
+            "metadata": {
+              "pages": 10,
+              "tables": 2
+            }
+          }
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:45.109469",
+      "metrics": {
+        "setup_time": 0.054903507232666016,
+        "teardown_time": 7.152557373046875e-07
+      }
+    },
+    {
+      "interaction_name": "marker_to_arangodb_pipeline",
+      "level": "Two module pipeline",
+      "success": true,
+      "duration": 0.1255629062652588,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "module1_output": {
+            "content": "Sample extracted content",
+            "metadata": {
+              "pages": 5,
+              "sections": [
+                "intro",
+                "methods",
+                "results"
+              ]
+            },
+            "entities": [
+              "quantum",
+              "computing",
+              "algorithm"
+            ]
+          },
+          "module2_output": {
+            "success": true,
+            "document_key": "mock_123",
+            "relationships_created": 3
+          },
+          "pipeline_result": {
+            "success": true,
+            "document_key": "mock_123",
+            "relationships_created": 3
+          }
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:45.235055",
+      "metrics": {
+        "setup_time": 0.12555217742919922,
+        "teardown_time": 7.152557373046875e-07
+      }
+    },
+    {
+      "interaction_name": "youtube_to_sparta_pipeline",
+      "level": "Two module pipeline",
+      "success": true,
+      "duration": 0.0001895427703857422,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "module1_output": {
+            "transcript": "This video discusses CVE-2024-0001 vulnerability in quantum systems",
+            "metadata": {
+              "duration": 600,
+              "author": "SecurityExpert"
+            }
+          },
+          "module2_output": {
+            "vulnerabilities": [
+              "CVE-2024-0001"
+            ],
+            "severity": "HIGH"
+          },
+          "pipeline_result": {
+            "vulnerabilities": [
+              "CVE-2024-0001"
+            ],
+            "severity": "HIGH"
+          }
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:45.235260",
+      "metrics": {
+        "setup_time": 0.00018167495727539062,
+        "teardown_time": 2.384185791015625e-07
+      }
+    },
+    {
+      "interaction_name": "optimized_pipeline",
+      "level": "Two module pipeline",
+      "success": false,
+      "duration": 8.106231689453125e-06,
+      "input_data": {},
+      "output_data": {},
+      "error": "'OptimizedPipelineInteraction' object has no attribute 'batch_size'",
+      "timestamp": "2025-06-07T19:57:45.235278",
+      "metrics": {
+        "setup_time": 2.86102294921875e-06,
+        "teardown_time": 4.76837158203125e-07
+      }
+    },
+    {
+      "interaction_name": "adaptive_pipeline",
+      "level": "Two module pipeline",
+      "success": true,
+      "duration": 1.0728836059570312e-05,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "module1_output": {
+            "pipeline": "arxiv->arangodb",
+            "modules": [
+              "arxiv",
+              "arangodb"
+            ],
+            "input_data": {}
+          },
+          "module2_output": {
+            "pipeline": "arxiv->arangodb",
+            "stages": [
+              {
+                "module": "arxiv",
+                "input": {},
+                "output": {
+                  "papers": [
+                    "paper1",
+                    "paper2"
+                  ]
+                },
+                "success": true
+              },
+              {
+                "module": "arangodb",
+                "input": {
+                  "papers": [
+                    "paper1",
+                    "paper2"
+                  ]
+                },
+                "output": {
+                  "stored": true,
+                  "key": "doc_123"
+                },
+                "success": true
+              }
+            ]
+          },
+          "pipeline_result": {
+            "pipeline": "arxiv->arangodb",
+            "stages": [
+              {
+                "module": "arxiv",
+                "input": {},
+                "output": {
+                  "papers": [
+                    "paper1",
+                    "paper2"
+                  ]
+                },
+                "success": true
+              },
+              {
+                "module": "arangodb",
+                "input": {
+                  "papers": [
+                    "paper1",
+                    "paper2"
+                  ]
+                },
+                "output": {
+                  "stored": true,
+                  "key": "doc_123"
+                },
+                "success": true
+              }
+            ]
+          }
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:45.235302",
+      "metrics": {
+        "setup_time": 2.1457672119140625e-06,
+        "teardown_time": 2.384185791015625e-07
+      }
+    }
+  ],
+  "by_level": {
+    "LEVEL_1": {
+      "total": 5,
+      "passed": 4,
+      "failed": 1
+    }
+  }
+}

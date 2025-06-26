@@ -1,0 +1,535 @@
+[Music]
+
+[Applause]
+
+Hi, welcome to another video. So, AI
+
+coders are something that everyone is
+
+using these days, whether it be Klein,
+
+Claude Code, Ader, or what I have been
+
+using lately, which is Open Code. Now,
+
+these tools are cool, but what if you
+
+could make a whole team of these AI
+
+coders that could accomplish tasks for
+
+you asynchronously and easily while
+
+being interactive and running all
+
+locally? Well, I thought I'd show you
+
+guys how if you want to create a team of
+
+multiple AI coder instances working on
+
+different tasks, you can use what I'm
+
+going to show you today. Now,
+
+technically, you can create a ton of AI
+
+terminal windows and just ask each one
+
+to get on a task, but that's not only
+
+tedious, it's also amazingly bad because
+
+if multiple AI coders are working on the
+
+same project, then one AI coder might
+
+overwrite another instance's code and it
+
+just won't work. Plus, giving one task
+
+manually to each one and navigating
+
+through them can become very
+
+challenging. But to accomplish this, I
+
+have a good workflow. So what I do is
+
+I've come up with a task claiming
+
+system. What I do is I have a task file
+
+that contains the tasks I want to be
+
+accomplished. Sometimes the tasks are
+
+dependent on each other. So I generally
+
+try to organize them based on a set of
+
+tasks and subtasks that can be
+
+accomplished simultaneously.
+
+Now with each task I have three fields.
+
+The branch name. If a branch already
+
+exists to be worked on, then there's the
+
+status of its current state. Since most
+
+of them will run
+
+simultaneously, we need to keep track of
+
+what's
+
+happening. So it will update the status
+
+as required like if it has been claimed
+
+or if it is in the status of
+
+intervention required or anything like
+
+that.
+
+I also have one more thing which is to
+
+ask it to store the name of the t-mu
+
+session. Now tmux is one of the major
+
+things we need in order to make multiple
+
+AI coders work. So before we come to the
+
+t-mux part let me talk you through git
+
+work trees. Now git work trees and
+
+branches are different things. Git work
+
+trees are basically just a physical copy
+
+of the whole repo or project that you
+
+have which means you can actually run
+
+them without switching branches and
+
+stuff. Although this is still governed
+
+by git meaning that once the feature is
+
+complete you can merge that work tree
+
+back and then get one repo back just
+
+like it was which is quite good to show
+
+it to you in action. You can see that
+
+here I have this project and I can just
+
+go ahead and run the get workree add
+
+command along with the B operator then
+
+the name of this tree or feature and
+
+then the place to keep the tree which
+
+will be just in the work
+
+directory/feature name then in a bit it
+
+will do that and you can now see here
+
+that it has basically just copied the
+
+whole repo and this can be run and
+
+everything we can merge these back to
+
+the main thing and I'll show that
+
+towards the end. Plus, you don't need to
+
+do these things manually as it will all
+
+get automated in the next steps. But
+
+this is something you can take a look at
+
+for a better understanding of how things
+
+are working under the
+
+hood. Now, apart from git work trees,
+
+we'll also be using another thing which
+
+is called
+
+tmux. Now, what is that? Well, tmox is
+
+literally an abbreviation for terminal
+
+multiplexer. It basically allows you to
+
+create multiple sessions of terminal
+
+running in the background which you can
+
+attach to anytime and see what's going
+
+on in there or run some long running
+
+commands and then come back and you can
+
+have multiple such
+
+sessions. Let me just show you how it
+
+works so you can understand how it
+
+works. But before we do that, let me
+
+tell you about today's sponsor, Surf
+
+Shark. Are you tired of your online
+
+activity being tracked or feeling unsafe
+
+on public Wi-Fi? Surf Shark's VPN is
+
+here to help. Surf Shark encrypts your
+
+internet connection, shielding your
+
+personal data, ensuring your browsing
+
+stays private, especially on unsecured
+
+networks. It also lets you bypass
+
+annoying geo restrictions, giving you
+
+access to a wider range of content from
+
+around the globe. They are even offering
+
+extra 4 months for free deal on their
+
+VPN. If you use my coupon code king or
+
+click the link in the description, you
+
+can use Surf Shark to unblock multiple
+
+AI models or features that are not
+
+available in some countries due to geo
+
+restriction. But with Surf Shark, you
+
+can say goodbye to not available in your
+
+region part and use the features all you
+
+want. The best part, one Surf Shark
+
+account supports unlimited devices. And
+
+there's also cross-platform support for
+
+Android, iOS, Mac, Windows, Linux, all
+
+covered. Plus, they offer over 3,200
+
+different servers in more than 100
+
+locations, so you always get a fast and
+
+stable connection anytime. Use my coupon
+
+code king or click the link in the
+
+description to get an exclusive extra 4
+
+month for free deal on Surf Shark. And
+
+don't worry, it comes with a 30-day
+
+money back guarantee, so you can try it
+
+risk-free. Now, back to the video. So,
+
+this is my general terminal. Now, I have
+
+Timox installed. What I can do is run
+
+tmuk new session along with the essay
+
+operator with the session name for my
+
+own reference and then it will just get
+
+into a new session and you can see that
+
+this is a tmuck session over here but
+
+this is fully separate from the main
+
+terminal. So if I run a clawed code
+
+instance here, you can see that it's
+
+running here. And now I can just attach
+
+from this session with thetrl +b and
+
+then d command which will bring me back
+
+to the main terminal. Now I can attach
+
+back to the t-mok session terminal with
+
+the attach command and the session name
+
+and I'll just get attached to that. And
+
+you can see that claude code is still
+
+running here which is quite awesome.
+
+This makes it a very good candidate to
+
+handle all our AI coding agents running.
+
+Now that is what we are going to use.
+
+But how will all this come together?
+
+Well, to start, you can choose whatever
+
+it is that you want to use between Ader,
+
+Claude code, and open code. All of them
+
+are great. I'll be using claude code for
+
+this video because that's what many
+
+people would want to use, but the same
+
+thing will also work with open code and
+
+ader. So I'll recommend you create a new
+
+command or you can also keep it in a
+
+rule. But with a command, it will work
+
+in any project without moving the rules
+
+file around in the project
+
+directory. So that is kind of cool. In
+
+claude code, you can generally create
+
+commands by going to the tot claude
+
+commands folder and then creating a new
+
+markdown file there. This is the agent
+
+spawn workflow. This asks the coder to
+
+become an agent spawner and
+
+orchestrator. I tell it that it is an
+
+agent spawner. It can read the tasks
+
+file and then find one or multiple tasks
+
+that can be solved by one agent and
+
+assign them to a new agent by first
+
+creating a new work tree, then building
+
+a prompt and then launching the agent. I
+
+ask it to read the tasks file and then
+
+select one or multiple tasks that can be
+
+solved by one agent. Like if multiple
+
+tasks are dependent on each other, they
+
+should be solved by the same agent. If a
+
+task is independent, it should be solved
+
+by a separate agent. Then for each
+
+selected task to be assigned, we ask it
+
+to make a git work tree first, then
+
+build the agent prompt, and then we ask
+
+it to create the T-mok session that is
+
+made and detached. And that session will
+
+run the cloud code instance with the
+
+prompt and allowed tools of edit, write,
+
+bash, and replace.
+
+I also ask it that for every agent you
+
+launch, update the tasks markdown file
+
+with claimed status and keep updating as
+
+you get new info from the team sessions.
+
+Now that's it and we can now finally use
+
+it. So fire up claude code. Now make
+
+sure that you have the tasks file
+
+figured out. I'm firing it up in
+
+Kingbench and I have the tasks as first
+
+creating a light theme and then I'm
+
+going to ask it to also add a filter to
+
+the options as well. Now we can just go
+
+ahead and run the workflow that we
+
+created and what you'll see is that it
+
+will just go ahead and first read the
+
+task file. Then it will run the get work
+
+tree command in order to make the tree
+
+and then it will run the t-mox command
+
+as well and create the session and in a
+
+bit it will get done. So it created the
+
+session and everything and the task
+
+should be going on in the sessions
+
+themselves. So you can just navigate to
+
+the session in Timm and then see what it
+
+is doing and everything.
+
+It might ask you questions which you
+
+will need to go and answer yourself. But
+
+if you don't want to navigate, then you
+
+can also just ask claude code to tell
+
+you about the status and it will just
+
+look at the print of those sessions and
+
+tell you what is happening which is also
+
+cool. In a bit it is done and you can
+
+now head on over to the work trees and
+
+just go ahead and run it. And you can
+
+see that the light theme works as well
+
+as the second work tree tasks are also
+
+done in the other folder. Now comes the
+
+part of merging them. So you can just
+
+ask the masterclad code to merge them
+
+for you and it should be able to do it
+
+easily which is awesome. This is the
+
+best way that I have seen to do
+
+self-spawning teams of AI coders working
+
+and this actually makes sense.
+
+I see many people opening up multiple
+
+terminal windows and then prompting
+
+manually by navigating each one, which
+
+is pretty bad, but this makes sense and
+
+actually works and is really useful for
+
+ripping through tasks
+
+easily. T-Mox also has options like
+
+split window and stuff and you can make
+
+it show you all the sessions in a tiled
+
+window and so on. So, you can try that
+
+if you want to keep an eye on what's
+
+happening.
+
+You can actually just ask claude code to
+
+give you the command on how to do that
+
+and just open it up in another terminal
+
+window. That is how it works. I found
+
+this workflow super good and it is
+
+actually useful, believe it or not.
+
+Overall, it's pretty cool. Anyway, share
+
+your thoughts below and subscribe to the
+
+channel. You can also donate via
+
+Superthanks option or join the channel
+
+as well and get some perks. I'll see you
+
+in the next video. Bye.

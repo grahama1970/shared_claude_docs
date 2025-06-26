@@ -1,0 +1,31 @@
+{
+  "project": "/home/graham/workspace/experiments/claude-test-reporter",
+  "name": "claude-test-reporter",
+  "type": "testing",
+  "timestamp": "20250530-064939",
+  "issues": [],
+  "warnings": [
+    "pytest not installed",
+    "No slash commands documented for Claude project",
+    "Some README features may lack implementation"
+  ],
+  "suggestions": [
+    "Consider refactoring large files"
+  ],
+  "validations": {
+    "imports": true,
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": false
+    }
+  },
+  "fixes_applied": [],
+  "status": "success",
+  "git_tag": "pre-cleanup-20250530-065013"
+}

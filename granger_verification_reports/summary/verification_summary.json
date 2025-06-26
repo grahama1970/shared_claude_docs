@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-06-05T19:39:38.469076",
+  "mode": "full",
+  "total_projects": 18,
+  "passed_projects": 18,
+  "failed_projects": 0,
+  "total_issues": 0,
+  "critical_issues": 0,
+  "total_duration": 21.71731185913086,
+  "auto_fixes_applied": 0,
+  "fix_directives_generated": 0
+}

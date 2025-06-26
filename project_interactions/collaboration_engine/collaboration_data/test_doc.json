@@ -1,0 +1,82 @@
+{
+  "id": "test_doc",
+  "content": "[Offline] Hello Beautiful Wonderful World!",
+  "version": 5,
+  "operations": [
+    {
+      "id": "bb913f65-89f1-48cb-ae81-0b78fd95369d",
+      "type": "insert",
+      "user_id": "user1",
+      "timestamp": 1748963606.741274,
+      "version": 0,
+      "data": {
+        "position": 0,
+        "text": "Hello "
+      }
+    },
+    {
+      "id": "d0e7ce22-f0fe-400c-bb51-dbfce4d9eb73",
+      "type": "insert",
+      "user_id": "user2",
+      "timestamp": 1748963606.7415533,
+      "version": 1,
+      "data": {
+        "position": 6,
+        "text": "World!"
+      }
+    },
+    {
+      "id": "57493e07-9e57-4689-87db-6b7890416741",
+      "type": "comment",
+      "user_id": "user1",
+      "timestamp": 1748963606.7419362,
+      "version": 0,
+      "data": {
+        "position": 0,
+        "text": "Great start!"
+      }
+    },
+    {
+      "id": "646da332-91fd-49dc-a0b6-a7f1558454b2",
+      "type": "insert",
+      "user_id": "user1",
+      "timestamp": 1748963606.742147,
+      "version": 2,
+      "data": {
+        "position": 5,
+        "text": " Beautiful"
+      }
+    },
+    {
+      "id": "05b6d67a-a819-4bff-974e-9fd10b1ce266",
+      "type": "insert",
+      "user_id": "user2",
+      "timestamp": 1748963606.8421526,
+      "version": 2,
+      "data": {
+        "position": 15,
+        "text": " Wonderful"
+      }
+    },
+    {
+      "id": "711758bc-9ec8-4e60-a030-fa8410d8a85c",
+      "type": "insert",
+      "user_id": "user1",
+      "timestamp": 1748963546.7425504,
+      "version": 0,
+      "data": {
+        "position": 0,
+        "text": "[Offline] "
+      }
+    }
+  ],
+  "comments": [
+    {
+      "id": "57493e07-9e57-4689-87db-6b7890416741",
+      "user_id": "user1",
+      "timestamp": 1748963606.7419362,
+      "position": 0,
+      "text": "Great start!"
+    }
+  ]
+}

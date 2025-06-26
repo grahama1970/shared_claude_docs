@@ -1,0 +1,11 @@
+{
+  "iteration": 1,
+  "perplexity_concerns": "Check output for concerns",
+  "gemini_concerns": "Check output for concerns",
+  "next_actions": [
+    "Review AI feedback",
+    "Implement suggested fixes",
+    "Re-run bug hunter",
+    "Continue until all concerns addressed"
+  ]
+}

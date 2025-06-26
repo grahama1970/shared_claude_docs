@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRANGER Quick Switch Demo</title>
+    <style>
+        /* Universal Switch Bar Styles */
+        .granger-switch-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .switch-btn {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #fff;
+            padding: 4px 12px;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .switch-btn:hover {
+            background: #3a3a3a;
+            transform: translateY(-1px);
+        }
+
+        .switch-btn.active {
+            background: #0066cc;
+            border-color: #0080ff;
+            box-shadow: 0 0 5px rgba(0,128,255,0.5);
+        }
+
+        .current-info {
+            margin-left: auto;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* Transition Overlay */
+        .switch-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .switch-transition.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .transition-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .transition-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top-color: #0066cc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Demo Content */
+        .demo-container {
+            margin-top: 50px;
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .interface-preview {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 400px;
+        }
+
+        .chat-interface {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .annotator-interface {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .terminal-interface {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .shortcut-help {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .shortcut-help h4 {
+            margin: 0 0 10px 0;
+        }
+
+        .shortcut-help kbd {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Switch Bar -->
+    <div class="granger-switch-bar">
+        <button class="switch-btn active" onclick="switchTo('chat')">
+            📱 Chat
+        </button>
+        <button class="switch-btn" onclick="switchTo('annotator')">
+            📝 Annotator
+        </button>
+        <button class="switch-btn" onclick="switchTo('terminal')">
+            ⌨️ Terminal
+        </button>
+        <span class="current-info">Current: Chat | Session: demo123</span>
+    </div>
+
+    <!-- Transition Overlay -->
+    <div class="switch-transition" id="transitionOverlay">
+        <div class="transition-content">
+            <div class="transition-spinner"></div>
+            <h3 id="transitionText">Switching to Annotator...</h3>
+            <p>Preserving your session state</p>
+        </div>
+    </div>
+
+    <!-- Demo Content -->
+    <div class="demo-container">
+        <h1>GRANGER Quick Switch Demo</h1>
+        <p>Experience seamless switching between GRANGER interfaces. Try the buttons above or use keyboard shortcuts!</p>
+        
+        <div id="interfacePreview" class="interface-preview chat-interface">
+            <h2>Chat Interface</h2>
+            <p>Welcome to the GRANGER Chat interface. This is where you interact with the AI assistant.</p>
+            <div style="margin-top: 20px;">
+                <strong>Current Context:</strong>
+                <ul>
+                    <li>Conversation ID: conv_456</li>
+                    <li>Messages: 42</li>
+                    <li>Last activity: 2 minutes ago</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="shortcut-help">
+        <h4>Keyboard Shortcuts</h4>
+        <div><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>1</kbd> → Chat</div>
+        <div><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>2</kbd> → Annotator</div>
+        <div><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>3</kbd> → Terminal</div>
+        <div><kbd>Ctrl</kbd> + <kbd>Tab</kbd> → Cycle</div>
+    </div>
+
+    <script>
+        // Current interface state
+        let currentInterface = 'chat';
+        let sessionState = {
+            chat: { conversationId: 'conv_456', messages: 42 },
+            annotator: { docId: 'doc_789', page: 5, annotations: 12 },
+            terminal: { workspace: 'main', lastCommand: 'ls -la', history: 156 }
+        };
+
+        // Interface templates
+        const interfaceTemplates = {
+            chat: {
+                title: 'Chat Interface',
+                icon: '📱',
+                class: 'chat-interface',
+                content: `
+                    <h2>Chat Interface</h2>
+                    <p>Welcome to the GRANGER Chat interface. This is where you interact with the AI assistant.</p>
+                    <div style="margin-top: 20px;">
+                        <strong>Current Context:</strong>
+                        <ul>
+                            <li>Conversation ID: ${sessionState.chat.conversationId}</li>
+                            <li>Messages: ${sessionState.chat.messages}</li>
+                            <li>Last activity: 2 minutes ago</li>
+                        </ul>
+                    </div>
+                `
+            },
+            annotator: {
+                title: 'Annotator Interface',
+                icon: '📝',
+                class: 'annotator-interface',
+                content: `
+                    <h2>PDF Annotator</h2>
+                    <p>Annotate and analyze documents with AI assistance.</p>
+                    <div style="margin-top: 20px;">
+                        <strong>Current Document:</strong>
+                        <ul>
+                            <li>Document ID: ${sessionState.annotator.docId}</li>
+                            <li>Current Page: ${sessionState.annotator.page}</li>
+                            <li>Annotations: ${sessionState.annotator.annotations}</li>
+                        </ul>
+                    </div>
+                `
+            },
+            terminal: {
+                title: 'Terminal Interface',
+                icon: '⌨️',
+                class: 'terminal-interface',
+                content: `
+                    <h2>$ granger terminal</h2>
+                    <p>GRANGER Terminal v1.0.0</p>
+                    <div style="margin-top: 20px;">
+                        <pre>$ ${sessionState.terminal.lastCommand}
+total 156
+drwxr-xr-x  5 user  staff   160 Nov  4 10:30 .
+drwxr-xr-x 12 user  staff   384 Nov  4 10:15 ..
+-rw-r--r--  1 user  staff  1024 Nov  4 10:30 config.json
+-rw-r--r--  1 user  staff  2048 Nov  4 10:25 data.db
+drwxr-xr-x  3 user  staff    96 Nov  4 10:20 modules
+
+$ _</pre>
+                        <p>Workspace: ${sessionState.terminal.workspace} | History: ${sessionState.terminal.history} commands</p>
+                    </div>
+                `
+            }
+        };
+
+        // Switch to interface function
+        function switchTo(targetInterface) {
+            if (targetInterface === currentInterface) return;
+
+            // Show transition overlay
+            const overlay = document.getElementById('transitionOverlay');
+            const transitionText = document.getElementById('transitionText');
+            const template = interfaceTemplates[targetInterface];
+            
+            transitionText.textContent = `Switching to ${template.title}...`;
+            overlay.classList.add('active');
+
+            // Simulate switch delay
+            setTimeout(() => {
+                // Update UI
+                currentInterface = targetInterface;
+                updateInterface();
+                
+                // Hide transition
+                overlay.classList.remove('active');
+                
+                // Show completion message
+                console.log(`Switched to ${targetInterface} in 0.8s`);
+            }, 800);
+        }
+
+        // Update interface display
+        function updateInterface() {
+            const preview = document.getElementById('interfacePreview');
+            const template = interfaceTemplates[currentInterface];
+            
+            // Update preview
+            preview.className = `interface-preview ${template.class}`;
+            preview.innerHTML = template.content;
+            
+            // Update switch bar
+            document.querySelectorAll('.switch-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const activeBtn = Array.from(document.querySelectorAll('.switch-btn'))
+                .find(btn => btn.textContent.includes(template.icon));
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            // Update current info
+            document.querySelector('.current-info').textContent = 
+                `Current: ${template.title.split(' ')[0]} | Session: demo123`;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.altKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchTo('chat');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchTo('annotator');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchTo('terminal');
+                        break;
+                }
+            } else if (e.ctrlKey && e.key === 'Tab') {
+                e.preventDefault();
+                // Cycle through interfaces
+                const interfaces = ['chat', 'annotator', 'terminal'];
+                const currentIndex = interfaces.indexOf(currentInterface);
+                const nextIndex = (currentIndex + 1) % interfaces.length;
+                switchTo(interfaces[nextIndex]);
+            }
+        });
+
+        // Deep link handler (simulated)
+        function handleDeepLink(url) {
+            const match = url.match(/granger:\/\/switch\/(\w+)/);
+            if (match) {
+                switchTo(match[1]);
+            }
+        }
+
+        // Simulate deep link on page load if URL has hash
+        if (window.location.hash) {
+            const target = window.location.hash.slice(1);
+            if (interfaceTemplates[target]) {
+                setTimeout(() => switchTo(target), 500);
+            }
+        }
+    </script>
+</body>
+</html>

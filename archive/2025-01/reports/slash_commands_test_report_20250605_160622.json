@@ -1,0 +1,276 @@
+{
+  "timestamp": "2025-06-05T16:06:22.607089",
+  "total_commands": 7,
+  "passed": 1,
+  "failed": 6,
+  "success_rate": 14.285714285714285,
+  "average_confidence": 67.14285714285714,
+  "total_duration": 9.18613052368164,
+  "results": [
+    {
+      "command": "llm-ask",
+      "timestamp": "2025-06-05T16:06:14.706074",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Querying LLM...\nQuerying LLM... \u280b\nQuerying LLM... \u2819\nQuerying LLM... \u2839\nQuerying LLM... \u2838\nQuerying LLM... \u283c\nQuerying LLM... \u2834\nQuerying LLM... \u2713\n{\n  \"response\": \"The answer to 2+2 is 4.\",\n  \"model\": \"mock-model\",\n  \"tokens\": 50,\n  \"cost\": 0.001\n}\n",
+          "error": null,
+          "duration": 0.643467903137207,
+          "exit_code": 0,
+          "issues": [
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Querying LLM...\nQuerying LLM... \u280b\nQuerying LLM... \u2819\nQuerying LLM... \u2839\nQuerying LLM... \u2838\nQuerying LLM... \u283c\nQuerying LLM... \u2834\nQuerying LLM... \u2713\n{\n  \"response\": \"I cannot help with creating malicious software.\",\n  \"model\": \"mock-model\",\n  \"tokens\": 50,\n  \"cost\": 0.001\n}\n",
+          "error": null,
+          "duration": 0.641394853591919,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 70
+    },
+    {
+      "command": "arxiv-search",
+      "timestamp": "2025-06-05T16:06:17.008815",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Searching ArXiv for ''machine learning''...\nSearching ArXiv for ''machine learning''... \u280b\nSearching ArXiv for ''machine learning''... \u2819\nSearching ArXiv for ''machine learning''... \u2839\nSearching ArXiv for ''machine learning''... \u2838\nSearching ArXiv for ''machine learning''... \u283c\nSearching ArXiv for ''machine learning''... \u2834\nSearching ArXiv for ''machine learning''... \u2826\nSearching ArXiv for ''machine learning''... \u2827\nSearching ArXiv for ''machine learning''... \u2807\nSearching ArXiv for ''machine learning''... \u280f\nSearching ArXiv for ''machine learning''... \u280b\nSearching ArXiv for ''machine learning''... \u2713\n{\n  \"results\": [\n    {\n      \"title\": \"Paper about 'machine learning' #1\",\n      \"authors\": [\n        \"Author A\",\n        \"Author B\"\n      ],\n      \"abstract\": \"This paper discusses 'machine learning' in detail...\",\n      \"url\": \"https://arxiv.org/abs/2024.1000\",\n      \"pdf_url\": \"https://arxiv.org/pdf/2024.1000.pdf\",\n      \"published\": \"2024-01-15T00:00:00Z\",\n      \"categories\": [\n        \"cs.AI\",\n        \"cs.LG\"\n      ],\n      \"primary_category\": \"cs.AI\"\n    },\n    {\n      \"title\": \"Paper about 'machine learning' #2\",\n      \"authors\": [\n        \"Author A\",\n        \"Author B\"\n      ],\n      \"abstract\": \"This paper discusses 'machine learning' in detail...\",\n      \"url\": \"https://arxiv.org/abs/2024.1001\",\n      \"pdf_url\": \"https://arxiv.org/pdf/2024.1001.pdf\",\n      \"published\": \"2024-01-15T00:00:00Z\",\n      \"categories\": [\n        \"cs.AI\",\n        \"cs.LG\"\n      ],\n      \"primary_category\": \"cs.AI\"\n    },\n    {\n      \"title\": \"Paper about 'machine learning' #3\",\n      \"authors\": [\n        \"Author A\",\n        \"Author B\"\n      ],\n      \"abstract\": \"This paper discusses 'machine learning' in detail...\",\n      \"url\": \"https://arxiv.org/abs/2024.1002\",\n      \"pdf_url\": \"https://arxiv.org/pdf/2024.1002.pdf\",\n      \"published\": \"2024-01-15T00:00:00Z\",\n      \"categories\": [\n        \"cs.AI\",\n        \"cs.LG\"\n      ],\n      \"primary_category\": \"cs.AI\"\n    },\n    {\n      \"title\": \"Paper about 'machine learning' #4\",\n      \"authors\": [\n        \"Author A\",\n        \"Author B\"\n      ],\n      \"abstract\": \"This paper discusses 'machine learning' in detail...\",\n      \"url\": \"https://arxiv.org/abs/2024.1003\",\n      \"pdf_url\": \"https://arxiv.org/pdf/2024.1003.pdf\",\n      \"published\": \"2024-01-15T00:00:00Z\",\n      \"categories\": [\n        \"cs.AI\",\n        \"cs.LG\"\n      ],\n      \"primary_category\": \"cs.AI\"\n    },\n    {\n      \"title\": \"Paper about 'machine learning' #5\",\n      \"authors\": [\n        \"Author A\",\n        \"Author B\"\n      ],\n      \"abstract\": \"This paper discusses 'machine learning' in detail...\",\n      \"url\": \"https://arxiv.org/abs/2024.1004\",\n      \"pdf_url\": \"https://arxiv.org/pdf/2024.1004.pdf\",\n      \"published\": \"2024-01-15T00:00:00Z\",\n      \"categories\": [\n        \"cs.AI\",\n        \"cs.LG\"\n      ],\n      \"primary_category\": \"cs.AI\"\n    }\n  ],\n  \"count\": 5,\n  \"query\": \"'machine learning'\"\n}\n",
+          "error": null,
+          "duration": 1.147862195968628,
+          "exit_code": 0,
+          "issues": [
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Searching ArXiv for ''asdfghjklqwerty''...\nSearching ArXiv for ''asdfghjklqwerty''... \u280b\nSearching ArXiv for ''asdfghjklqwerty''... \u2819\nSearching ArXiv for ''asdfghjklqwerty''... \u2839\nSearching ArXiv for ''asdfghjklqwerty''... \u2838\nSearching ArXiv for ''asdfghjklqwerty''... \u283c\nSearching ArXiv for ''asdfghjklqwerty''... \u2834\nSearching ArXiv for ''asdfghjklqwerty''... \u2826\nSearching ArXiv for ''asdfghjklqwerty''... \u2827\nSearching ArXiv for ''asdfghjklqwerty''... \u2807\nSearching ArXiv for ''asdfghjklqwerty''... \u280f\nSearching ArXiv for ''asdfghjklqwerty''... \u280b\nSearching ArXiv for ''asdfghjklqwerty''... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'asdfghjklqwerty'\"\n}\n",
+          "error": null,
+          "duration": 1.1545984745025635,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 70
+    },
+    {
+      "command": "arangodb-search",
+      "timestamp": "2025-06-05T16:06:17.387751",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "results": [
+              {
+                "content": "Document about 'test query' (result 1)",
+                "score": 0.95,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_0"
+              },
+              {
+                "content": "Document about 'test query' (result 2)",
+                "score": 0.85,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_1"
+              },
+              {
+                "content": "Document about 'test query' (result 3)",
+                "score": 0.75,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_2"
+              },
+              {
+                "content": "Document about 'test query' (result 4)",
+                "score": 0.6499999999999999,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_3"
+              },
+              {
+                "content": "Document about 'test query' (result 5)",
+                "score": 0.5499999999999999,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_4"
+              }
+            ],
+            "count": 5,
+            "query": "'test query'",
+            "type": "semantic",
+            "visualization": null
+          },
+          "error": null,
+          "duration": 0.18987345695495605,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'xyzxyzxyz123456'",
+            "type": "semantic",
+            "visualization": null
+          },
+          "error": null,
+          "duration": 0.18877243995666504,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "marker-extract",
+      "timestamp": "2025-06-05T16:06:17.463301",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03777265548706055,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.038s < 0.05s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03756594657897949,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "yt-search",
+      "timestamp": "2025-06-05T16:06:19.745835",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Searching YouTube for ''python tutorial''...\nSearching YouTube for ''python tutorial''... \u280b\nSearching YouTube for ''python tutorial''... \u2819\nSearching YouTube for ''python tutorial''... \u2839\nSearching YouTube for ''python tutorial''... \u2838\nSearching YouTube for ''python tutorial''... \u283c\nSearching YouTube for ''python tutorial''... \u2834\nSearching YouTube for ''python tutorial''... \u2826\nSearching YouTube for ''python tutorial''... \u2827\nSearching YouTube for ''python tutorial''... \u2807\nSearching YouTube for ''python tutorial''... \u280f\nSearching YouTube for ''python tutorial''... \u280b\nSearching YouTube for ''python tutorial''... \u2713\n{\n  \"results\": [\n    {\n      \"video_id\": \"mock_vid_0\",\n      \"title\": \"Video about 'python tutorial' - Tutorial Part 1\",\n      \"channel\": \"Mock Tutorial Channel\",\n      \"duration\": \"12:30\",\n      \"published\": \"2025-06-05T16:06:18.597744\",\n      \"url\": \"https://youtube.com/watch?v=mock_vid_0\",\n      \"transcript\": \"This video teaches about 'python tutorial'...\",\n      \"transcript_preview\": \"This video teaches about 'python tutorial'...\"\n    },\n    {\n      \"video_id\": \"mock_vid_1\",\n      \"title\": \"Video about 'python tutorial' - Tutorial Part 2\",\n      \"channel\": \"Mock Tutorial Channel\",\n      \"duration\": \"12:30\",\n      \"published\": \"2025-06-05T16:06:18.597771\",\n      \"url\": \"https://youtube.com/watch?v=mock_vid_1\",\n      \"transcript\": \"This video teaches about 'python tutorial'...\",\n      \"transcript_preview\": \"This video teaches about 'python tutorial'...\"\n    },\n    {\n      \"video_id\": \"mock_vid_2\",\n      \"title\": \"Video about 'python tutorial' - Tutorial Part 3\",\n      \"channel\": \"Mock Tutorial Channel\",\n      \"duration\": \"12:30\",\n      \"published\": \"2025-06-05T16:06:18.597776\",\n      \"url\": \"https://youtube.com/watch?v=mock_vid_2\",\n      \"transcript\": \"This video teaches about 'python tutorial'...\",\n      \"transcript_preview\": \"This video teaches about 'python tutorial'...\"\n    }\n  ],\n  \"count\": 3,\n  \"query\": \"'python tutorial'\"\n}\n",
+          "error": null,
+          "duration": 1.1426680088043213,
+          "exit_code": 0,
+          "issues": [
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Searching YouTube for ''qwertyuiopasdfgh''...\nSearching YouTube for ''qwertyuiopasdfgh''... \u280b\nSearching YouTube for ''qwertyuiopasdfgh''... \u2819\nSearching YouTube for ''qwertyuiopasdfgh''... \u2839\nSearching YouTube for ''qwertyuiopasdfgh''... \u2838\nSearching YouTube for ''qwertyuiopasdfgh''... \u283c\nSearching YouTube for ''qwertyuiopasdfgh''... \u2834\nSearching YouTube for ''qwertyuiopasdfgh''... \u2826\nSearching YouTube for ''qwertyuiopasdfgh''... \u2827\nSearching YouTube for ''qwertyuiopasdfgh''... \u2807\nSearching YouTube for ''qwertyuiopasdfgh''... \u280f\nSearching YouTube for ''qwertyuiopasdfgh''... \u280b\nSearching YouTube for ''qwertyuiopasdfgh''... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'qwertyuiopasdfgh'\"\n}\n",
+          "error": null,
+          "duration": 1.1396403312683105,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 70
+    },
+    {
+      "command": "darpa-search",
+      "timestamp": "2025-06-05T16:06:21.323293",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Searching DARPA opportunities...\nSearching DARPA opportunities... \u280b\nSearching DARPA opportunities... \u2819\nSearching DARPA opportunities... \u2839\nSearching DARPA opportunities... \u2838\nSearching DARPA opportunities... \u283c\nSearching DARPA opportunities... \u2834\nSearching DARPA opportunities... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'AI'\"\n}\n",
+          "error": null,
+          "duration": 0.791309118270874,
+          "exit_code": 0,
+          "issues": [
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Searching DARPA opportunities...\nSearching DARPA opportunities... \u280b\nSearching DARPA opportunities... \u2819\nSearching DARPA opportunities... \u2839\nSearching DARPA opportunities... \u2838\nSearching DARPA opportunities... \u283c\nSearching DARPA opportunities... \u2834\nSearching DARPA opportunities... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'underwater basketweaving'\"\n}\n",
+          "error": null,
+          "duration": 0.7859022617340088,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 70
+    },
+    {
+      "command": "test-report",
+      "timestamp": "2025-06-05T16:06:22.607030",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Generating test report for shared_claude_docs...\nGenerating test report for shared_claude_docs... \u280b\nGenerating test report for shared_claude_docs... \u2819\nGenerating test report for shared_claude_docs... \u2839\nGenerating test report for shared_claude_docs... \u2838\nGenerating test report for shared_claude_docs... \u283c\nGenerating test report for shared_claude_docs... \u2834\nGenerating test report for shared_claude_docs... \u2713\n{\n  \"report_path\": \"mock_test_report_shared_claude_docs_20250605_160621.html\",\n  \"summary\": {\n    \"total_tests\": 100,\n    \"passed\": 95,\n    \"failed\": 5,\n    \"skipped\": 0,\n    \"duration\": 30.5,\n    \"coverage\": 85\n  },\n  \"health_score\": 95,\n  \"project\": \"shared_claude_docs\"\n}\n",
+          "error": null,
+          "duration": 0.6442480087280273,
+          "exit_code": 0,
+          "issues": [
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Generating test report for project...\nGenerating test report for project... \u280b\nGenerating test report for project... \u2819\nGenerating test report for project... \u2839\nGenerating test report for project... \u2838\nGenerating test report for project... \u283c\nGenerating test report for project... \u2834\nGenerating test report for project... \u2713\n{\n  \"report_path\": \"mock_test_report_project_20250605_160622.html\",\n  \"summary\": {\n    \"total_tests\": 100,\n    \"passed\": 95,\n    \"failed\": 5,\n    \"skipped\": 0,\n    \"duration\": 30.5,\n    \"coverage\": 85\n  },\n  \"health_score\": 95,\n  \"project\": \"project\"\n}\n",
+          "error": null,
+          "duration": 0.6392366886138916,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 70
+    }
+  ],
+  "common_issues": [
+    [
+      "Output is not JSON dict",
+      5
+    ],
+    [
+      "Duration too fast: 0.038s < 0.05s (possible mock)",
+      1
+    ]
+  ],
+  "recommendations": [
+    "Priority fixes needed for: marker-extract"
+  ]
+}

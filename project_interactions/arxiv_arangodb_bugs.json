@@ -1,0 +1,20 @@
+[
+  {
+    "bug": "ArXiv format incompatible with ArangoDB",
+    "field": "ArangoDB module not available",
+    "paper_id": "http://arxiv.org/abs/1909.03550v1",
+    "impact": "Cannot store papers without transformation"
+  },
+  {
+    "bug": "ArXiv format incompatible with ArangoDB",
+    "field": "ArangoDB module not available",
+    "paper_id": "http://arxiv.org/abs/1811.04422v1",
+    "impact": "Cannot store papers without transformation"
+  },
+  {
+    "bug": "ArXiv format incompatible with ArangoDB",
+    "field": "ArangoDB module not available",
+    "paper_id": "http://arxiv.org/abs/1707.04849v1",
+    "impact": "Cannot store papers without transformation"
+  }
+]

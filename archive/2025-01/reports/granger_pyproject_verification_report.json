@@ -1,0 +1,175 @@
+{
+  "timestamp": "2025-06-09T16:38:26.596610",
+  "summary": {
+    "total": 20,
+    "valid": 20,
+    "fixed": 0,
+    "invalid": 0,
+    "missing_directory": 0,
+    "missing_pyproject": 0,
+    "error": 0,
+    "pushed": 0
+  },
+  "results": [
+    {
+      "name": "granger_hub",
+      "path": "/home/graham/workspace/experiments/granger_hub/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "rl_commons",
+      "path": "/home/graham/workspace/experiments/rl_commons/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "world_model",
+      "path": "/home/graham/workspace/experiments/world_model/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "runpod_ops",
+      "path": "/home/graham/workspace/experiments/runpod_ops/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "marker",
+      "path": "/home/graham/workspace/experiments/marker/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "arangodb",
+      "path": "/home/graham/workspace/experiments/arangodb/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "memvid",
+      "path": "/home/graham/workspace/experiments/memvid/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "llm_call",
+      "path": "/home/graham/workspace/experiments/llm_call/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "unsloth_wip",
+      "path": "/home/graham/workspace/experiments/unsloth_wip/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "darpa_crawl",
+      "path": "/home/graham/workspace/experiments/darpa_crawl/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "gitget",
+      "path": "/home/graham/workspace/experiments/gitget/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "ppt",
+      "path": "/home/graham/workspace/experiments/ppt/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "arxiv-mcp-server",
+      "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "mcp-screenshot",
+      "path": "/home/graham/workspace/experiments/mcp-screenshot/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "annotator",
+      "path": "/home/graham/workspace/experiments/annotator/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    },
+    {
+      "name": "chat",
+      "path": "/home/graham/workspace/experiments/chat/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": false
+    },
+    {
+      "name": "aider-daemon",
+      "path": "/home/graham/workspace/experiments/aider-daemon/",
+      "status": "valid",
+      "error": null,
+      "fixes": [],
+      "has_github": true
+    }
+  ]
+}

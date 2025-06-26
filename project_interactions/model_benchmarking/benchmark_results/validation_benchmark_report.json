@@ -1,0 +1,152 @@
+[
+  {
+    "model_name": "Random Forest",
+    "framework": "sklearn",
+    "dataset_name": "synthetic_classification",
+    "timestamp": "2025-06-02T07:43:14.018717",
+    "accuracy": 0.88,
+    "precision": 0.8799662364768592,
+    "recall": 0.88,
+    "f1_score": 0.8799491788296832,
+    "auc_roc": null,
+    "mse": null,
+    "mae": null,
+    "r2": null,
+    "inference_time_mean": 0.0048777568154037,
+    "inference_time_std": 0.0001478515842974127,
+    "inference_throughput": 13120.78531629362,
+    "training_time": null,
+    "memory_usage_mb": 0.2848701477050781,
+    "model_size_mb": 17.613794326782227,
+    "cpu_usage_percent": 0.0,
+    "gpu_usage_percent": null,
+    "gpu_memory_mb": null,
+    "cross_val_scores": [
+      0.8325,
+      0.84,
+      0.8675,
+      0.82,
+      0.8375
+    ],
+    "confidence_interval": [
+      0.8089152063927185,
+      0.8700847936072813
+    ],
+    "p_value": null,
+    "hyperparameters": {},
+    "hardware_info": {
+      "cpu_count": 48,
+      "cpu_freq": "2404.96 MHz",
+      "total_memory": "251.55 GB",
+      "platform": "posix 6.8.0-57-generic",
+      "gpu": "NVIDIA RTX A5000",
+      "gpu_count": 1
+    },
+    "dataset_info": {
+      "num_samples": 2000,
+      "num_features": 20,
+      "num_classes": 3
+    },
+    "error_analysis": {}
+  },
+  {
+    "model_name": "Logistic Regression",
+    "framework": "sklearn",
+    "dataset_name": "synthetic_classification",
+    "timestamp": "2025-06-02T07:43:16.647749",
+    "accuracy": 0.6505,
+    "precision": 0.6519301882125411,
+    "recall": 0.6505,
+    "f1_score": 0.6496712361100521,
+    "auc_roc": null,
+    "mse": null,
+    "mae": null,
+    "r2": null,
+    "inference_time_mean": 0.000102068928460921,
+    "inference_time_std": 3.6822036143707673e-06,
+    "inference_throughput": 627027.2546703926,
+    "training_time": null,
+    "memory_usage_mb": 0.140716552734375,
+    "model_size_mb": 0.00116729736328125,
+    "cpu_usage_percent": 0.0,
+    "gpu_usage_percent": null,
+    "gpu_memory_mb": null,
+    "cross_val_scores": [
+      0.6675,
+      0.635,
+      0.67,
+      0.63,
+      0.6875
+    ],
+    "confidence_interval": [
+      0.6149022784824998,
+      0.7010977215175003
+    ],
+    "p_value": null,
+    "hyperparameters": {},
+    "hardware_info": {
+      "cpu_count": 48,
+      "cpu_freq": "2841.48 MHz",
+      "total_memory": "251.55 GB",
+      "platform": "posix 6.8.0-57-generic",
+      "gpu": "NVIDIA RTX A5000",
+      "gpu_count": 1
+    },
+    "dataset_info": {
+      "num_samples": 2000,
+      "num_features": 20,
+      "num_classes": 3
+    },
+    "error_analysis": {}
+  },
+  {
+    "model_name": "SVM",
+    "framework": "sklearn",
+    "dataset_name": "synthetic_classification",
+    "timestamp": "2025-06-02T07:43:16.889782",
+    "accuracy": 0.911,
+    "precision": 0.9110623839837808,
+    "recall": 0.911,
+    "f1_score": 0.9110271844638228,
+    "auc_roc": null,
+    "mse": null,
+    "mae": null,
+    "r2": null,
+    "inference_time_mean": 0.00828584367709775,
+    "inference_time_std": 6.456518446434503e-05,
+    "inference_throughput": 7724.017311224127,
+    "training_time": null,
+    "memory_usage_mb": 0.06658935546875,
+    "model_size_mb": 0.5830163955688477,
+    "cpu_usage_percent": 0.0,
+    "gpu_usage_percent": null,
+    "gpu_memory_mb": null,
+    "cross_val_scores": [
+      0.8625,
+      0.8625,
+      0.875,
+      0.825,
+      0.8825
+    ],
+    "confidence_interval": [
+      0.8227187364826777,
+      0.9002812635173224
+    ],
+    "p_value": null,
+    "hyperparameters": {},
+    "hardware_info": {
+      "cpu_count": 48,
+      "cpu_freq": "3048.20 MHz",
+      "total_memory": "251.55 GB",
+      "platform": "posix 6.8.0-57-generic",
+      "gpu": "NVIDIA RTX A5000",
+      "gpu_count": 1
+    },
+    "dataset_info": {
+      "num_samples": 2000,
+      "num_features": 20,
+      "num_classes": 3
+    },
+    "error_analysis": {}
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "deployment_id": "test-persist-1748984044",
+  "config": {
+    "service_name": "persist-test",
+    "version": "v1.0",
+    "strategy": 

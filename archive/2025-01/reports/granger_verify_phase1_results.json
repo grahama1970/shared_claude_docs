@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-06-09T10:09:53.721978",
+  "stats": {
+    "files_scanned": 184,
+    "projects_scanned": 1,
+    "issues_found": 3,
+    "issues_fixed": 0
+  },
+  "issues": {
+    "mocks": [],
+    "relative_imports": [],
+    "missing_deps": [
+      {
+        "project": "arxiv_mcp",
+        "dependency": "scikit-learn>=1.3.0",
+        "type": "pypi",
+        "error": "Cannot import scikit-learn"
+      },
+      {
+        "project": "arxiv_mcp",
+        "dependency": "sentence-transformers>=4.0.0",
+        "type": "pypi",
+        "error": "Cannot import sentence-transformers"
+      },
+      {
+        "project": "arxiv_mcp",
+        "dependency": "pytest-json-report>=1.5.0",
+        "type": "pypi",
+        "error": "Cannot import pytest-json-report"
+      }
+    ],
+    "syntax_errors": []
+  },
+  "failed_projects": []
+}

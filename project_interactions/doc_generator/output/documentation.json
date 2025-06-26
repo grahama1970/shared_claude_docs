@@ -1,0 +1,339 @@
+{
+  "generated": "2025-06-01T20:11:03.901257",
+  "modules": {
+    "example_module": {
+      "name": "example_module",
+      "path": "example_module.py",
+      "docstring": "Example module for testing documentation generator\n\nThis module demonstrates various Python constructs that the documentation\ngenerator can extract and document.",
+      "imports": [
+        "from typing import ...",
+        "json",
+        "datetime"
+      ],
+      "classes": [
+        {
+          "name": "DataProcessor",
+          "docstring": "Processes data with various transformations",
+          "bases": [],
+          "methods": [
+            {
+              "name": "__init__",
+              "docstring": "Initialize processor with configuration\n\nArgs:\n    config: Configuration dictionary",
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                },
+                {
+                  "name": "config",
+                  "type": "Dict[str, any]"
+                }
+              ],
+              "return_type": null,
+              "decorators": [],
+              "is_async": false,
+              "line_number": 21,
+              "complexity": 1
+            },
+            {
+              "name": "process",
+              "docstring": "Process a list of data items\n\nArgs:\n    data: List of strings to process\n    \nReturns:\n    Processed data list",
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                },
+                {
+                  "name": "data",
+                  "type": "List[str]"
+                }
+              ],
+              "return_type": "List[str]",
+              "decorators": [],
+              "is_async": false,
+              "line_number": 30,
+              "complexity": 2
+            },
+            {
+              "name": "_transform",
+              "docstring": "Internal transformation method",
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                },
+                {
+                  "name": "item",
+                  "type": "str"
+                }
+              ],
+              "return_type": "str",
+              "decorators": [],
+              "is_async": false,
+              "line_number": 45,
+              "complexity": 1
+            }
+          ],
+          "attributes": {},
+          "line_number": 18,
+          "decorators": []
+        },
+        {
+          "name": "ConfigManager",
+          "docstring": "Manages application configuration",
+          "bases": [],
+          "methods": [
+            {
+              "name": "__init__",
+              "docstring": null,
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                }
+              ],
+              "return_type": null,
+              "decorators": [],
+              "is_async": false,
+              "line_number": 90,
+              "complexity": 1
+            },
+            {
+              "name": "load",
+              "docstring": "Load configuration from file",
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                },
+                {
+                  "name": "path",
+                  "type": "str"
+                }
+              ],
+              "return_type": "None",
+              "decorators": [],
+              "is_async": false,
+              "line_number": 93,
+              "complexity": 1
+            },
+            {
+              "name": "get",
+              "docstring": "Get configuration value",
+              "parameters": [
+                {
+                  "name": "self",
+                  "type": "Any"
+                },
+                {
+                  "name": "key",
+                  "type": "str"
+                },
+                {
+                  "name": "default",
+                  "type": "any"
+                }
+              ],
+              "return_type": "any",
+              "decorators": [],
+              "is_async": false,
+              "line_number": 98,
+              "complexity": 1
+            }
+          ],
+          "attributes": {
+            "config_version": "str"
+          },
+          "line_number": 85,
+          "decorators": []
+        }
+      ],
+      "functions": [
+        {
+          "name": "__init__",
+          "docstring": "Initialize processor with configuration\n\nArgs:\n    config: Configuration dictionary",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "config",
+              "type": "Dict[str, any]"
+            }
+          ],
+          "return_type": null,
+          "decorators": [],
+          "is_async": false,
+          "line_number": 21,
+          "complexity": 1
+        },
+        {
+          "name": "process",
+          "docstring": "Process a list of data items\n\nArgs:\n    data: List of strings to process\n    \nReturns:\n    Processed data list",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "data",
+              "type": "List[str]"
+            }
+          ],
+          "return_type": "List[str]",
+          "decorators": [],
+          "is_async": false,
+          "line_number": 30,
+          "complexity": 2
+        },
+        {
+          "name": "_transform",
+          "docstring": "Internal transformation method",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "item",
+              "type": "str"
+            }
+          ],
+          "return_type": "str",
+          "decorators": [],
+          "is_async": false,
+          "line_number": 45,
+          "complexity": 1
+        },
+        {
+          "name": "process_async",
+          "docstring": "Async version of process method",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "data",
+              "type": "List[str]"
+            }
+          ],
+          "return_type": "List[str]",
+          "decorators": [],
+          "is_async": true,
+          "line_number": 49,
+          "complexity": 1
+        },
+        {
+          "name": "validate_input",
+          "docstring": "Validate input data\n\nArgs:\n    data: Data to validate\n    \nReturns:\n    True if valid, False otherwise",
+          "parameters": [
+            {
+              "name": "data",
+              "type": "any"
+            }
+          ],
+          "return_type": "bool",
+          "decorators": [],
+          "is_async": false,
+          "line_number": 55,
+          "complexity": 4
+        },
+        {
+          "name": "fetch_data",
+          "docstring": "Fetch data from URL\n\nArgs:\n    url: URL to fetch from\n    timeout: Request timeout in seconds\n    \nReturns:\n    JSON data or None if failed",
+          "parameters": [
+            {
+              "name": "url",
+              "type": "str"
+            },
+            {
+              "name": "timeout",
+              "type": "int"
+            }
+          ],
+          "return_type": "Optional[Dict]",
+          "decorators": [],
+          "is_async": true,
+          "line_number": 71,
+          "complexity": 1
+        },
+        {
+          "name": "__init__",
+          "docstring": null,
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            }
+          ],
+          "return_type": null,
+          "decorators": [],
+          "is_async": false,
+          "line_number": 90,
+          "complexity": 1
+        },
+        {
+          "name": "load",
+          "docstring": "Load configuration from file",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "path",
+              "type": "str"
+            }
+          ],
+          "return_type": "None",
+          "decorators": [],
+          "is_async": false,
+          "line_number": 93,
+          "complexity": 1
+        },
+        {
+          "name": "get",
+          "docstring": "Get configuration value",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "Any"
+            },
+            {
+              "name": "key",
+              "type": "str"
+            },
+            {
+              "name": "default",
+              "type": "any"
+            }
+          ],
+          "return_type": "any",
+          "decorators": [],
+          "is_async": false,
+          "line_number": 98,
+          "complexity": 1
+        }
+      ],
+      "constants": {
+        "DEFAULT_TIMEOUT": 30,
+        "MAX_RETRIES": 3
+      },
+      "dependencies": [
+        "json",
+        "datetime",
+        "typing"
+      ],
+      "test_coverage": null
+    }
+  },
+  "dependency_graph": {
+    "example_module": [
+      "typing",
+      "json",
+      "datetime"
+    ]
+  }
+}

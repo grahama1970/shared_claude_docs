@@ -1,0 +1,443 @@
+#!/usr/bin/env python3
+"""
+Module: granger_proper_imports_test.py
+Description: Test with PROPER import paths from actual module locations
+
+This version adds the CORRECT paths to sys.path to import from the actual
+Granger modules, not the project_interactions duplicates.
+
+External Dependencies:
+- All Granger modules from their actual locations
+"""
+
+import asyncio
+import sys
+import os
+from pathlib import Path
+from datetime import datetime
+
+# CRITICAL FIX: Add the ACTUAL module source paths
+# Remove any project_interactions paths that might interfere
+current_dir = Path(__file__).parent
+if str(current_dir) in sys.path:
+    sys.path.remove(str(current_dir))
+
+# Add ACTUAL module paths
+MODULE_PATHS = {
+    'granger_hub': '/home/graham/workspace/experiments/granger_hub/src',
+    'rl_commons': '/home/graham/workspace/experiments/rl_commons/src',
+    'arangodb': '/home/graham/workspace/experiments/arangodb/src',
+    'youtube_transcripts': '/home/graham/workspace/experiments/youtube_transcripts/src',
+    'sparta': '/home/graham/workspace/experiments/sparta/src',
+    'marker': '/home/graham/workspace/experiments/marker/src',
+    'world_model': '/home/graham/workspace/experiments/world_model/src',
+    'claude_test_reporter': '/home/graham/workspace/experiments/claude-test-reporter/src',
+    'llm_call': '/home/graham/workspace/experiments/llm_call/src',
+}
+
+# Add all paths at the beginning to ensure they're found first
+for module, path in MODULE_PATHS.items():
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.insert(0, path)
+        print(f"✅ Added path for {module}: {path}")
+
+async def main():
+    """Test with proper import paths"""
+    
+    print("\n🚀 GRANGER PROPER IMPORTS TEST")
+    print("=" * 60)
+    print("📍 Using ACTUAL module paths, not project_interactions")
+    print("=" * 60)
+    
+    results = {
+        "tested_modules": [],
+        "successful_imports": [],
+        "failed_imports": [],
+        "successful_operations": [],
+        "failed_operations": []
+    }
+    
+    # Test each module
+    print("\n📦 Testing Module Imports from Correct Paths...")
+    
+    # Test arangodb (which we fixed)
+    await test_arangodb_proper(results)
+    
+    # Test other modules
+    await test_granger_hub_proper(results)
+    await test_rl_commons_proper(results)
+    await test_youtube_transcripts_proper(results)
+    await test_sparta_proper(results)
+    await test_marker_proper(results)
+    await test_world_model_proper(results)
+    await test_claude_test_reporter_proper(results)
+    await test_llm_call_proper(results)
+    
+    # Summary
+    print_detailed_summary(results)
+    create_proper_verification_report(results)
+
+
+async def test_arangodb_proper(results: dict):
+    """Test arangodb from actual module location"""
+    module_name = "arangodb"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        # This should now import from /home/graham/workspace/experiments/arangodb/src/arangodb
+        import arangodb
+        print(f"   📍 Imported from: {arangodb.__file__}")
+        
+        from arangodb import ArangoDBClient, DatabaseOperations
+        results["successful_imports"].append(f"{module_name}: ArangoDBClient, DatabaseOperations")
+        
+        # Test instantiation
+        try:
+            client = ArangoDBClient()
+            results["successful_operations"].append(f"{module_name}: ArangoDBClient instantiated")
+            
+            # Test connection
+            db = client.connect()
+            results["successful_operations"].append(f"{module_name}: Connected to database")
+            
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_granger_hub_proper(results: dict):
+    """Test granger_hub from actual location"""
+    module_name = "granger_hub"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import granger_hub
+        print(f"   📍 Imported from: {granger_hub.__file__}")
+        
+        from granger_hub import BaseModule, ModuleRegistry
+        results["successful_imports"].append(f"{module_name}: BaseModule, ModuleRegistry")
+        
+        # Test usage
+        try:
+            registry = ModuleRegistry()
+            results["successful_operations"].append(f"{module_name}: ModuleRegistry created")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_rl_commons_proper(results: dict):
+    """Test rl_commons"""
+    module_name = "rl_commons"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import rl_commons
+        print(f"   📍 Imported from: {rl_commons.__file__}")
+        
+        from rl_commons import ContextualBandit, RLState
+        results["successful_imports"].append(f"{module_name}: ContextualBandit, RLState")
+        
+        # Test with correct API
+        try:
+            bandit = ContextualBandit(
+                name="test",
+                n_arms=3,
+                n_features=5,
+                alpha=1.0
+            )
+            state = RLState(features=[0.1, 0.2, 0.3, 0.4, 0.5])
+            action = bandit.select_action(state)
+            results["successful_operations"].append(f"{module_name}: Bandit action selected")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_youtube_transcripts_proper(results: dict):
+    """Test youtube_transcripts"""
+    module_name = "youtube_transcripts"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import youtube_transcripts
+        print(f"   📍 Imported from: {youtube_transcripts.__file__}")
+        
+        from youtube_transcripts.unified_search import UnifiedYouTubeSearch, UnifiedSearchConfig
+        results["successful_imports"].append(f"{module_name}: UnifiedYouTubeSearch")
+        
+        # Test usage
+        try:
+            config = UnifiedSearchConfig()
+            client = UnifiedYouTubeSearch(config)
+            results["successful_operations"].append(f"{module_name}: Client created")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_sparta_proper(results: dict):
+    """Test sparta"""
+    module_name = "sparta"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import sparta
+        print(f"   📍 Imported from: {sparta.__file__}")
+        
+        from sparta import get_workflow, should_process_resource, settings
+        results["successful_imports"].append(f"{module_name}: Functions imported")
+        
+        # Test function
+        try:
+            result = should_process_resource("CVE-2024-1234")
+            results["successful_operations"].append(f"{module_name}: Function executed")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_marker_proper(results: dict):
+    """Test marker"""
+    module_name = "marker"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import marker
+        print(f"   📍 Imported from: {marker.__file__}")
+        
+        from marker import Document, convert_single_pdf, settings
+        results["successful_imports"].append(f"{module_name}: Document, convert_single_pdf")
+        
+        # Test Document class
+        try:
+            doc = Document()
+            results["successful_operations"].append(f"{module_name}: Document created")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_world_model_proper(results: dict):
+    """Test world_model"""
+    module_name = "world_model"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import world_model
+        print(f"   📍 Imported from: {world_model.__file__}")
+        
+        from world_model import WorldModelOrchestrator, StatePredictor
+        results["successful_imports"].append(f"{module_name}: WorldModelOrchestrator")
+        
+        # Test instantiation
+        try:
+            orchestrator = WorldModelOrchestrator()
+            results["successful_operations"].append(f"{module_name}: Orchestrator created")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_claude_test_reporter_proper(results: dict):
+    """Test claude-test-reporter"""
+    module_name = "claude-test-reporter"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import claude_test_reporter
+        print(f"   📍 Imported from: {claude_test_reporter.__file__}")
+        
+        from claude_test_reporter import TestReporter, UniversalReportGenerator
+        results["successful_imports"].append(f"{module_name}: TestReporter")
+        
+        # Test instantiation
+        try:
+            reporter = TestReporter()
+            results["successful_operations"].append(f"{module_name}: TestReporter created")
+        except Exception as e:
+            results["failed_operations"].append(f"{module_name}: {e}")
+            
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+async def test_llm_call_proper(results: dict):
+    """Test llm_call"""
+    module_name = "llm_call"
+    results["tested_modules"].append(module_name)
+    
+    print(f"\n🔍 Testing {module_name}...")
+    
+    try:
+        import llm_call
+        print(f"   📍 Imported from: {llm_call.__file__}")
+        
+        from llm_call import call, ask
+        results["successful_imports"].append(f"{module_name}: call, ask")
+        
+        # Note: Not testing operations due to API key requirements
+        
+    except ImportError as e:
+        results["failed_imports"].append(f"{module_name}: {e}")
+        print(f"   ❌ Import failed: {e}")
+
+
+def print_detailed_summary(results: dict):
+    """Print detailed test summary"""
+    print("\n" + "=" * 60)
+    print("📊 PROPER IMPORTS TEST SUMMARY")
+    print("=" * 60)
+    
+    total_modules = len(results['tested_modules'])
+    successful_imports = len(results['successful_imports'])
+    failed_imports = len(results['failed_imports'])
+    
+    print(f"\nModules Tested: {total_modules}")
+    print(f"Successful Imports: {successful_imports}")
+    print(f"Failed Imports: {failed_imports}")
+    
+    if total_modules > 0:
+        success_rate = (successful_imports / total_modules) * 100
+        print(f"\n✨ Import Success Rate: {success_rate:.1f}%")
+    
+    print("\n✅ Successfully Imported Modules:")
+    for success in results['successful_imports']:
+        print(f"   - {success}")
+    
+    if results['failed_imports']:
+        print("\n❌ Failed Imports:")
+        for failure in results['failed_imports']:
+            print(f"   - {failure}")
+    
+    print("\n🔧 Successful Operations:")
+    for op in results['successful_operations']:
+        print(f"   - {op}")
+
+
+def create_proper_verification_report(results: dict):
+    """Create honest verification report"""
+    report_path = Path("/home/graham/workspace/shared_claude_docs/project_interactions/GRANGER_PROPER_IMPORTS_VERIFICATION.md")
+    
+    total_modules = len(results['tested_modules'])
+    successful_imports = len(results['successful_imports'])
+    success_rate = (successful_imports / total_modules * 100) if total_modules > 0 else 0
+    
+    content = [
+        "# Granger Proper Imports Test Verification",
+        "",
+        f"*Generated: {datetime.now().isoformat()}*",
+        "",
+        "## Critical Discovery",
+        "",
+        "The previous tests were importing from WRONG locations:",
+        "- ❌ Wrong: `/home/graham/workspace/shared_claude_docs/project_interactions/MODULE/`",
+        "- ✅ Correct: `/home/graham/workspace/experiments/MODULE/src/`",
+        "",
+        "## Test Results with Correct Import Paths",
+        "",
+        f"- **Modules Tested**: {total_modules}",
+        f"- **Successful Imports**: {successful_imports}",
+        f"- **Failed Imports**: {len(results['failed_imports'])}",
+        f"- **Import Success Rate**: {success_rate:.1f}%",
+        "",
+        "## Module Import Details",
+        ""
+    ]
+    
+    # Add detailed results
+    for module in results['tested_modules']:
+        imported = any(module in s for s in results['successful_imports'])
+        status = "✅" if imported else "❌"
+        
+        # Find the import location if successful
+        location = ""
+        for success in results['successful_imports']:
+            if module in success:
+                # The actual file path was printed during import
+                break
+                
+        content.append(f"### {module} {status}")
+        
+        if imported:
+            content.append(f"- Successfully imported from correct location")
+            # List what was imported
+            for success in results['successful_imports']:
+                if module in success:
+                    content.append(f"- Imports: {success.split(': ')[1]}")
+            # List successful operations
+            for op in results['successful_operations']:
+                if module in op:
+                    content.append(f"- ✅ {op.split(': ')[1]}")
+        else:
+            # Find the error
+            for failure in results['failed_imports']:
+                if module in failure:
+                    content.append(f"- ❌ Error: {failure.split(': ')[1]}")
+        
+        content.append("")
+    
+    content.extend([
+        "## Key Findings",
+        "",
+        "1. **Import Path Issue Confirmed**: The project_interactions directory contains",
+        "   duplicate (empty) __init__.py files that shadow the real modules",
+        "",
+        "2. **Real Module Locations**: All Granger modules are in `/home/graham/workspace/experiments/`",
+        "   with source code in the `src/` subdirectory",
+        "",
+        "3. **Fix Required**: Either remove the duplicate __init__.py files from project_interactions",
+        "   or ensure sys.path prioritizes the actual module locations",
+        "",
+        "## Honest Assessment",
+        "",
+        f"With correct import paths, the success rate is {success_rate:.1f}%. This represents",
+        "the TRUE state of the Granger ecosystem when modules are imported from their",
+        "actual locations rather than empty stub files.",
+        ""
+    ])
+    
+    report_path.write_text("\n".join(content))
+    print(f"\n📄 Proper verification report created: {report_path}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

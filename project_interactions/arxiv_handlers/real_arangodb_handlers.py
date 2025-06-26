@@ -1,0 +1,1055 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Real ArangoDB Handlers for GRANGER Integration
+
+This module provides real handlers that use the actual ArangoDB Python library
+and the ArangoDB module functionality for graph database operations, search,
+and memory management in the context of ArXiv paper research.
+
+External Dependencies:
+- python-arango: https://python-arango.readthedocs.io/
+- ArangoDB module: /home/graham/workspace/experiments/arangodb/
+
+Example Usage:
+>>> from real_arangodb_handlers import ArangoDocumentHandler
+>>> handler = ArangoDocumentHandler()
+>>> result = handler.handle({"action": "create", "collection": "papers", "document": {...}})
+>>> print(f"Created document: {result['document_id']}")
+"""
+
+import os
+import sys
+import time
+import json
+from datetime import datetime, timezone
+from typing import Dict, List, Any, Optional, Tuple, Union
+from pathlib import Path
+
+# Add ArangoDB module to path
+ARANGODB_PATH = Path("/home/graham/workspace/experiments/arangodb/src")
+if ARANGODB_PATH.exists():
+    sys.path.insert(0, str(ARANGODB_PATH))
+
+# Import ArangoDB core functionality
+try:
+    from arangodb.core.arango_setup import connect_arango, ensure_database, ensure_collection
+    from arangodb.core.db_operations import (
+        create_document, get_document, update_document, delete_document,
+        create_relationship, query_documents, delete_relationship_by_key
+    )
+    from arangodb.core.search.semantic_search import semantic_search, ensure_document_has_embedding
+    from arangodb.core.search.bm25_search import bm25_search
+    from arangodb.core.search.hybrid_search import hybrid_search
+    from arangodb.core.memory.memory_agent import MemoryAgent
+    from arangodb.core.constants import (
+        COLLECTION_NAME, EDGE_COLLECTION_NAME, GRAPH_NAME,
+        DEFAULT_EMBEDDING_DIMENSIONS
+    )
+    ARANGODB_AVAILABLE = True
+except ImportError as e:
+    ARANGODB_AVAILABLE = False
+    print(f"WARNING: ArangoDB module not available: {e}")
+    print("Please ensure ArangoDB module is installed at /home/graham/workspace/experiments/arangodb/")
+
+
+class BaseArangoHandler:
+    """Base class for ArangoDB handlers"""
+    
+    def __init__(self):
+        self.db = None
+        self.client = None
+        if ARANGODB_AVAILABLE:
+            try:
+                self.client = connect_arango()
+                self.db = ensure_database(self.client)
+            except Exception as e:
+                print(f"Failed to connect to ArangoDB: {e}")
+                self.db = None
+    
+    def _ensure_connected(self) -> bool:
+        """Ensure database connection is active"""
+        if not self.db:
+            return False
+        try:
+            # Test connection
+            self.db.ping()
+            return True
+        except:
+            # Try to reconnect
+            try:
+                self.client = connect_arango()
+                self.db = ensure_database(self.client)
+                return True
+            except:
+                return False
+    
+    def _format_response(self, success: bool, data: Any = None, 
+                        error: str = None, metadata: Dict = None) -> Dict[str, Any]:
+        """Format standard response"""
+        response = {
+            "success": success,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if data is not None:
+            response["data"] = data
+        if error:
+            response["error"] = error
+        if metadata:
+            response["metadata"] = metadata
+            
+        return response
+
+
+class ArangoDocumentHandler(BaseArangoHandler):
+    """Handler for document CRUD operations in ArangoDB"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle document operations
+        
+        Args:
+            params: Dictionary with:
+                - action: "create", "read", "update", "delete", "search"
+                - collection: Collection name
+                - document: Document data (for create/update)
+                - document_id: Document ID (for read/update/delete)
+                - query: Search query (for search)
+                
+        Returns:
+            Dictionary with operation results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        if not self._ensure_connected():
+            return self._format_response(False, error="Failed to connect to ArangoDB")
+        
+        action = params.get("action", "").lower()
+        collection = params.get("collection", COLLECTION_NAME)
+        
+        # Ensure collection exists
+        try:
+            ensure_collection(self.db, collection)
+        except Exception as e:
+            return self._format_response(False, error=f"Failed to ensure collection: {e}")
+        
+        try:
+            if action == "create":
+                return self._handle_create(collection, params)
+            elif action == "read":
+                return self._handle_read(collection, params)
+            elif action == "update":
+                return self._handle_update(collection, params)
+            elif action == "delete":
+                return self._handle_delete(collection, params)
+            elif action == "search":
+                return self._handle_search(collection, params)
+            else:
+                return self._format_response(False, error=f"Unknown action: {action}")
+                
+        except Exception as e:
+            return self._format_response(False, error=str(e))
+    
+    def _handle_create(self, collection: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle document creation"""
+        document = params.get("document", {})
+        ensure_embedding = params.get("ensure_embedding", True)
+        
+        # Add timestamp if not present
+        if "created_at" not in document:
+            document["created_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = create_document(
+            self.db, collection, document, 
+            ensure_embedding=ensure_embedding
+        )
+        
+        if result:
+            return self._format_response(
+                True, 
+                data={
+                    "document_id": result.get("_id"),
+                    "document_key": result.get("_key"),
+                    "document": result
+                }
+            )
+        else:
+            return self._format_response(False, error="Failed to create document")
+    
+    def _handle_read(self, collection: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle document retrieval"""
+        document_id = params.get("document_id")
+        document_key = params.get("document_key")
+        
+        if not document_id and not document_key:
+            return self._format_response(False, error="document_id or document_key required")
+        
+        # If only key provided, construct full ID
+        if document_key and not document_id:
+            document_id = f"{collection}/{document_key}"
+        
+        result = get_document(self.db, document_id, collection)
+        
+        if result:
+            return self._format_response(True, data={"document": result})
+        else:
+            return self._format_response(False, error="Document not found")
+    
+    def _handle_update(self, collection: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle document update"""
+        document_id = params.get("document_id")
+        document_key = params.get("document_key")
+        updates = params.get("updates", {})
+        
+        if not document_id and not document_key:
+            return self._format_response(False, error="document_id or document_key required")
+        
+        # Add update timestamp
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = update_document(
+            self.db, collection, document_key or document_id, updates
+        )
+        
+        if result:
+            return self._format_response(True, data={"document": result})
+        else:
+            return self._format_response(False, error="Failed to update document")
+    
+    def _handle_delete(self, collection: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle document deletion"""
+        document_key = params.get("document_key")
+        
+        if not document_key:
+            return self._format_response(False, error="document_key required")
+        
+        result = delete_document(self.db, collection, document_key)
+        
+        if result:
+            return self._format_response(True, data={"deleted": True})
+        else:
+            return self._format_response(False, error="Failed to delete document")
+    
+    def _handle_search(self, collection: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle document search"""
+        query = params.get("query", {})
+        limit = params.get("limit", 10)
+        offset = params.get("offset", 0)
+        
+        # Build AQL query
+        aql = f"FOR doc IN {collection}"
+        bind_vars = {}
+        
+        # Add filters
+        filters = []
+        for key, value in query.items():
+            filters.append(f"doc.{key} == @{key}")
+            bind_vars[key] = value
+        
+        if filters:
+            aql += " FILTER " + " AND ".join(filters)
+        
+        aql += f" LIMIT {offset}, {limit} RETURN doc"
+        
+        # Execute query
+        cursor = self.db.aql.execute(aql, bind_vars=bind_vars)
+        documents = list(cursor)
+        
+        return self._format_response(
+            True,
+            data={
+                "documents": documents,
+                "count": len(documents),
+                "query": query
+            }
+        )
+
+
+class ArangoSearchHandler(BaseArangoHandler):
+    """Handler for advanced search operations in ArangoDB"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle search operations
+        
+        Args:
+            params: Dictionary with:
+                - search_type: "semantic", "bm25", "hybrid"
+                - query: Search query text
+                - collection: Collection to search (optional)
+                - limit: Maximum results
+                - filters: Additional filters
+                
+        Returns:
+            Dictionary with search results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        if not self._ensure_connected():
+            return self._format_response(False, error="Failed to connect to ArangoDB")
+        
+        search_type = params.get("search_type", "hybrid")
+        query = params.get("query", "")
+        collection = params.get("collection", COLLECTION_NAME)
+        limit = params.get("limit", 10)
+        filters = params.get("filters", {})
+        
+        try:
+            start_time = time.time()
+            
+            if search_type == "semantic":
+                results = self._semantic_search(query, collection, limit, filters)
+            elif search_type == "bm25":
+                results = self._bm25_search(query, collection, limit, filters)
+            elif search_type == "hybrid":
+                results = self._hybrid_search(query, collection, limit, filters)
+            else:
+                return self._format_response(False, error=f"Unknown search type: {search_type}")
+            
+            duration = time.time() - start_time
+            
+            return self._format_response(
+                True,
+                data={
+                    "results": results.get("results", []),
+                    "total": results.get("total", 0),
+                    "search_type": search_type,
+                    "query": query
+                },
+                metadata={
+                    "search_time": duration,
+                    "collection": collection
+                }
+            )
+            
+        except Exception as e:
+            return self._format_response(False, error=str(e))
+    
+    def _semantic_search(self, query: str, collection: str, 
+                        limit: int, filters: Dict) -> Dict[str, Any]:
+        """Perform semantic vector search"""
+        # Build filter expression from filters dict
+        filter_expr = None
+        if filters:
+            filter_parts = []
+            for key, value in filters.items():
+                if isinstance(value, str):
+                    filter_parts.append(f'doc.{key} == "{value}"')
+                else:
+                    filter_parts.append(f'doc.{key} == {value}')
+            filter_expr = " AND ".join(filter_parts)
+        
+        return semantic_search(
+            db=self.db,
+            query_text=query,
+            collection_name=collection,
+            filter_expr=filter_expr,
+            top_n=limit,
+            output_format="json"
+        )
+    
+    def _bm25_search(self, query: str, collection: str, 
+                    limit: int, filters: Dict) -> Dict[str, Any]:
+        """Perform BM25 text search"""
+        # Build filter expression
+        filter_expr = None
+        if filters:
+            filter_parts = []
+            for key, value in filters.items():
+                if isinstance(value, str):
+                    filter_parts.append(f'doc.{key} == "{value}"')
+                else:
+                    filter_parts.append(f'doc.{key} == {value}')
+            filter_expr = " AND ".join(filter_parts)
+        
+        return bm25_search(
+            db=self.db,
+            query_text=query,
+            collections=[collection],
+            filter_expr=filter_expr,
+            top_n=limit,
+            output_format="json"
+        )
+    
+    def _hybrid_search(self, query: str, collection: str, 
+                      limit: int, filters: Dict) -> Dict[str, Any]:
+        """Perform hybrid search combining semantic and BM25"""
+        return hybrid_search(
+            db=self.db,
+            query_text=query,
+            collection=collection,
+            additional_context=filters,
+            top_n=limit,
+            output_format="json"
+        )
+
+
+class ArangoGraphHandler(BaseArangoHandler):
+    """Handler for graph operations in ArangoDB"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle graph operations
+        
+        Args:
+            params: Dictionary with:
+                - action: "create_edge", "traverse", "find_path", "get_neighbors"
+                - from_id: Source document ID
+                - to_id: Target document ID
+                - edge_data: Edge attributes (for create_edge)
+                - direction: "outbound", "inbound", "any" (for traversal)
+                - max_depth: Maximum traversal depth
+                
+        Returns:
+            Dictionary with graph operation results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        if not self._ensure_connected():
+            return self._format_response(False, error="Failed to connect to ArangoDB")
+        
+        action = params.get("action", "").lower()
+        
+        try:
+            if action == "create_edge":
+                return self._handle_create_edge(params)
+            elif action == "traverse":
+                return self._handle_traverse(params)
+            elif action == "find_path":
+                return self._handle_find_path(params)
+            elif action == "get_neighbors":
+                return self._handle_get_neighbors(params)
+            else:
+                return self._format_response(False, error=f"Unknown action: {action}")
+                
+        except Exception as e:
+            return self._format_response(False, error=str(e))
+    
+    def _handle_create_edge(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Create an edge between documents"""
+        from_id = params.get("from_id")
+        to_id = params.get("to_id")
+        edge_data = params.get("edge_data", {})
+        edge_collection = params.get("edge_collection", EDGE_COLLECTION_NAME)
+        
+        if not from_id or not to_id:
+            return self._format_response(False, error="from_id and to_id required")
+        
+        # Add timestamp
+        edge_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = create_relationship(
+            self.db, from_id, to_id, 
+            edge_collection=edge_collection,
+            **edge_data
+        )
+        
+        if result:
+            return self._format_response(
+                True,
+                data={
+                    "edge_id": result.get("_id"),
+                    "edge": result
+                }
+            )
+        else:
+            return self._format_response(False, error="Failed to create edge")
+    
+    def _handle_traverse(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Traverse graph from a starting point"""
+        start_id = params.get("start_id")
+        direction = params.get("direction", "outbound")
+        max_depth = params.get("max_depth", 2)
+        edge_collection = params.get("edge_collection", EDGE_COLLECTION_NAME)
+        
+        if not start_id:
+            return self._format_response(False, error="start_id required")
+        
+        # Build traversal query
+        aql = f"""
+        FOR v, e, p IN 1..{max_depth} {direction.upper()} @start_id
+        {edge_collection}
+        RETURN {{
+            vertex: v,
+            edge: e,
+            path: p
+        }}
+        """
+        
+        cursor = self.db.aql.execute(aql, bind_vars={"start_id": start_id})
+        results = list(cursor)
+        
+        return self._format_response(
+            True,
+            data={
+                "traversal_results": results,
+                "count": len(results),
+                "start_id": start_id,
+                "direction": direction,
+                "max_depth": max_depth
+            }
+        )
+    
+    def _handle_find_path(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Find shortest path between two documents"""
+        from_id = params.get("from_id")
+        to_id = params.get("to_id")
+        edge_collection = params.get("edge_collection", EDGE_COLLECTION_NAME)
+        
+        if not from_id or not to_id:
+            return self._format_response(False, error="from_id and to_id required")
+        
+        # Find shortest path
+        aql = f"""
+        FOR p IN SHORTEST_PATH
+        @from_id TO @to_id
+        {edge_collection}
+        RETURN p
+        """
+        
+        cursor = self.db.aql.execute(
+            aql, 
+            bind_vars={"from_id": from_id, "to_id": to_id}
+        )
+        paths = list(cursor)
+        
+        if paths:
+            return self._format_response(
+                True,
+                data={
+                    "path": paths[0],
+                    "path_length": len(paths[0]["edges"]) if paths else 0
+                }
+            )
+        else:
+            return self._format_response(
+                True,
+                data={
+                    "path": None,
+                    "message": "No path found"
+                }
+            )
+    
+    def _handle_get_neighbors(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Get immediate neighbors of a document"""
+        document_id = params.get("document_id")
+        direction = params.get("direction", "any")
+        edge_collection = params.get("edge_collection", EDGE_COLLECTION_NAME)
+        
+        if not document_id:
+            return self._format_response(False, error="document_id required")
+        
+        # Get neighbors
+        aql = f"""
+        FOR v, e IN 1..1 {direction.upper()} @document_id
+        {edge_collection}
+        RETURN {{
+            neighbor: v,
+            edge: e
+        }}
+        """
+        
+        cursor = self.db.aql.execute(aql, bind_vars={"document_id": document_id})
+        neighbors = list(cursor)
+        
+        return self._format_response(
+            True,
+            data={
+                "neighbors": neighbors,
+                "count": len(neighbors),
+                "document_id": document_id,
+                "direction": direction
+            }
+        )
+
+
+class ArangoMemoryHandler(BaseArangoHandler):
+    """Handler for memory agent operations in ArangoDB"""
+    
+    def __init__(self):
+        super().__init__()
+        self.memory_agent = None
+        if self.db and ARANGODB_AVAILABLE:
+            self.memory_agent = MemoryAgent(self.db)
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle memory operations
+        
+        Args:
+            params: Dictionary with:
+                - action: "store", "recall", "search", "get_context"
+                - message: Message to store (for store)
+                - conversation_id: Conversation identifier
+                - query: Search query (for search/recall)
+                - limit: Maximum results
+                
+        Returns:
+            Dictionary with memory operation results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        if not self.memory_agent:
+            return self._format_response(False, error="Memory agent not initialized")
+        
+        action = params.get("action", "").lower()
+        
+        try:
+            if action == "store":
+                return self._handle_store_message(params)
+            elif action == "recall":
+                return self._handle_recall_messages(params)
+            elif action == "search":
+                return self._handle_search_memory(params)
+            elif action == "get_context":
+                return self._handle_get_context(params)
+            else:
+                return self._format_response(False, error=f"Unknown action: {action}")
+                
+        except Exception as e:
+            return self._format_response(False, error=str(e))
+    
+    def _handle_store_message(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Store a message in memory"""
+        message = params.get("message", {})
+        conversation_id = params.get("conversation_id")
+        message_type = params.get("message_type", "user")
+        
+        if not message or not conversation_id:
+            return self._format_response(False, error="message and conversation_id required")
+        
+        # Store conversation with messages
+        messages = [{
+            "role": message_type,
+            "content": message.get("content", ""),
+            "metadata": message.get("metadata", {})
+        }]
+        
+        result = self.memory_agent.store_conversation(
+            messages=messages,
+            conversation_id=conversation_id
+        )
+        
+        if result:
+            return self._format_response(
+                True,
+                data={
+                    "stored_messages": result.get("messages", []),
+                    "workflow_id": result.get("workflow_id")
+                }
+            )
+        else:
+            return self._format_response(False, error="Failed to store message")
+    
+    def _handle_recall_messages(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Recall messages from memory"""
+        conversation_id = params.get("conversation_id")
+        limit = params.get("limit", 10)
+        
+        if not conversation_id:
+            return self._format_response(False, error="conversation_id required")
+        
+        # Retrieve messages
+        messages = self.memory_agent.retrieve_messages(
+            conversation_id=conversation_id,
+            limit=limit
+        )
+        
+        return self._format_response(
+            True,
+            data={
+                "messages": messages,
+                "count": len(messages),
+                "conversation_id": conversation_id
+            }
+        )
+    
+    def _handle_search_memory(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Search through memory"""
+        query = params.get("query", "")
+        limit = params.get("limit", 10)
+        conversation_id = params.get("conversation_id")
+        
+        # Search using the search method
+        results = self.memory_agent.search(
+            query=query,
+            top_k=limit,
+            conversation_id=conversation_id
+        )
+        
+        return self._format_response(
+            True,
+            data={
+                "results": results,
+                "count": len(results) if isinstance(results, list) else 0,
+                "query": query
+            }
+        )
+    
+    def _handle_get_context(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Get contextual information"""
+        query = params.get("query", "")
+        conversation_id = params.get("conversation_id")
+        context_window = params.get("context_window", 5)
+        
+        # Use search to get relevant context
+        context = self.memory_agent.search(
+            query=query,
+            top_k=context_window,
+            conversation_id=conversation_id
+        )
+        
+        return self._format_response(
+            True,
+            data={
+                "context": context,
+                "context_size": len(context) if isinstance(context, list) else 0,
+                "query": query
+            }
+        )
+
+
+class ArangoPaperHandler(BaseArangoHandler):
+    """Specialized handler for ArXiv paper storage and analysis in ArangoDB"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle paper-specific operations
+        
+        Args:
+            params: Dictionary with:
+                - action: "store_paper", "find_similar", "create_citation", "analyze_topic"
+                - paper: Paper data (for store_paper)
+                - paper_id: Paper identifier
+                - topic: Topic to analyze
+                
+        Returns:
+            Dictionary with paper operation results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        if not self._ensure_connected():
+            return self._format_response(False, error="Failed to connect to ArangoDB")
+        
+        action = params.get("action", "").lower()
+        
+        try:
+            if action == "store_paper":
+                return self._handle_store_paper(params)
+            elif action == "find_similar":
+                return self._handle_find_similar(params)
+            elif action == "create_citation":
+                return self._handle_create_citation(params)
+            elif action == "analyze_topic":
+                return self._handle_analyze_topic(params)
+            else:
+                return self._format_response(False, error=f"Unknown action: {action}")
+                
+        except Exception as e:
+            return self._format_response(False, error=str(e))
+    
+    def _handle_store_paper(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Store an ArXiv paper with enhanced metadata"""
+        paper = params.get("paper", {})
+        collection = params.get("collection", "arxiv_papers")
+        
+        if not paper:
+            return self._format_response(False, error="paper data required")
+        
+        # Ensure collection exists
+        ensure_collection(self.db, collection)
+        
+        # Enhance paper data
+        enhanced_paper = {
+            **paper,
+            "stored_at": datetime.now(timezone.utc).isoformat(),
+            "source": "arxiv",
+            "type": "research_paper"
+        }
+        
+        # Create searchable content field
+        if "content" not in enhanced_paper:
+            enhanced_paper["content"] = f"{paper.get('title', '')} {paper.get('summary', '')}"
+        
+        # Store with embedding
+        result = create_document(
+            self.db, collection, enhanced_paper,
+            ensure_embedding=True
+        )
+        
+        if result:
+            return self._format_response(
+                True,
+                data={
+                    "paper_id": result.get("_id"),
+                    "stored_paper": result
+                }
+            )
+        else:
+            return self._format_response(False, error="Failed to store paper")
+    
+    def _handle_find_similar(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Find papers similar to a given paper"""
+        paper_id = params.get("paper_id")
+        query_text = params.get("query_text", "")
+        limit = params.get("limit", 10)
+        collection = params.get("collection", "arxiv_papers")
+        
+        if not paper_id and not query_text:
+            return self._format_response(False, error="paper_id or query_text required")
+        
+        # If paper_id provided, get its content for similarity search
+        if paper_id:
+            paper = get_document(self.db, paper_id, collection)
+            if paper:
+                query_text = paper.get("content", paper.get("summary", ""))
+        
+        # Perform semantic search
+        results = semantic_search(
+            db=self.db,
+            query_text=query_text,
+            collection_name=collection,
+            filter_expr=f'doc._id != "{paper_id}"' if paper_id else None,
+            top_n=limit,
+            output_format="json"
+        )
+        
+        return self._format_response(
+            True,
+            data={
+                "similar_papers": results.get("results", []),
+                "count": results.get("total", 0),
+                "base_paper_id": paper_id
+            }
+        )
+    
+    def _handle_create_citation(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Create citation relationship between papers"""
+        citing_paper_id = params.get("citing_paper_id")
+        cited_paper_id = params.get("cited_paper_id")
+        citation_type = params.get("citation_type", "references")
+        confidence = params.get("confidence", 1.0)
+        
+        if not citing_paper_id or not cited_paper_id:
+            return self._format_response(
+                False, 
+                error="citing_paper_id and cited_paper_id required"
+            )
+        
+        # Create citation edge
+        edge_data = {
+            "type": "citation",
+            "citation_type": citation_type,
+            "confidence": confidence,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = create_relationship(
+            self.db,
+            citing_paper_id,
+            cited_paper_id,
+            edge_collection="paper_citations",
+            **edge_data
+        )
+        
+        if result:
+            return self._format_response(
+                True,
+                data={
+                    "citation_id": result.get("_id"),
+                    "citation": result
+                }
+            )
+        else:
+            return self._format_response(False, error="Failed to create citation")
+    
+    def _handle_analyze_topic(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze papers by topic"""
+        topic = params.get("topic", "")
+        collection = params.get("collection", "arxiv_papers")
+        limit = params.get("limit", 20)
+        
+        if not topic:
+            return self._format_response(False, error="topic required")
+        
+        # Search for papers on this topic
+        results = hybrid_search(
+            db=self.db,
+            query_text=topic,
+            collection=collection,
+            top_n=limit,
+            output_format="json"
+        )
+        
+        papers = results.get("results", [])
+        
+        # Analyze topic trends
+        analysis = {
+            "topic": topic,
+            "paper_count": len(papers),
+            "papers": papers,
+            "statistics": self._calculate_topic_statistics(papers),
+            "temporal_distribution": self._calculate_temporal_distribution(papers)
+        }
+        
+        return self._format_response(True, data=analysis)
+    
+    def _calculate_topic_statistics(self, papers: List[Dict]) -> Dict[str, Any]:
+        """Calculate statistics about papers"""
+        if not papers:
+            return {}
+        
+        # Extract years
+        years = []
+        for paper in papers:
+            if "published" in paper.get("doc", {}):
+                try:
+                    year = int(paper["doc"]["published"][:4])
+                    years.append(year)
+                except:
+                    pass
+        
+        if years:
+            return {
+                "earliest_year": min(years),
+                "latest_year": max(years),
+                "year_span": max(years) - min(years),
+                "average_year": sum(years) / len(years)
+            }
+        
+        return {}
+    
+    def _calculate_temporal_distribution(self, papers: List[Dict]) -> Dict[str, int]:
+        """Calculate temporal distribution of papers"""
+        distribution = {}
+        
+        for paper in papers:
+            if "published" in paper.get("doc", {}):
+                try:
+                    year = paper["doc"]["published"][:4]
+                    distribution[year] = distribution.get(year, 0) + 1
+                except:
+                    pass
+        
+        return distribution
+
+
+class ArangoBatchHandler(BaseArangoHandler):
+    """Handler for batch operations across multiple handlers"""
+    
+    def handle(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process multiple ArangoDB operations in batch
+        
+        Args:
+            params: Dictionary with:
+                - operations: List of operations to perform
+                
+        Returns:
+            Dictionary with batch results
+        """
+        if not ARANGODB_AVAILABLE:
+            return self._format_response(False, error="ArangoDB module not available")
+        
+        operations = params.get("operations", [])
+        results = []
+        
+        # Initialize handlers
+        handlers = {
+            "document": ArangoDocumentHandler(),
+            "search": ArangoSearchHandler(),
+            "graph": ArangoGraphHandler(),
+            "memory": ArangoMemoryHandler(),
+            "paper": ArangoPaperHandler()
+        }
+        
+        start_time = time.time()
+        successful = 0
+        
+        for op in operations:
+            op_type = op.get("type")
+            op_params = op.get("params", {})
+            
+            if op_type in handlers:
+                try:
+                    result = handlers[op_type].handle(op_params)
+                    results.append({
+                        "operation": op_type,
+                        "success": result.get("success", False),
+                        "result": result
+                    })
+                    if result.get("success"):
+                        successful += 1
+                except Exception as e:
+                    results.append({
+                        "operation": op_type,
+                        "success": False,
+                        "error": str(e)
+                    })
+            else:
+                results.append({
+                    "operation": op_type,
+                    "success": False,
+                    "error": f"Unknown operation type: {op_type}"
+                })
+        
+        duration = time.time() - start_time
+        
+        return self._format_response(
+            True,
+            data={
+                "total_operations": len(operations),
+                "successful": successful,
+                "failed": len(operations) - successful,
+                "batch_time": duration,
+                "results": results
+            }
+        )
+
+
+if __name__ == "__main__":
+    # Test the handlers
+    print("Testing ArangoDB Handlers...")
+    
+    # Test document creation
+    doc_handler = ArangoDocumentHandler()
+    result = doc_handler.handle({
+        "action": "create",
+        "collection": "test_papers",
+        "document": {
+            "title": "Test Paper",
+            "summary": "This is a test paper for ArangoDB integration",
+            "authors": ["Test Author"],
+            "tags": ["test", "arangodb"]
+        }
+    })
+    
+    if result["success"]:
+        print(f"\nDocument Test: Created document {result['data']['document_id']}")
+    else:
+        print(f"\nDocument Test Failed: {result.get('error')}")
+    
+    # Test search
+    search_handler = ArangoSearchHandler()
+    result = search_handler.handle({
+        "search_type": "hybrid",
+        "query": "test paper integration",
+        "limit": 5
+    })
+    
+    if result["success"]:
+        print(f"\nSearch Test: Found {result['data']['total']} results")
+    else:
+        print(f"\nSearch Test Failed: {result.get('error')}")

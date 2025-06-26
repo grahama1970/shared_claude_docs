@@ -1,0 +1,427 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Performance Benchmarking for GRANGER System
+
+This script benchmarks the performance of GRANGER modules before and after optimization.
+It measures:
+- API response times
+- Database query performance
+- Memory usage
+- Throughput
+- Latency percentiles
+"""
+
+import os
+import sys
+import time
+import json
+import psutil
+import asyncio
+import statistics
+from pathlib import Path
+from typing import Dict, List, Any, Tuple
+from datetime import datetime
+from collections import defaultdict
+
+# Add paths
+sys.path.insert(0, '/home/graham/workspace/shared_claude_docs/project_interactions')
+sys.path.insert(0, '/home/graham/workspace/experiments')
+
+# Import handlers
+from arxiv_handlers.real_arxiv_handlers import ArxivSearchHandler
+from arangodb_handlers.real_arangodb_handlers import ArangoDocumentHandler
+
+
+class PerformanceBenchmark:
+    """Performance benchmarking utilities"""
+    
+    def __init__(self):
+        self.results = defaultdict(list)
+        self.process = psutil.Process()
+        
+    def measure_operation(self, name: str, func, *args, **kwargs) -> Tuple[Any, Dict[str, float]]:
+        """Measure performance of an operation"""
+        # Initial memory
+        mem_before = self.process.memory_info().rss / 1024 / 1024  # MB
+        
+        # Execute operation
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        
+        # Final memory
+        mem_after = self.process.memory_info().rss / 1024 / 1024  # MB
+        
+        # Calculate metrics
+        duration = end_time - start_time
+        memory_delta = mem_after - mem_before
+        
+        # Store results
+        self.results[name].append({
+            "duration": duration,
+            "memory_delta": memory_delta,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        return result, {
+            "duration": duration,
+            "memory_delta": memory_delta
+        }
+        
+    def get_statistics(self, operation: str) -> Dict[str, float]:
+        """Get statistics for an operation"""
+        if operation not in self.results:
+            return {}
+            
+        durations = [r["duration"] for r in self.results[operation]]
+        memory_deltas = [r["memory_delta"] for r in self.results[operation]]
+        
+        return {
+            "count": len(durations),
+            "avg_duration": statistics.mean(durations),
+            "min_duration": min(durations),
+            "max_duration": max(durations),
+            "p50_duration": statistics.median(durations),
+            "p95_duration": self._percentile(durations, 95),
+            "p99_duration": self._percentile(durations, 99),
+            "avg_memory": statistics.mean(memory_deltas),
+            "total_memory": sum(memory_deltas)
+        }
+        
+    def _percentile(self, data: List[float], percentile: int) -> float:
+        """Calculate percentile"""
+        if not data:
+            return 0
+        sorted_data = sorted(data)
+        index = int(len(sorted_data) * percentile / 100)
+        return sorted_data[min(index, len(sorted_data) - 1)]
+        
+    def generate_report(self) -> str:
+        """Generate benchmark report"""
+        report = "# GRANGER Performance Benchmark Report\n\n"
+        report += f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        
+        report += "## Operation Performance\n\n"
+        report += "| Operation | Count | Avg (s) | Min (s) | Max (s) | P50 (s) | P95 (s) | P99 (s) | Avg Mem (MB) |\n"
+        report += "|-----------|-------|---------|---------|---------|---------|---------|---------|---------------|\n"
+        
+        for operation in sorted(self.results.keys()):
+            stats = self.get_statistics(operation)
+            report += f"| {operation} | {stats['count']} | "
+            report += f"{stats['avg_duration']:.3f} | "
+            report += f"{stats['min_duration']:.3f} | "
+            report += f"{stats['max_duration']:.3f} | "
+            report += f"{stats['p50_duration']:.3f} | "
+            report += f"{stats['p95_duration']:.3f} | "
+            report += f"{stats['p99_duration']:.3f} | "
+            report += f"{stats['avg_memory']:.2f} |\n"
+            
+        return report
+
+
+class ModuleBenchmarks:
+    """Benchmark individual modules"""
+    
+    def __init__(self, benchmark: PerformanceBenchmark):
+        self.benchmark = benchmark
+        
+    def benchmark_arxiv_search(self, queries: List[str], iterations: int = 5):
+        """Benchmark ArXiv search performance"""
+        print("\n📊 Benchmarking ArXiv Search...")
+        
+        handler = ArxivSearchHandler()
+        
+        for query in queries:
+            for i in range(iterations):
+                result, metrics = self.benchmark.measure_operation(
+                    "arxiv_search",
+                    handler.handle,
+                    {
+                        "query": query,
+                        "max_results": 5,
+                        "sort_by": "relevance"
+                    }
+                )
+                
+                print(f"  Query '{query[:30]}...' iteration {i+1}: {metrics['duration']:.3f}s")
+                
+    def benchmark_arxiv_download(self, paper_ids: List[str], iterations: int = 3):
+        """Benchmark ArXiv download performance"""
+        print("\n📊 Benchmarking ArXiv Downloads...")
+        
+        from arxiv_handlers.real_arxiv_handlers import ArxivDownloadHandler
+        handler = ArxivDownloadHandler()
+        
+        for i in range(iterations):
+            result, metrics = self.benchmark.measure_operation(
+                "arxiv_download",
+                handler.handle,
+                {"paper_ids": paper_ids[:2]}  # Limit to 2 papers
+            )
+            
+            print(f"  Download iteration {i+1}: {metrics['duration']:.3f}s")
+            
+    def benchmark_arangodb_operations(self, iterations: int = 10):
+        """Benchmark ArangoDB operations"""
+        print("\n📊 Benchmarking ArangoDB Operations...")
+        
+        handler = ArangoDocumentHandler()
+        
+        # Connect once
+        if not handler.connect():
+            print("  ❌ Failed to connect to ArangoDB")
+            return
+            
+        # Benchmark document creation
+        for i in range(iterations):
+            doc = {
+                "type": "benchmark_test",
+                "iteration": i,
+                "timestamp": datetime.now().isoformat(),
+                "data": {"test": f"data_{i}" * 100}  # Some payload
+            }
+            
+            result, metrics = self.benchmark.measure_operation(
+                "arango_create",
+                handler.handle,
+                {
+                    "operation": "create",
+                    "collection": "benchmark_test",
+                    "data": doc
+                }
+            )
+            
+            print(f"  Create iteration {i+1}: {metrics['duration']:.3f}s")
+            
+        # Benchmark batch operations
+        batch_docs = [
+            {
+                "type": "batch_test",
+                "index": j,
+                "batch": "test_batch",
+                "data": {"value": j * 100}
+            }
+            for j in range(50)
+        ]
+        
+        result, metrics = self.benchmark.measure_operation(
+            "arango_batch_create",
+            handler.handle,
+            {
+                "operation": "batch_create",
+                "collection": "benchmark_test",
+                "documents": batch_docs
+            }
+        )
+        
+        print(f"  Batch create (50 docs): {metrics['duration']:.3f}s")
+        
+    def benchmark_search_operations(self, queries: List[str], iterations: int = 5):
+        """Benchmark search operations"""
+        print("\n📊 Benchmarking Search Operations...")
+        
+        from arangodb_handlers.real_arangodb_handlers import ArangoSearchHandler
+        handler = ArangoSearchHandler()
+        
+        if not handler.connect():
+            print("  ❌ Failed to connect to ArangoDB")
+            return
+            
+        for query in queries:
+            for i in range(iterations):
+                # BM25 search
+                result, metrics = self.benchmark.measure_operation(
+                    "search_bm25",
+                    handler.handle,
+                    {
+                        "search_type": "bm25",
+                        "query": query,
+                        "limit": 10
+                    }
+                )
+                
+                print(f"  BM25 search '{query[:20]}...' iteration {i+1}: {metrics['duration']:.3f}s")
+
+
+class ScalabilityTests:
+    """Test system scalability"""
+    
+    def __init__(self, benchmark: PerformanceBenchmark):
+        self.benchmark = benchmark
+        
+    async def test_concurrent_operations(self, concurrency_levels: List[int]):
+        """Test performance under different concurrency levels"""
+        print("\n📊 Testing Concurrent Operations...")
+        
+        from performance_optimization_task import OptimizedArxivHandler, CacheManager, PerformanceMetrics
+        
+        cache = CacheManager()
+        metrics = PerformanceMetrics()
+        handler = OptimizedArxivHandler(cache, metrics)
+        
+        for level in concurrency_levels:
+            print(f"\n  Testing with {level} concurrent requests...")
+            
+            # Create concurrent tasks
+            tasks = []
+            queries = [f"machine learning application {i}" for i in range(level)]
+            
+            start_time = time.time()
+            
+            # Run searches concurrently
+            for query in queries:
+                task = asyncio.create_task(
+                    asyncio.to_thread(handler.search_papers, query, 3)
+                )
+                tasks.append(task)
+                
+            results = await asyncio.gather(*tasks)
+            
+            duration = time.time() - start_time
+            throughput = level / duration
+            
+            print(f"    Duration: {duration:.3f}s")
+            print(f"    Throughput: {throughput:.2f} req/s")
+            print(f"    Avg latency: {duration/level:.3f}s")
+            
+        cache.clear()
+        
+    def test_data_scaling(self, data_sizes: List[int]):
+        """Test performance with different data sizes"""
+        print("\n📊 Testing Data Scaling...")
+        
+        handler = ArangoDocumentHandler()
+        
+        if not handler.connect():
+            print("  ❌ Failed to connect to ArangoDB")
+            return
+            
+        for size in data_sizes:
+            print(f"\n  Testing with {size} documents...")
+            
+            # Generate test documents
+            docs = []
+            for i in range(size):
+                doc = {
+                    "type": "scale_test",
+                    "index": i,
+                    "data": {"value": f"test_data_{i}" * 10}
+                }
+                docs.append(doc)
+                
+            # Measure batch insert
+            result, metrics = self.benchmark.measure_operation(
+                f"batch_insert_{size}",
+                handler.handle,
+                {
+                    "operation": "batch_create",
+                    "collection": "scale_test",
+                    "documents": docs
+                }
+            )
+            
+            throughput = size / metrics['duration']
+            
+            print(f"    Duration: {metrics['duration']:.3f}s")
+            print(f"    Throughput: {throughput:.0f} docs/s")
+            print(f"    Memory delta: {metrics['memory_delta']:.2f} MB")
+
+
+async def run_comprehensive_benchmark():
+    """Run comprehensive performance benchmarks"""
+    benchmark = PerformanceBenchmark()
+    module_bench = ModuleBenchmarks(benchmark)
+    scalability = ScalabilityTests(benchmark)
+    
+    print("🚀 GRANGER Performance Benchmarking Suite")
+    print("="*60)
+    
+    # Module benchmarks
+    print("\n1️⃣ Module Performance Benchmarks")
+    
+    # ArXiv benchmarks
+    test_queries = [
+        "machine learning security",
+        "quantum computing",
+        "buffer overflow",
+        "neural network optimization"
+    ]
+    module_bench.benchmark_arxiv_search(test_queries, iterations=3)
+    
+    # Get some paper IDs for download test
+    handler = ArxivSearchHandler()
+    result = handler.handle({"query": "machine learning", "max_results": 5})
+    if "papers" in result:
+        paper_ids = [p["pdf_url"].split("/")[-1].replace(".pdf", "") for p in result["papers"]]
+        module_bench.benchmark_arxiv_download(paper_ids[:3], iterations=2)
+        
+    # ArangoDB benchmarks
+    module_bench.benchmark_arangodb_operations(iterations=5)
+    module_bench.benchmark_search_operations(["test", "benchmark"], iterations=3)
+    
+    # Scalability tests
+    print("\n\n2️⃣ Scalability Tests")
+    
+    # Concurrent operations
+    await scalability.test_concurrent_operations([1, 5, 10, 20])
+    
+    # Data scaling
+    scalability.test_data_scaling([10, 100, 500, 1000])
+    
+    # Generate report
+    print("\n\n3️⃣ Performance Report")
+    print("="*60)
+    
+    report = benchmark.generate_report()
+    print(report)
+    
+    # Save report
+    report_path = Path("performance_benchmark_report.md")
+    report_path.write_text(report)
+    print(f"\n📄 Report saved to: {report_path}")
+    
+    # Performance summary
+    print("\n\n4️⃣ Performance Summary")
+    print("="*60)
+    
+    # Calculate key metrics
+    arxiv_stats = benchmark.get_statistics("arxiv_search")
+    arango_stats = benchmark.get_statistics("arango_create")
+    
+    if arxiv_stats:
+        print(f"ArXiv Search - Avg: {arxiv_stats['avg_duration']:.3f}s, P95: {arxiv_stats['p95_duration']:.3f}s")
+    if arango_stats:
+        print(f"ArangoDB Create - Avg: {arango_stats['avg_duration']:.3f}s, P95: {arango_stats['p95_duration']:.3f}s")
+        
+    # Success criteria
+    success = True
+    if arxiv_stats and arxiv_stats['avg_duration'] > 3.0:
+        print("⚠️ ArXiv search performance below target (<3s)")
+        success = False
+    if arango_stats and arango_stats['avg_duration'] > 0.5:
+        print("⚠️ ArangoDB create performance below target (<0.5s)")
+        success = False
+        
+    print(f"\nBenchmark Result: {'✅ PASSED' if success else '❌ NEEDS OPTIMIZATION'}")
+    
+    return success
+
+
+if __name__ == "__main__":
+    # Set environment
+    os.environ['ARANGO_HOST'] = 'http://localhost:8529'
+    os.environ['ARANGO_USER'] = 'root'
+    os.environ['ARANGO_PASSWORD'] = 'openSesame'
+    
+    # Run benchmarks
+    success = asyncio.run(run_comprehensive_benchmark())
+    
+    # Exit code
+    exit(0 if success else 1)

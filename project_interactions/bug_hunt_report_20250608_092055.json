@@ -1,0 +1,145 @@
+{
+  "success": true,
+  "duration_hours": 0.02,
+  "tests_run": 7,
+  "total_bugs_found": 7,
+  "critical_bugs": 0,
+  "high_bugs": 2,
+  "bugs_by_module": {
+    "granger_hub": 2,
+    "arangodb": 4
+  },
+  "bug_patterns": {},
+  "test_history": [
+    {
+      "scenario": "Security Boundary Testing",
+      "timestamp": "2025-06-08T09:19:57.060164",
+      "bugs_found": 2,
+      "duration": 1.3828277587890625e-05,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Performance and Scale Testing",
+      "timestamp": "2025-06-08T09:19:57.561900",
+      "bugs_found": 0,
+      "duration": 5.4836273193359375e-06,
+      "success": false
+    },
+    {
+      "scenario": "Pipeline State Corruption Testing",
+      "timestamp": "2025-06-08T09:19:58.354523",
+      "bugs_found": 2,
+      "duration": 0.29120564460754395,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Temporal Evolution Testing",
+      "timestamp": "2025-06-08T09:19:58.856367",
+      "bugs_found": 0,
+      "duration": 4.5299530029296875e-06,
+      "success": false
+    },
+    {
+      "scenario": "Memvid Integration Testing",
+      "timestamp": "2025-06-08T09:19:59.357763",
+      "bugs_found": 0,
+      "duration": 6.4373016357421875e-06,
+      "success": false
+    },
+    {
+      "scenario": "Module Resilience Testing",
+      "timestamp": "2025-06-08T09:20:54.407828",
+      "bugs_found": 3,
+      "duration": 54.54864192008972,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Visual Memory Resilience",
+      "timestamp": "2025-06-08T09:20:54.909850",
+      "bugs_found": 0,
+      "duration": 9.059906005859375e-06,
+      "success": false
+    }
+  ],
+  "detailed_bugs": [
+    {
+      "description": "Pipeline data isolation testing not fully implemented",
+      "severity": "medium",
+      "type": "test_coverage",
+      "modules_affected": [
+        "granger_hub",
+        "arangodb"
+      ],
+      "scenario": "Security Boundary Testing",
+      "level": 3,
+      "id": "2a3f5f9a-4129-4c53-bb0c-9c5ff784ddd3",
+      "timestamp": "2025-06-08T09:19:57.060135"
+    },
+    {
+      "description": "Test completed too quickly (0.000s)",
+      "severity": "high",
+      "type": "test_validity",
+      "scenario": "Security Boundary Testing",
+      "level": 3,
+      "id": "78836812-8b84-4224-894b-72623bceb5b5",
+      "timestamp": "2025-06-08T09:19:57.060158"
+    },
+    {
+      "description": "Pipeline state recovery not implemented",
+      "severity": "medium",
+      "type": "state_management",
+      "modules_affected": [
+        "granger_hub"
+      ],
+      "scenario": "Pipeline State Corruption Testing",
+      "level": 2,
+      "id": "b183b8b5-4314-4236-86e2-ede4f83ba613",
+      "timestamp": "2025-06-08T09:19:58.354477"
+    },
+    {
+      "description": "Test completed too quickly (0.291s)",
+      "severity": "high",
+      "type": "test_validity",
+      "scenario": "Pipeline State Corruption Testing",
+      "level": 2,
+      "id": "37702c59-446a-4166-9040-80edb0f914a8",
+      "timestamp": "2025-06-08T09:19:58.354511"
+    },
+    {
+      "description": "Poor ArangoDB error for http://localhost:9999: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "2f30815e-691d-498c-972a-40d541a1a3ba",
+      "timestamp": "2025-06-08T09:20:54.407764"
+    },
+    {
+      "description": "Poor ArangoDB error for https://localhost:8529: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "653bc2ab-c5ea-4117-b2a6-6929ccc8c7da",
+      "timestamp": "2025-06-08T09:20:54.407796"
+    },
+    {
+      "description": "Poor ArangoDB error for http://999.999.999.999:8529: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "b84f7caa-cfc1-4122-baf8-fc1e31028924",
+      "timestamp": "2025-06-08T09:20:54.407816"
+    }
+  ]
+}

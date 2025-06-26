@@ -1,0 +1,17 @@
+PROJECTS=(
+  "/home/graham/workspace/experiments/rl_commons/"
+  "/home/graham/workspace/experiments/aider-daemon/"
+    "/home/graham/workspace/experiments/sparta/"
+    "/home/graham/workspace/experiments/marker/"
+    "/home/graham/workspace/experiments/arangodb/"
+    "/home/graham/workspace/experiments/chat/"
+    "/home/graham/workspace/experiments/youtube_transcripts/"
+    "/home/graham/workspace/experiments/llm_call/"
+    "/home/graham/workspace/mcp-servers/arxiv-mcp-server/"
+    "/home/graham/workspace/experiments/granger_hub/"
+    "/home/graham/workspace/experiments/claude-test-reporter/"
+    "/home/graham/workspace/experiments/fine_tuning/"
+    "/home/graham/workspace/experiments/annotator/"
+    "/home/graham/workspace/experiments/mcp-screenshot/"
+    /home/graham/workspace/experiments/darpa_crawl/README.md
+)

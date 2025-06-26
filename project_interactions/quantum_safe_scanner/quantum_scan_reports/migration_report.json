@@ -1,0 +1,848 @@
+{
+  "scan_timestamp": "2025-06-01T19:05:52.952759",
+  "total_files_scanned": 2,
+  "summary_statistics": {
+    "RSA": 40,
+    "ECC": 28,
+    "DH": 20,
+    "DSA": 10
+  },
+  "estimated_total_effort_hours": 566,
+  "vulnerabilities": [
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 73,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# RSA patterns"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 74,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'\\bRSA\\b': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 75,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'RSA-?\\d{3,4}': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 76,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'rsaEncryption': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 77,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'RSAPrivateKey|RSAPublicKey': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 78,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'Crypto\\.PublicKey\\.RSA': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 79,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "r'OpenSSL.*RSA': 'RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 81,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# Elliptic Curve patterns"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 82,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "r'\\bECC\\b|\\bECDSA\\b': 'ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 83,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "r'elliptic.?curve': 'ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 84,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "r'secp256[kr]1|P-256|P-384|P-521': 'ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 85,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "r'EC_KEY|ECPrivateKey|ECPublicKey': 'ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 86,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "r'Crypto\\.PublicKey\\.ECC': 'ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 88,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "# Diffie-Hellman patterns"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 89,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'\\bDH\\b|Diffie.?Hellman': 'DH',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 90,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'DHE|ECDHE': 'DH',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 91,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'DH_generate_parameters': 'DH',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 92,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'DiffieHellmanGroup': 'DH',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 94,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "# DSA patterns"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 95,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'\\bDSA\\b': 'DSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 96,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'DSAPrivateKey|DSAPublicKey': 'DSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 97,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "r'Crypto\\.PublicKey\\.DSA': 'DSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 110,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "'RSA': {"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 115,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "'ECC': {"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 120,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "'DH': {"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 125,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "'DSA': {"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 213,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "# RSA vulnerability assessment"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 214,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "if algorithm == 'RSA':"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 222,
+      "algorithm": "ECC",
+      "key_size": 256,
+      "vulnerability_level": "medium",
+      "code_snippet": "# ECC is generally more resistant but still vulnerable"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 223,
+      "algorithm": "ECC",
+      "key_size": 256,
+      "vulnerability_level": "medium",
+      "code_snippet": "elif algorithm == 'ECC':"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 229,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "# DH and DSA are highly vulnerable"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 230,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "elif algorithm in ['DH', 'DSA']:"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 285,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "if algorithm in ['RSA', 'ECC']:"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 368,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "risk = 'High' if algo in ['DH', 'DSA'] else 'Medium'"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 422,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "import Crypto.PublicKey.RSA"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 423,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "from cryptography.hazmat.primitives.asymmetric import rsa"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 425,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# RSA-2048 key generation"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 426,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "private_key = rsa.generate_private_key("
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 431,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# ECDSA with P-256"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 433,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "private_key = ec.generate_private_key(ec.SECP256R1())"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 439,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "// Generate RSA-1024 key pair (weak!)"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 440,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "KeyPairGenerator keyGen = KeyPairGenerator.getInstance(\"RSA\");"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 444,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "// Diffie-Hellman key exchange"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 445,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "KeyPairGenerator dhGen = KeyPairGenerator.getInstance(\"DH\");"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 452,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "\"crypto/rsa\""
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 453,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "\"crypto/ecdsa\""
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 457,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "// Generate RSA-4096 key"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 458,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "privateKey, _ := rsa.GenerateKey(rand.Reader, 4096)"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 460,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "// Generate ECC P-384 key"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 461,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "ecKey, _ := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 494,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "from Crypto.PublicKey import RSA, ECC, DSA"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 499,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "self.rsa_key = RSA.generate(2048)"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 500,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "self.ecc_key = ECC.generate(curve='P-256')"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 501,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "self.dsa_key = DSA.generate(2048)"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 504,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# RSA encryption with 2048-bit key"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 508,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# ECDSA signature with secp256k1"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 534,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "algorithm='RSA',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 536,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "context='rsa.generate_private_key(key_size=2048)',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 538,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "code_snippet='private_key = rsa.generate_private_key(key_size=2048)'"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 543,
+      "algorithm": "ECC",
+      "key_size": 256,
+      "vulnerability_level": "medium",
+      "code_snippet": "algorithm='ECC',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 545,
+      "algorithm": "ECC",
+      "key_size": 256,
+      "vulnerability_level": "medium",
+      "code_snippet": "context='ecdsa.GenerateKey(elliptic.P256())',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 547,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "code_snippet='key, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)'"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 552,
+      "algorithm": "DH",
+      "key_size": 1024,
+      "vulnerability_level": "high",
+      "code_snippet": "algorithm='DH',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 554,
+      "algorithm": "DH",
+      "key_size": 1024,
+      "vulnerability_level": "high",
+      "code_snippet": "context='DH_generate_parameters(1024)',"
+    },
+    {
+      "file_path": "quantum_safe_scanner_interaction.py",
+      "line_number": 556,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "code_snippet='DH *dh = DH_generate_parameters(1024, DH_GENERATOR_2, NULL, NULL);'"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 6,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 15,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# RSA-2048 key generation (vulnerable to quantum attacks)"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 16,
+      "algorithm": "RSA",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "self.rsa_private_key = rsa.generate_private_key("
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 22,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# ECDSA with P-256 curve (vulnerable)"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 24,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "ec.SECP256R1(),  # P-256 curve"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 28,
+      "algorithm": "DSA",
+      "key_size": 2048,
+      "vulnerability_level": "high",
+      "code_snippet": "# DSA key generation (highly vulnerable)"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 29,
+      "algorithm": "DSA",
+      "key_size": 2048,
+      "vulnerability_level": "high",
+      "code_snippet": "self.dsa_private_key = dsa.generate_private_key("
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 35,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "\"\"\"Legacy RSA with weak 1024-bit key\"\"\""
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 36,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# WARNING: RSA-1024 is critically weak!"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 37,
+      "algorithm": "RSA",
+      "key_size": 1024,
+      "vulnerability_level": "high",
+      "code_snippet": "weak_key = rsa.generate_private_key("
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 44,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "def setup_tls_ecdhe(self):"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 45,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "\"\"\"Setup ECDHE for TLS (needs quantum-safe replacement)\"\"\""
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 46,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# Elliptic Curve Diffie-Hellman Ephemeral"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 48,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "ec.SECP384R1(),  # P-384 curve"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 58,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# Initialize with RSA-4096 (still quantum-vulnerable)"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 59,
+      "algorithm": "RSA",
+      "key_size": 4096,
+      "vulnerability_level": "low",
+      "code_snippet": "self.signing_key = rsa.generate_private_key("
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 66,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "\"\"\"Generate ECDSA key pair for signatures\"\"\""
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 67,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "# Using secp256k1 (Bitcoin curve) - quantum-vulnerable"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 69,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "ec.SECP256K1(),"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 74,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "def setup_diffie_hellman(self):"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 75,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "\"\"\"Classic Diffie-Hellman setup (highly vulnerable)\"\"\""
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 76,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "# Note: DH is particularly vulnerable to quantum attacks"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 78,
+      "algorithm": "DSA",
+      "key_size": 2048,
+      "vulnerability_level": "high",
+      "code_snippet": "parameters = dsa.generate_parameters("
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 89,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# OpenSSL-style RSA operations"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 90,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# RSAPublicKey and RSAPrivateKey usage"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 91,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "print(\"Initializing RSA encryption...\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 94,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# KeyPairGenerator.getInstance(\"RSA\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 95,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "# Cipher.getInstance(\"RSA/ECB/PKCS1Padding\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 99,
+      "algorithm": "ECC",
+      "key_size": 2048,
+      "vulnerability_level": "medium",
+      "code_snippet": "# ECDsaCng for elliptic curve operations"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 107,
+      "algorithm": "RSA",
+      "key_size": null,
+      "vulnerability_level": "low",
+      "code_snippet": "print(\"- RSA (various key sizes)\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 108,
+      "algorithm": "ECC",
+      "key_size": null,
+      "vulnerability_level": "medium",
+      "code_snippet": "print(\"- ECDSA/ECDH (various curves)\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 109,
+      "algorithm": "DSA",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "print(\"- DSA\")"
+    },
+    {
+      "file_path": "sample_vulnerable_code.py",
+      "line_number": 110,
+      "algorithm": "DH",
+      "key_size": null,
+      "vulnerability_level": "high",
+      "code_snippet": "print(\"- Diffie-Hellman\")"
+    }
+  ],
+  "recommendations": [
+    {
+      "current_algorithm": "RSA",
+      "recommended_algorithms": [
+        "CRYSTALS-Dilithium",
+        "FALCON",
+        "SPHINCS+"
+      ],
+      "migration_effort": "high",
+      "security_level": 3,
+      "implementation_notes": "For encryption, use CRYSTALS-Kyber or Classic McEliece",
+      "estimated_hours": 200
+    },
+    {
+      "current_algorithm": "ECC",
+      "recommended_algorithms": [
+        "CRYSTALS-Dilithium",
+        "FALCON",
+        "SPHINCS+"
+      ],
+      "migration_effort": "high",
+      "security_level": 3,
+      "implementation_notes": "For key exchange, use CRYSTALS-Kyber",
+      "estimated_hours": 176
+    },
+    {
+      "current_algorithm": "DH",
+      "recommended_algorithms": [
+        "CRYSTALS-Kyber",
+        "Classic McEliece",
+        "BIKE",
+        "HQC"
+      ],
+      "migration_effort": "high",
+      "security_level": 3,
+      "implementation_notes": "CRYSTALS-Kyber recommended for most use cases",
+      "estimated_hours": 140
+    },
+    {
+      "current_algorithm": "DSA",
+      "recommended_algorithms": [
+        "CRYSTALS-Dilithium",
+        "FALCON",
+        "SPHINCS+"
+      ],
+      "migration_effort": "medium",
+      "security_level": 3,
+      "implementation_notes": "CRYSTALS-Dilithium offers best performance",
+      "estimated_hours": 50
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Demonstration of Documentation Generator usage
+"""
+
+from pathlib import Path
+from doc_generator_interaction import DocumentationGenerator
+
+def main():
+    """Run documentation generator demo"""
+    
+    # Create generator instance
+    generator = DocumentationGenerator()
+    
+    # Generate documentation for the example module
+    print("Generating documentation for example_module.py...")
+    module_info = generator.generate_from_module("example_module.py")
+    
+    # Display module information
+    print(f"\nModule: {module_info.name}")
+    print(f"Docstring: {module_info.docstring[:50]}...")
+    print(f"Classes: {[c.name for c in module_info.classes]}")
+    print(f"Functions: {[f.name for f in module_info.functions]}")
+    print(f"Constants: {list(module_info.constants.keys())}")
+    print(f"Dependencies: {sorted(module_info.dependencies)}")
+    
+    # Export in different formats
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    
+    print("\nExporting documentation...")
+    
+    # Markdown
+    generator.export_markdown(output_dir / "documentation.md")
+    print("✅ Markdown exported to output/documentation.md")
+    
+    # HTML
+    generator.export_html(output_dir / "documentation.html")
+    print("✅ HTML exported to output/documentation.html")
+    
+    # JSON
+    generator.export_json(output_dir / "documentation.json")
+    print("✅ JSON exported to output/documentation.json")
+    
+    # Generate dependency diagram
+    print("\nDependency Diagram:")
+    print(generator.generate_interaction_diagram())
+    
+    # Show sample of generated markdown
+    print("\nSample of generated Markdown:")
+    print("-" * 50)
+    with open(output_dir / "documentation.md") as f:
+        lines = f.readlines()
+        print("".join(lines[:30]))  # First 30 lines
+    print("-" * 50)
+    
+
+if __name__ == "__main__":
+    main()

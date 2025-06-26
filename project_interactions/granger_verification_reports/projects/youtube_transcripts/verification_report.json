@@ -1,0 +1,152 @@
+{
+  "project_name": "youtube_transcripts",
+  "project_path": "/home/graham/workspace/experiments/youtube_transcripts",
+  "project_type": "Media Processing",
+  "status": "warnings",
+  "mode": "VerificationMode.FULL",
+  "duration": 3.063096761703491,
+  "cleanup_result": "passed",
+  "compliance_result": "failed",
+  "test_result": "passed",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 0,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/rate_limiter.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/error_handler.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/circular_ref_detector.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/link_extractor.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/storage_operations.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/research_pipeline.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/module_boundaries.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/youtube_error_handler.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/error_handler_v2.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    }
+  ],
+  "auto_fixes_applied": 0,
+  "fix_directive_generated": true
+}

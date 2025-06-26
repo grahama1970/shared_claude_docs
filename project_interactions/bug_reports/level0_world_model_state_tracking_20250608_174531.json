@@ -1,0 +1,119 @@
+{
+  "test_name": "World Model State Tracking",
+  "level": 0,
+  "modules": [
+    "World Model",
+    "Test Reporter"
+  ],
+  "timestamp": "20250608_174531",
+  "duration": 0.00039458274841308594,
+  "verification": {
+    "verified": false,
+    "reason": "Test Reporter not available",
+    "confidence_score": 0.5,
+    "total_tests": 6,
+    "passed_tests": 0,
+    "failed_tests": 6,
+    "bugs_found": 3,
+    "suspicious_patterns": []
+  },
+  "bugs": [
+    {
+      "bug": "World Model module import failure",
+      "severity": "CRITICAL",
+      "timestamp": 1749419131.4988432,
+      "test_level": 0,
+      "modules": [
+        "World Model",
+        "Test Reporter"
+      ],
+      "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)",
+      "impact": "Cannot use World Model functionality"
+    },
+    {
+      "bug": "Exception in prediction",
+      "severity": "HIGH",
+      "timestamp": 1749419131.4988794,
+      "test_level": 0,
+      "modules": [
+        "World Model",
+        "Test Reporter"
+      ],
+      "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+    },
+    {
+      "bug": "Exception in memory management test",
+      "severity": "MEDIUM",
+      "timestamp": 1749419131.498919,
+      "test_level": 0,
+      "modules": [
+        "World Model",
+        "Test Reporter"
+      ],
+      "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "bug_check_1",
+      "passed": false,
+      "timestamp": 1749419131.4988463,
+      "duration": 0.0002505779266357422,
+      "details": {
+        "bug": "World Model module import failure",
+        "severity": "CRITICAL",
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)",
+        "impact": "Cannot use World Model functionality"
+      }
+    },
+    {
+      "test": "world_model_import",
+      "passed": false,
+      "timestamp": 1749419131.4988475,
+      "duration": 0.0002524852752685547,
+      "details": {
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+      }
+    },
+    {
+      "test": "bug_check_2",
+      "passed": false,
+      "timestamp": 1749419131.4988842,
+      "duration": 0.0002887248992919922,
+      "details": {
+        "bug": "Exception in prediction",
+        "severity": "HIGH",
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+      }
+    },
+    {
+      "test": "prediction_test",
+      "passed": false,
+      "timestamp": 1749419131.4988854,
+      "duration": 0.00029015541076660156,
+      "details": {
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+      }
+    },
+    {
+      "test": "bug_check_3",
+      "passed": false,
+      "timestamp": 1749419131.4989202,
+      "duration": 0.0003249645233154297,
+      "details": {
+        "bug": "Exception in memory management test",
+        "severity": "MEDIUM",
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+      }
+    },
+    {
+      "test": "memory_management",
+      "passed": false,
+      "timestamp": 1749419131.4989212,
+      "duration": 0.00032591819763183594,
+      "details": {
+        "error": "cannot import name 'WorldModel' from 'world_model' (unknown location)"
+      }
+    }
+  ]
+}

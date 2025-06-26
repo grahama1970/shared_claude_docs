@@ -1,0 +1,34 @@
+{
+  "deployment_id": "test-persist-1748984081",
+  "config": {
+    "service_name": "persist-test",
+    "version": "v1.0",
+    "strategy": "canary",
+    "health_check_interval_seconds": 10,
+    "monitoring_duration_minutes": 30,
+    "rollback_threshold_violations": 3,
+    "traffic_increment_percentage": 10,
+    "health_thresholds": {
+      "max_response_time_ms": 1000,
+      "max_error_rate": 0.05,
+      "min_success_rate": 0.95,
+      "max_cpu_usage": 0.8,
+      "max_memory_usage": 0.85
+    },
+    "feature_flags": {}
+  },
+  "status": "completed",
+  "start_time": "2025-06-03T16:54:41.649563",
+  "end_time": null,
+  "current_traffic_percentage": 0,
+  "health_violations": [],
+  "rollback_count": 0,
+  "metrics_history": [
+    {
+      "response_time_ms": 100,
+      "error_rate": 0.01,
+      "success_rate": 0.99,
+      "cpu_usage": 0.5,
+      "memory_usage": 0.6,
+      "active_connections": 500,
+      "timestamp": 

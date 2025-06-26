@@ -1,0 +1,6 @@
+STDOUT:
+
+
+STDERR:
+/home/graham/workspace/experiments/claude-test-reporter/.venv/bin/python: No module named pytest
+

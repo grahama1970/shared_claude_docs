@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-06-07 16:38:19",
+  "results": [
+    {
+      "project": "granger_hub",
+      "path": "/home/graham/workspace/experiments/granger_hub",
+      "status": "no_output",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/granger_hub/.venv/bin/pytest\", line 4, in <module>\n    from pytest import console_main\n  File \"/home/graham/workspace/experiments/granger_hub/.venv/lib/python3.11/site-packages/pytest/__init__.py\", line 21\n    from __future__ import annotations\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: from __future__ imports must occur at the beginning of the file\n",
+      "error": "No test output found",
+      "duration": 0.023426294326782227
+    },
+    {
+      "project": "rl_commons",
+      "path": "/home/graham/workspace/experiments/rl_commons",
+      "status": "passed",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "output": "============================= test session starts ==============================\ncollected 81 items / 1 error\n\n==================================== ERRORS ====================================\n___________________ ERROR collecting tests/test_honeypot.py ____________________\n'honeypot' not found in `markers` configuration option\n--------------------------------- JSON report ----------------------------------\nreport saved to: /home/graham/workspace/experiments/rl_commons/test_report.json\n=========================== short test summary info ============================\nERROR tests/test_honeypot.py - Failed: 'honeypot' not found in `markers` conf...\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 2.48s ===============================\n",
+      "error": null,
+      "duration": 3.215428113937378
+    },
+    {
+      "project": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "status": "no_output",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "output": "Cannot read termcap database;\nusing dumb terminal settings.\nERROR: usage: pytest [options] [file_or_dir] [file_or_dir] [...]\npytest: error: unrecognized arguments: --json-report --json-report-file=/home/graham/workspace/experiments/claude-test-reporter/test_report.json\n  inifile: /home/graham/workspace/experiments/claude-test-reporter/pyproject.toml\n  rootdir: /home/graham/workspace/experiments/claude-test-reporter\n\n",
+      "error": "No test output found",
+      "duration": 0.13961172103881836
+    }
+  ]
+}

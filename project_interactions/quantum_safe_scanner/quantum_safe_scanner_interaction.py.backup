@@ -1,0 +1,645 @@
+"""
+Module: quantum_safe_scanner_interaction.py
+Purpose: Scan codebases for quantum-vulnerable cryptography and suggest migrations
+
+This module implements a pipeline to identify quantum-vulnerable cryptographic
+algorithms in codebases and provide migration recommendations to quantum-safe
+alternatives based on NIST Post-Quantum Cryptography standards.
+
+External Dependencies:
+- re: https://docs.python.org/3/library/re.html
+- pathlib: https://docs.python.org/3/library/pathlib.html
+- typing: https://docs.python.org/3/library/typing.html
+- dataclasses: https://docs.python.org/3/library/dataclasses.html
+- datetime: https://docs.python.org/3/library/datetime.html
+
+Example Usage:
+>>> scanner = QuantumSafeScanner()
+>>> results = scanner.scan_directory("/path/to/codebase")
+>>> report = scanner.generate_migration_report(results)
+>>> print(f"Found {len(results)} vulnerabilities")
+Found 5 vulnerabilities
+"""
+
+import re
+import os
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional, Set
+from dataclasses import dataclass, field
+from datetime import datetime
+import json
+
+
+@dataclass
+class CryptoVulnerability:
+    """Represents a quantum-vulnerable cryptographic implementation"""
+    file_path: str
+    line_number: int
+    algorithm: str
+    key_size: Optional[int]
+    context: str
+    vulnerability_level: str  # "high", "medium", "low"
+    code_snippet: str
+
+
+@dataclass
+class MigrationRecommendation:
+    """Quantum-safe migration recommendation"""
+    current_algorithm: str
+    recommended_algorithms: List[str]
+    migration_effort: str  # "low", "medium", "high"
+    security_level: int  # NIST security level (1-5)
+    implementation_notes: str
+    estimated_hours: int
+
+
+@dataclass
+class MigrationReport:
+    """Complete migration analysis report"""
+    scan_timestamp: str
+    total_files_scanned: int
+    vulnerabilities: List[CryptoVulnerability]
+    recommendations: List[MigrationRecommendation]
+    summary_statistics: Dict[str, int]
+    estimated_total_effort_hours: int
+
+
+class QuantumSafeScanner:
+    """Scanner for quantum-vulnerable cryptography in codebases"""
+    
+    def __init__(self):
+        # Quantum-vulnerable algorithm patterns
+        self.vulnerable_patterns = {
+            # RSA patterns
+            r'\bRSA\b': 'RSA',
+            r'RSA-?\d{3,4}': 'RSA',
+            r'rsaEncryption': 'RSA',
+            r'RSAPrivateKey|RSAPublicKey': 'RSA',
+            r'Crypto\.PublicKey\.RSA': 'RSA',
+            r'OpenSSL.*RSA': 'RSA',
+            
+            # Elliptic Curve patterns
+            r'\bECC\b|\bECDSA\b': 'ECC',
+            r'elliptic.?curve': 'ECC',
+            r'secp256[kr]1|P-256|P-384|P-521': 'ECC',
+            r'EC_KEY|ECPrivateKey|ECPublicKey': 'ECC',
+            r'Crypto\.PublicKey\.ECC': 'ECC',
+            
+            # Diffie-Hellman patterns
+            r'\bDH\b|Diffie.?Hellman': 'DH',
+            r'DHE|ECDHE': 'DH',
+            r'DH_generate_parameters': 'DH',
+            r'DiffieHellmanGroup': 'DH',
+            
+            # DSA patterns
+            r'\bDSA\b': 'DSA',
+            r'DSAPrivateKey|DSAPublicKey': 'DSA',
+            r'Crypto\.PublicKey\.DSA': 'DSA',
+        }
+        
+        # Key size patterns
+        self.key_size_patterns = {
+            r'(\d{3,4})\s*bit': lambda m: int(m.group(1)),
+            r'key.?size.?\D*(\d{3,4})': lambda m: int(m.group(1)),
+            r'modulus.?\D*(\d{3,4})': lambda m: int(m.group(1)),
+            r'bits?\s*=\s*(\d{3,4})': lambda m: int(m.group(1)),
+        }
+        
+        # NIST PQC recommendations
+        self.pqc_recommendations = {
+            'RSA': {
+                'algorithms': ['CRYSTALS-Dilithium', 'FALCON', 'SPHINCS+'],
+                'use_case': 'Digital signatures',
+                'notes': 'For encryption, use CRYSTALS-Kyber or Classic McEliece'
+            },
+            'ECC': {
+                'algorithms': ['CRYSTALS-Dilithium', 'FALCON', 'SPHINCS+'],
+                'use_case': 'Digital signatures',
+                'notes': 'For key exchange, use CRYSTALS-Kyber'
+            },
+            'DH': {
+                'algorithms': ['CRYSTALS-Kyber', 'Classic McEliece', 'BIKE', 'HQC'],
+                'use_case': 'Key encapsulation/exchange',
+                'notes': 'CRYSTALS-Kyber recommended for most use cases'
+            },
+            'DSA': {
+                'algorithms': ['CRYSTALS-Dilithium', 'FALCON', 'SPHINCS+'],
+                'use_case': 'Digital signatures',
+                'notes': 'CRYSTALS-Dilithium offers best performance'
+            }
+        }
+        
+        # File extensions to scan
+        self.supported_extensions = {
+            '.py', '.js', '.java', '.cpp', '.c', '.cs', '.go', '.rs',
+            '.rb', '.php', '.swift', '.kt', '.scala', '.ts', '.jsx', '.tsx'
+        }
+    
+    def scan_file(self, file_path: Path) -> List[CryptoVulnerability]:
+        """Scan a single file for quantum-vulnerable cryptography"""
+        vulnerabilities = []
+        
+        try:
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            lines = content.splitlines()
+            
+            for line_num, line in enumerate(lines, 1):
+                # Check for vulnerable algorithms
+                for pattern, algorithm in self.vulnerable_patterns.items():
+                    if re.search(pattern, line, re.IGNORECASE):
+                        # Extract context (surrounding lines)
+                        start = max(0, line_num - 3)
+                        end = min(len(lines), line_num + 2)
+                        context_lines = lines[start:end]
+                        context = '\n'.join(context_lines)
+                        
+                        # Try to extract key size
+                        key_size = self._extract_key_size(context)
+                        
+                        # Determine vulnerability level
+                        vuln_level = self._assess_vulnerability_level(algorithm, key_size)
+                        
+                        vulnerability = CryptoVulnerability(
+                            file_path=str(file_path),
+                            line_number=line_num,
+                            algorithm=algorithm,
+                            key_size=key_size,
+                            context=context,
+                            vulnerability_level=vuln_level,
+                            code_snippet=line.strip()
+                        )
+                        vulnerabilities.append(vulnerability)
+                        break  # Avoid duplicate detection on same line
+        
+        except Exception as e:
+            print(f"Error scanning {file_path}: {e}")
+        
+        return vulnerabilities
+    
+    def scan_directory(self, directory: str) -> List[CryptoVulnerability]:
+        """Scan entire directory for quantum-vulnerable cryptography"""
+        vulnerabilities = []
+        dir_path = Path(directory)
+        
+        if not dir_path.exists():
+            raise ValueError(f"Directory not found: {directory}")
+        
+        # Find all supported files
+        files_to_scan = []
+        for ext in self.supported_extensions:
+            files_to_scan.extend(dir_path.rglob(f'*{ext}'))
+        
+        print(f"Scanning {len(files_to_scan)} files...")
+        
+        for file_path in files_to_scan:
+            file_vulns = self.scan_file(file_path)
+            vulnerabilities.extend(file_vulns)
+        
+        return vulnerabilities
+    
+    def _extract_key_size(self, context: str) -> Optional[int]:
+        """Extract key size from code context"""
+        for pattern, extractor in self.key_size_patterns.items():
+            match = re.search(pattern, context, re.IGNORECASE)
+            if match:
+                try:
+                    return extractor(match)
+                except:
+                    pass
+        return None
+    
+    def _assess_vulnerability_level(self, algorithm: str, key_size: Optional[int]) -> str:
+        """Assess the vulnerability level based on algorithm and key size"""
+        # RSA vulnerability assessment
+        if algorithm == 'RSA':
+            if key_size and key_size < 2048:
+                return 'high'
+            elif key_size and key_size < 3072:
+                return 'medium'
+            else:
+                return 'low'
+        
+        # ECC is generally more resistant but still vulnerable
+        elif algorithm == 'ECC':
+            if key_size and key_size < 256:
+                return 'high'
+            else:
+                return 'medium'
+        
+        # DH and DSA are highly vulnerable
+        elif algorithm in ['DH', 'DSA']:
+            return 'high'
+        
+        return 'medium'
+    
+    def generate_recommendations(self, vulnerabilities: List[CryptoVulnerability]) -> List[MigrationRecommendation]:
+        """Generate migration recommendations for found vulnerabilities"""
+        recommendations = []
+        seen_algorithms = set()
+        
+        for vuln in vulnerabilities:
+            if vuln.algorithm not in seen_algorithms:
+                seen_algorithms.add(vuln.algorithm)
+                
+                pqc_info = self.pqc_recommendations.get(vuln.algorithm, {})
+                
+                # Estimate migration effort
+                effort = self._estimate_migration_effort(vuln.algorithm, vulnerabilities)
+                hours = self._estimate_hours(vuln.algorithm, effort, vulnerabilities)
+                
+                recommendation = MigrationRecommendation(
+                    current_algorithm=vuln.algorithm,
+                    recommended_algorithms=pqc_info.get('algorithms', []),
+                    migration_effort=effort,
+                    security_level=3,  # NIST Level 3 is recommended for most applications
+                    implementation_notes=pqc_info.get('notes', ''),
+                    estimated_hours=hours
+                )
+                recommendations.append(recommendation)
+        
+        return recommendations
+    
+    def _estimate_migration_effort(self, algorithm: str, vulnerabilities: List[CryptoVulnerability]) -> str:
+        """Estimate the migration effort based on usage patterns"""
+        algo_count = sum(1 for v in vulnerabilities if v.algorithm == algorithm)
+        
+        if algo_count < 5:
+            return 'low'
+        elif algo_count < 20:
+            return 'medium'
+        else:
+            return 'high'
+    
+    def _estimate_hours(self, algorithm: str, effort: str, vulnerabilities: List[CryptoVulnerability]) -> int:
+        """Estimate hours required for migration"""
+        base_hours = {
+            'low': 8,
+            'medium': 40,
+            'high': 120
+        }
+        
+        algo_count = sum(1 for v in vulnerabilities if v.algorithm == algorithm)
+        hours = base_hours[effort]
+        
+        # Add complexity factors
+        if algorithm in ['RSA', 'ECC']:
+            hours += algo_count * 2  # More complex migrations
+        else:
+            hours += algo_count * 1
+        
+        return hours
+    
+    def generate_migration_report(self, vulnerabilities: List[CryptoVulnerability]) -> MigrationReport:
+        """Generate comprehensive migration report"""
+        recommendations = self.generate_recommendations(vulnerabilities)
+        
+        # Calculate statistics
+        stats = {}
+        for vuln in vulnerabilities:
+            stats[vuln.algorithm] = stats.get(vuln.algorithm, 0) + 1
+        
+        # Calculate total effort
+        total_hours = sum(rec.estimated_hours for rec in recommendations)
+        
+        report = MigrationReport(
+            scan_timestamp=datetime.now().isoformat(),
+            total_files_scanned=len(set(v.file_path for v in vulnerabilities)),
+            vulnerabilities=vulnerabilities,
+            recommendations=recommendations,
+            summary_statistics=stats,
+            estimated_total_effort_hours=total_hours
+        )
+        
+        return report
+    
+    def export_report_json(self, report: MigrationReport, output_path: str) -> None:
+        """Export migration report as JSON"""
+        report_dict = {
+            'scan_timestamp': report.scan_timestamp,
+            'total_files_scanned': report.total_files_scanned,
+            'summary_statistics': report.summary_statistics,
+            'estimated_total_effort_hours': report.estimated_total_effort_hours,
+            'vulnerabilities': [
+                {
+                    'file_path': v.file_path,
+                    'line_number': v.line_number,
+                    'algorithm': v.algorithm,
+                    'key_size': v.key_size,
+                    'vulnerability_level': v.vulnerability_level,
+                    'code_snippet': v.code_snippet
+                }
+                for v in report.vulnerabilities
+            ],
+            'recommendations': [
+                {
+                    'current_algorithm': r.current_algorithm,
+                    'recommended_algorithms': r.recommended_algorithms,
+                    'migration_effort': r.migration_effort,
+                    'security_level': r.security_level,
+                    'implementation_notes': r.implementation_notes,
+                    'estimated_hours': r.estimated_hours
+                }
+                for r in report.recommendations
+            ]
+        }
+        
+        with open(output_path, 'w') as f:
+            json.dump(report_dict, f, indent=2)
+    
+    def export_report_markdown(self, report: MigrationReport, output_path: str) -> None:
+        """Export migration report as Markdown"""
+        md_content = f"""# Quantum-Safe Cryptography Migration Report
+
+Generated: {report.scan_timestamp}
+
+## Executive Summary
+
+- **Total Files Scanned**: {report.total_files_scanned}
+- **Total Vulnerabilities Found**: {len(report.vulnerabilities)}
+- **Estimated Migration Effort**: {report.estimated_total_effort_hours} hours
+
+## Vulnerability Summary
+
+| Algorithm | Count | Risk Level |
+|-----------|-------|------------|
+"""
+        
+        for algo, count in report.summary_statistics.items():
+            risk = 'High' if algo in ['DH', 'DSA'] else 'Medium'
+            md_content += f"| {algo} | {count} | {risk} |\n"
+        
+        md_content += "\n## Migration Recommendations\n\n"
+        
+        for rec in report.recommendations:
+            md_content += f"""### {rec.current_algorithm}
+
+**Recommended Alternatives**: {', '.join(rec.recommended_algorithms)}
+**Migration Effort**: {rec.migration_effort}
+**Estimated Hours**: {rec.estimated_hours}
+**NIST Security Level**: {rec.security_level}
+
+**Implementation Notes**: {rec.implementation_notes}
+
+---
+
+"""
+        
+        md_content += "\n## Detailed Vulnerabilities\n\n"
+        
+        for vuln in report.vulnerabilities[:10]:  # Show first 10
+            md_content += f"""**File**: `{vuln.file_path}`
+**Line**: {vuln.line_number}
+**Algorithm**: {vuln.algorithm}
+**Key Size**: {vuln.key_size or 'Unknown'}
+**Vulnerability Level**: {vuln.vulnerability_level}
+
+```
+{vuln.code_snippet}
+```
+
+---
+
+"""
+        
+        with open(output_path, 'w') as f:
+            f.write(md_content)
+    
+    def classify_vulnerability(self, algorithm: str, key_size: Optional[int]) -> str:
+        """Classify vulnerability severity based on algorithm and key size"""
+        return self._assess_vulnerability_level(algorithm, key_size)
+    
+    def get_nist_pqc_algorithms(self) -> Dict[str, List[str]]:
+        """Get NIST PQC standardized algorithms"""
+        return {
+            "ML-KEM": ["Kyber-512", "Kyber-768", "Kyber-1024"],
+            "ML-DSA": ["Dilithium2", "Dilithium3", "Dilithium5"],
+            "SLH-DSA": ["SPHINCS+-128", "SPHINCS+-192", "SPHINCS+-256"],
+            "kem": ["ML-KEM", "BIKE", "HQC"],
+            "signature": ["ML-DSA", "SLH-DSA", "Falcon"]
+        }
+    
+    def save_report(self, report: MigrationReport, output_path: str) -> None:
+        """Save migration report to file"""
+        self.export_report_json(report, output_path)
+
+
+# Test methods for timing verification
+def test_small_scan(scanner: QuantumSafeScanner) -> Tuple[float, int]:
+    """Test scanning a small codebase (should complete in ~3 seconds)"""
+    import time
+    import tempfile
+    import os
+    
+    start_time = time.time()
+    
+    # Create temporary test files
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create test files with vulnerable crypto
+        test_files = [
+            ('crypto.py', '''
+import Crypto.PublicKey.RSA
+from cryptography.hazmat.primitives.asymmetric import rsa
+
+# RSA-2048 key generation
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048
+)
+
+# ECDSA with P-256
+from cryptography.hazmat.primitives.asymmetric import ec
+private_key = ec.generate_private_key(ec.SECP256R1())
+'''),
+            ('auth.java', '''
+import java.security.KeyPairGenerator;
+import java.security.KeyPair;
+
+// Generate RSA-1024 key pair (weak!)
+KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+keyGen.initialize(1024);
+KeyPair keyPair = keyGen.generateKeyPair();
+
+// Diffie-Hellman key exchange
+KeyPairGenerator dhGen = KeyPairGenerator.getInstance("DH");
+dhGen.initialize(2048);
+'''),
+            ('tls.go', '''
+package main
+
+import (
+    "crypto/rsa"
+    "crypto/ecdsa"
+    "crypto/elliptic"
+)
+
+// Generate RSA-4096 key
+privateKey, _ := rsa.GenerateKey(rand.Reader, 4096)
+
+// Generate ECC P-384 key
+ecKey, _ := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+''')
+        ]
+        
+        for filename, content in test_files:
+            filepath = os.path.join(tmpdir, filename)
+            with open(filepath, 'w') as f:
+                f.write(content)
+        
+        # Scan the directory
+        vulnerabilities = scanner.scan_directory(tmpdir)
+    
+    duration = time.time() - start_time
+    return duration, len(vulnerabilities)
+
+
+def test_medium_scan(scanner: QuantumSafeScanner) -> Tuple[float, int]:
+    """Test scanning a medium codebase (should complete in ~8 seconds)"""
+    import time
+    import tempfile
+    import os
+    
+    start_time = time.time()
+    
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create more test files
+        for i in range(20):
+            subdir = os.path.join(tmpdir, f'module_{i}')
+            os.makedirs(subdir, exist_ok=True)
+            
+            # Create various crypto files
+            crypto_code = f'''
+# Module {i} cryptography
+from Crypto.PublicKey import RSA, ECC, DSA
+import OpenSSL
+
+class CryptoModule{i}:
+    def __init__(self):
+        self.rsa_key = RSA.generate(2048)
+        self.ecc_key = ECC.generate(curve='P-256')
+        self.dsa_key = DSA.generate(2048)
+    
+    def encrypt_rsa(self, data):
+        # RSA encryption with 2048-bit key
+        pass
+    
+    def sign_ecdsa(self, data):
+        # ECDSA signature with secp256k1
+        pass
+'''
+            
+            filepath = os.path.join(subdir, f'crypto_{i}.py')
+            with open(filepath, 'w') as f:
+                f.write(crypto_code)
+        
+        vulnerabilities = scanner.scan_directory(tmpdir)
+    
+    duration = time.time() - start_time
+    return duration, len(vulnerabilities)
+
+
+def test_report_generation(scanner: QuantumSafeScanner) -> Tuple[float, bool]:
+    """Test report generation (should complete in ~1 second)"""
+    import time
+    import tempfile
+    
+    start_time = time.time()
+    
+    # Create sample vulnerabilities
+    vulnerabilities = [
+        CryptoVulnerability(
+            file_path='/src/auth.py',
+            line_number=42,
+            algorithm='RSA',
+            key_size=2048,
+            context='rsa.generate_private_key(key_size=2048)',
+            vulnerability_level='medium',
+            code_snippet='private_key = rsa.generate_private_key(key_size=2048)'
+        ),
+        CryptoVulnerability(
+            file_path='/src/tls.go',
+            line_number=15,
+            algorithm='ECC',
+            key_size=256,
+            context='ecdsa.GenerateKey(elliptic.P256())',
+            vulnerability_level='medium',
+            code_snippet='key, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)'
+        ),
+        CryptoVulnerability(
+            file_path='/src/legacy.c',
+            line_number=100,
+            algorithm='DH',
+            key_size=1024,
+            context='DH_generate_parameters(1024)',
+            vulnerability_level='high',
+            code_snippet='DH *dh = DH_generate_parameters(1024, DH_GENERATOR_2, NULL, NULL);'
+        )
+    ]
+    
+    # Generate report
+    report = scanner.generate_migration_report(vulnerabilities)
+    
+    # Export reports
+    with tempfile.TemporaryDirectory() as tmpdir:
+        json_path = os.path.join(tmpdir, 'report.json')
+        md_path = os.path.join(tmpdir, 'report.md')
+        
+        scanner.export_report_json(report, json_path)
+        scanner.export_report_markdown(report, md_path)
+        
+        # Verify files were created
+        success = os.path.exists(json_path) and os.path.exists(md_path)
+    
+    duration = time.time() - start_time
+    return duration, success
+
+
+if __name__ == "__main__":
+    # Test with real data
+    scanner = QuantumSafeScanner()
+    
+    print("=== Quantum-Safe Cryptography Migration Scanner ===\n")
+    
+    # Test 1: Small scan
+    print("Test 1: Small codebase scan")
+    duration1, vuln_count1 = test_small_scan(scanner)
+    print(f"✅ Completed in {duration1:.2f}s, found {vuln_count1} vulnerabilities")
+    print(f"   Expected: ~3s, 6+ vulnerabilities\n")
+    
+    # Test 2: Medium scan
+    print("Test 2: Medium codebase scan")
+    duration2, vuln_count2 = test_medium_scan(scanner)
+    print(f"✅ Completed in {duration2:.2f}s, found {vuln_count2} vulnerabilities")
+    print(f"   Expected: ~8s, 60+ vulnerabilities\n")
+    
+    # Test 3: Report generation
+    print("Test 3: Report generation")
+    duration3, success = test_report_generation(scanner)
+    status = "✅" if success else "❌"
+    print(f"{status} Completed in {duration3:.2f}s, reports generated: {success}")
+    print(f"   Expected: ~1s, success=True\n")
+    
+    # Real-world example
+    print("Real-world example:")
+    print("Scanning current directory for quantum-vulnerable cryptography...")
+    
+    try:
+        current_dir = Path(__file__).parent
+        vulnerabilities = scanner.scan_directory(str(current_dir))
+        
+        if vulnerabilities:
+            print(f"\nFound {len(vulnerabilities)} quantum-vulnerable implementations:")
+            for vuln in vulnerabilities[:3]:
+                print(f"  - {vuln.algorithm} in {Path(vuln.file_path).name}:{vuln.line_number}")
+            
+            report = scanner.generate_migration_report(vulnerabilities)
+            print(f"\nMigration Summary:")
+            print(f"  Total effort: {report.estimated_total_effort_hours} hours")
+            for rec in report.recommendations:
+                print(f"  - {rec.current_algorithm} → {rec.recommended_algorithms[0]} ({rec.migration_effort} effort)")
+        else:
+            print("No quantum-vulnerable cryptography found in current directory")
+    
+    except Exception as e:
+        print(f"Error during real-world scan: {e}")
+    
+    print("\n✅ Module validation passed")

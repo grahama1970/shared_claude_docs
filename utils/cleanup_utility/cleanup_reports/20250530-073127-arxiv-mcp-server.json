@@ -1,0 +1,43 @@
+{
+  "project": "/home/graham/workspace/mcp-servers/arxiv-mcp-server",
+  "name": "arxiv-mcp-server",
+  "type": "mcp",
+  "timestamp": "20250530-073127",
+  "issues": [
+    "Found 1 hardcoded PYTHONPATH entries",
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities, initialize"
+  ],
+  "warnings": [
+    "TOML syntax error in pyproject.toml: Unbalanced quotes (line 5 column 11 char 87)",
+    "README.md missing sections: requirements",
+    "Tests directory exists but contains no test files",
+    "No slash commands documented for Claude project",
+    "Some README features may lack implementation",
+    "High technical debt: 6487 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "imports": true,
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    }
+  },
+  "fixes_applied": [
+    "Removed 1 hardcoded PYTHONPATH entries"
+  ],
+  "status": "issues",
+  "git_status": "merged",
+  "git_tag": "pre-cleanup-20250530-073243"
+}

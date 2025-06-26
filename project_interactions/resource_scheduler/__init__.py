@@ -1,0 +1,30 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""Resource Scheduler module for GRANGER Task #32"""
+
+from .resource_scheduler_interaction import (
+    ResourceScheduler,
+    SchedulingAlgorithm,
+    ResourceType,
+    JobStatus,
+    ResourceRequirements,
+    Job,
+    ResourceNode,
+    ResourceMonitor
+)
+
+__all__ = [
+    'ResourceScheduler',
+    'SchedulingAlgorithm',
+    'ResourceType', 
+    'JobStatus',
+    'ResourceRequirements',
+    'Job',
+    'ResourceNode',
+    'ResourceMonitor'
+]

@@ -1,0 +1,436 @@
+{
+  "timestamp": "2025-06-08T16:33:06.489754",
+  "summary": {
+    "total_scenarios": 67,
+    "scenarios_tested": 30,
+    "scenarios_passed": 29,
+    "scenarios_failed": 1,
+    "pass_rate": 96.7,
+    "bugs_found": 1,
+    "fixes_applied": 0,
+    "confidence": 1
+  },
+  "bugs_by_severity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1
+  },
+  "skeptical_notes": [
+    "\u26a0\ufe0f High pass rate suspicious - are tests really working?",
+    "\u274c Not all scenarios tested!"
+  ],
+  "verdict": "SUSPICIOUS",
+  "bugs": [
+    {
+      "type": "SyntaxError",
+      "module": "sparta",
+      "severity": "MEDIUM",
+      "description": "invalid syntax (sparta_mock_data.py, line 10)",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/graham/workspace/shared_claude_docs/project_interactions/granger_full_bug_hunter.py\", line 131, in test_single_module\n    result[\"actual\"] = self._test_sparta()\n  File \"/home/graham/workspace/shared_claude_docs/project_interactions/granger_full_bug_hunter.py\", line 181, in _test_sparta\n    from sparta.integrations.sparta_module import SPARTAModule\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/__init__.py\", line 6, in <module>\n    from .sparta_module import SPARTAModule\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/sparta_module.py\", line 66, in <module>\n    from .sparta_mock_data import SPARTAMockAPI\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/sparta_mock_data.py\", line 10\n    Description: Implementation of sparta mock data functionality\n                                ^^\nSyntaxError: invalid syntax\n"
+    }
+  ],
+  "test_results": [
+    {
+      "level": 0,
+      "scenario": 1,
+      "module": "sparta",
+      "description": "SPARTA CVE search functionality",
+      "bugs": [
+        {
+          "type": "SyntaxError",
+          "module": "sparta",
+          "severity": "MEDIUM",
+          "description": "invalid syntax (sparta_mock_data.py, line 10)",
+          "traceback": "Traceback (most recent call last):\n  File \"/home/graham/workspace/shared_claude_docs/project_interactions/granger_full_bug_hunter.py\", line 131, in test_single_module\n    result[\"actual\"] = self._test_sparta()\n  File \"/home/graham/workspace/shared_claude_docs/project_interactions/granger_full_bug_hunter.py\", line 181, in _test_sparta\n    from sparta.integrations.sparta_module import SPARTAModule\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/__init__.py\", line 6, in <module>\n    from .sparta_module import SPARTAModule\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/sparta_module.py\", line 66, in <module>\n    from .sparta_mock_data import SPARTAMockAPI\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/integrations/sparta_mock_data.py\", line 10\n    Description: Implementation of sparta mock data functionality\n                                ^^\nSyntaxError: invalid syntax\n"
+        }
+      ],
+      "status": "FAIL",
+      "duration": 0.14513635635375977,
+      "expected": "Returns CVE data for security keywords",
+      "actual": "SyntaxError: invalid syntax (sparta_mock_data.py, line 10)"
+    },
+    {
+      "level": 0,
+      "scenario": 2,
+      "module": "arxiv-mcp-server",
+      "description": "ArXiv paper retrieval",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 5.030632019042969e-05,
+      "expected": "Fetches papers based on search query",
+      "actual": "ArXiv MCP server structure invalid"
+    },
+    {
+      "level": 0,
+      "scenario": 3,
+      "module": "arangodb",
+      "description": "ArangoDB connection and queries",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 4.857706546783447,
+      "expected": "Connects and performs basic CRUD operations",
+      "actual": "ArangoDB package available"
+    },
+    {
+      "level": 0,
+      "scenario": 4,
+      "module": "youtube_transcripts",
+      "description": "YouTube transcript extraction",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.0002460479736328125,
+      "expected": "Downloads and parses video transcripts",
+      "actual": "YouTube module import failed"
+    },
+    {
+      "level": 0,
+      "scenario": 5,
+      "module": "marker",
+      "description": "PDF processing with Marker",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.07298421859741211,
+      "expected": "Converts PDF to structured data",
+      "actual": "Marker module import failed"
+    },
+    {
+      "level": 0,
+      "scenario": 6,
+      "module": "llm_call",
+      "description": "LLM API calls",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.10328960418701172,
+      "expected": "Successfully calls LLM and returns response",
+      "actual": "LLM Call module import failed"
+    },
+    {
+      "level": 0,
+      "scenario": 7,
+      "module": "gitget",
+      "description": "Git repository analysis",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.04456210136413574,
+      "expected": "Clones and analyzes repository structure",
+      "actual": "GitGet module import failed"
+    },
+    {
+      "level": 0,
+      "scenario": 8,
+      "module": "world_model",
+      "description": "World model state tracking",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.005605459213256836,
+      "expected": "Tracks and predicts system states",
+      "actual": "World Model import failed"
+    },
+    {
+      "level": 0,
+      "scenario": 9,
+      "module": "rl_commons",
+      "description": "RL decision making",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.4258840084075928,
+      "expected": "Makes decisions based on rewards",
+      "actual": "RL Commons imports successfully"
+    },
+    {
+      "level": 0,
+      "scenario": 10,
+      "module": "claude-test-reporter",
+      "description": "Test report generation",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.03843832015991211,
+      "expected": "Generates formatted test reports",
+      "actual": "Test Reporter imports successfully"
+    },
+    {
+      "level": 1,
+      "scenario": 11,
+      "modules": [
+        "arxiv-mcp-server",
+        "marker"
+      ],
+      "description": "ArXiv to Marker Pipeline",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023894309997559,
+      "expected": "Downloads paper and converts to structured format",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 12,
+      "modules": [
+        "youtube_transcripts",
+        "sparta"
+      ],
+      "description": "YouTube to SPARTA Pipeline",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20022106170654297,
+      "expected": "Extracts security topics from video content",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 13,
+      "modules": [
+        "marker",
+        "arangodb"
+      ],
+      "description": "Marker to ArangoDB Storage",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023488998413086,
+      "expected": "Processes document and stores in graph database",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 14,
+      "modules": [
+        "arangodb",
+        "unsloth"
+      ],
+      "description": "ArangoDB to Unsloth Training",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20008420944213867,
+      "expected": "Retrieves data and prepares for fine-tuning",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 15,
+      "modules": [
+        "gitget",
+        "arangodb"
+      ],
+      "description": "GitGet to ArangoDB Pipeline",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023679733276367,
+      "expected": "Analyzes repo and stores code patterns",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 16,
+      "modules": [
+        "world_model",
+        "rl_commons"
+      ],
+      "description": "World Model RL Integration",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023393630981445,
+      "expected": "Uses predictions to improve decisions",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 17,
+      "modules": [
+        "sparta",
+        "arangodb"
+      ],
+      "description": "SPARTA to ArangoDB Pipeline",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023822784423828,
+      "expected": "Stores CVE data in knowledge graph",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 18,
+      "modules": [
+        "llm_call",
+        "claude-test-reporter"
+      ],
+      "description": "LLM to Test Reporter",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023059844970703,
+      "expected": "Generates test results from LLM analysis",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 19,
+      "modules": [
+        "granger_hub",
+        "rl_commons"
+      ],
+      "description": "Hub Coordination with RL",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20021820068359375,
+      "expected": "Optimizes module coordination",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 1,
+      "scenario": 20,
+      "modules": [
+        "unsloth",
+        "llm_call"
+      ],
+      "description": "Unsloth to LLM Pipeline",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.20023560523986816,
+      "expected": "Uses fine-tuned model for inference",
+      "actual": "Binary interaction test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 21,
+      "modules": [
+        "arxiv-mcp-server",
+        "marker",
+        "arangodb"
+      ],
+      "description": "Research to Training Workflow",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005378723144531,
+      "expected": "Complete research pipeline executes",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 22,
+      "modules": [
+        "sparta",
+        "arangodb",
+        "claude-test-reporter"
+      ],
+      "description": "Security Monitoring System",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005369186401367,
+      "expected": "Monitors and reports security issues",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 23,
+      "modules": [
+        "youtube_transcripts",
+        "marker",
+        "arangodb"
+      ],
+      "description": "Knowledge Graph Builder",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005414485931396,
+      "expected": "Builds knowledge graph from content",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 24,
+      "modules": [
+        "rl_commons",
+        "world_model",
+        "llm_call"
+      ],
+      "description": "Adaptive Learning System",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.500542163848877,
+      "expected": "System learns and adapts behavior",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 25,
+      "modules": [
+        "granger_hub",
+        "multiple modules"
+      ],
+      "description": "Real-Time Collaboration",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005333423614502,
+      "expected": "Modules collaborate in real-time",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 26,
+      "modules": [
+        "llm_call",
+        "fallback providers"
+      ],
+      "description": "LLM Fallback Chain",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5003581047058105,
+      "expected": "Falls back when primary fails",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 27,
+      "modules": [
+        "rl_commons",
+        "reward signals"
+      ],
+      "description": "RL Multi-Armed Bandit",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005292892456055,
+      "expected": "Optimizes selection over time",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 28,
+      "modules": [
+        "world_model",
+        "predictions"
+      ],
+      "description": "World Model Prediction",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005373954772949,
+      "expected": "Accurately predicts outcomes",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 29,
+      "modules": [
+        "claude-test-reporter",
+        "aggregation"
+      ],
+      "description": "Test Reporter Aggregation",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.5005402565002441,
+      "expected": "Aggregates results from multiple sources",
+      "actual": "Workflow test placeholder"
+    },
+    {
+      "level": 2,
+      "scenario": 30,
+      "modules": [
+        "granger_hub",
+        "broadcast"
+      ],
+      "description": "Hub Broadcast System",
+      "bugs": [],
+      "status": "PASS",
+      "duration": 0.500201940536499,
+      "expected": "Broadcasts updates to all modules",
+      "actual": "Workflow test placeholder"
+    }
+  ]
+}

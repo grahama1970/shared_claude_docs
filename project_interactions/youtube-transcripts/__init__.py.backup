@@ -1,0 +1,6 @@
+"""
+YouTube Transcripts Interactions Package
+
+This package contains GRANGER-compliant interaction tests for youtube-transcripts,
+implementing technical content mining capabilities for Task #003.
+"""

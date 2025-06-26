@@ -1,0 +1,209 @@
+{
+  "timestamp": "2025-06-08T16:28:55.035484",
+  "summary": {
+    "total_scenarios": 67,
+    "scenarios_tested": 20,
+    "scenarios_passed": 10,
+    "scenarios_failed": 10,
+    "pass_rate": 50.0,
+    "bugs_found": 2,
+    "fixes_applied": 0,
+    "confidence": 0.6
+  },
+  "bugs_by_severity": {
+    "critical": 2,
+    "high": 0,
+    "medium": 0
+  },
+  "verdict": "CRITICAL_ISSUES",
+  "bugs": [
+    {
+      "type": "SYNTAX_ERROR",
+      "module": "sparta",
+      "file": "/home/graham/workspace/experiments/sparta/src/sparta/integrations/real_apis_fixed.py",
+      "line": 12,
+      "severity": "CRITICAL",
+      "description": "Syntax error: invalid syntax"
+    },
+    {
+      "type": "MISSING_MODULE",
+      "module": "arxiv-mcp-server",
+      "severity": "CRITICAL",
+      "description": "Module directory not found: /home/graham/workspace/experiments/arxiv-mcp-server"
+    }
+  ],
+  "test_results": [
+    {
+      "level": 0,
+      "scenario": 1,
+      "module": "sparta",
+      "bugs": [
+        {
+          "type": "SYNTAX_ERROR",
+          "module": "sparta",
+          "file": "/home/graham/workspace/experiments/sparta/src/sparta/integrations/real_apis_fixed.py",
+          "line": 12,
+          "severity": "CRITICAL",
+          "description": "Syntax error: invalid syntax"
+        }
+      ],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 3,
+      "module": "arangodb",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 4,
+      "module": "youtube_transcripts",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 5,
+      "module": "marker",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 6,
+      "module": "llm_call",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 7,
+      "module": "gitget",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 8,
+      "module": "world_model",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 9,
+      "module": "rl_commons",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 0,
+      "scenario": 10,
+      "module": "claude-test-reporter",
+      "bugs": [],
+      "status": "FAIL"
+    },
+    {
+      "level": 1,
+      "scenario": 11,
+      "modules": [
+        "arxiv-mcp-server",
+        "marker"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 12,
+      "modules": [
+        "youtube_transcripts",
+        "sparta"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 13,
+      "modules": [
+        "marker",
+        "arangodb"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 14,
+      "modules": [
+        "arangodb",
+        "unsloth"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 15,
+      "modules": [
+        "gitget",
+        "arangodb"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 16,
+      "modules": [
+        "world_model",
+        "rl_commons"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 17,
+      "modules": [
+        "sparta",
+        "arangodb"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 18,
+      "modules": [
+        "llm_call",
+        "claude-test-reporter"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 19,
+      "modules": [
+        "granger_hub",
+        "rl_commons"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    },
+    {
+      "level": 1,
+      "scenario": 20,
+      "modules": [
+        "unsloth",
+        "llm_call"
+      ],
+      "bugs": [],
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "direct_call": false,
+  "conversational_call": true,
+  "responses": {
+    "direct": null,
+    "conversational": ""
+  }
+}

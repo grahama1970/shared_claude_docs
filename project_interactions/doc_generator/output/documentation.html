@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        code { background: #f4f4f4; padding: 2px 4px; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+        h1, h2, h3, h4, h5 { color: #333; }
+        h1 { border-bottom: 2px solid #333; }
+        h2 { border-bottom: 1px solid #666; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1>Project Documentation</h1>
+<p>Generated: 2025-06-01 20:11:03</p>
+<h3>example_module</h3>
+<p><strong>Path:</strong> <code>example_module.py</code></p>
+<p><strong>Description:</strong></p>
+<p>Example module for testing documentation generator</p>
+<p>This module demonstrates various Python constructs that the documentation
+generator can extract and document.</p>
+<h4>Constants</h4>
+<ul>
+<li><code>DEFAULT_TIMEOUT</code> = <code>30</code></li>
+<li><code>MAX_RETRIES</code> = <code>3</code></li>
+</ul>
+<h4>Functions</h4>
+<h5><code>__init__(self: Any, config: Dict[str, any])</code></h5>
+<p>Initialize processor with configuration</p>
+<p>Args:
+    config: Configuration dictionary</p>
+<ul>
+<li><strong>Line:</strong> 21</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>process(self: Any, data: List[str]) -&gt; List[str]</code></h5>
+<p>Process a list of data items</p>
+<p>Args:
+    data: List of strings to process</p>
+<p>Returns:
+    Processed data list</p>
+<ul>
+<li><strong>Line:</strong> 30</li>
+<li><strong>Complexity:</strong> 2</li>
+</ul>
+<h5><code>_transform(self: Any, item: str) -&gt; str</code></h5>
+<p>Internal transformation method</p>
+<ul>
+<li><strong>Line:</strong> 45</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5>async <code>process_async(self: Any, data: List[str]) -&gt; List[str]</code></h5>
+<p>Async version of process method</p>
+<ul>
+<li><strong>Line:</strong> 49</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>validate_input(data: any) -&gt; bool</code></h5>
+<p>Validate input data</p>
+<p>Args:
+    data: Data to validate</p>
+<p>Returns:
+    True if valid, False otherwise</p>
+<ul>
+<li><strong>Line:</strong> 55</li>
+<li><strong>Complexity:</strong> 4</li>
+</ul>
+<h5>async <code>fetch_data(url: str, timeout: int) -&gt; Optional[Dict]</code></h5>
+<p>Fetch data from URL</p>
+<p>Args:
+    url: URL to fetch from
+    timeout: Request timeout in seconds</p>
+<p>Returns:
+    JSON data or None if failed</p>
+<ul>
+<li><strong>Line:</strong> 71</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>__init__(self: Any)</code></h5>
+<ul>
+<li><strong>Line:</strong> 90</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>load(self: Any, path: str) -&gt; None</code></h5>
+<p>Load configuration from file</p>
+<ul>
+<li><strong>Line:</strong> 93</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>get(self: Any, key: str, default: any) -&gt; any</code></h5>
+<p>Get configuration value</p>
+<ul>
+<li><strong>Line:</strong> 98</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h4>Classes</h4>
+<h5><code>class DataProcessor</code></h5>
+<p>Processes data with various transformations</p>
+<p><strong>Methods:</strong></p>
+<h5><code>__init__(self: Any, config: Dict[str, any])</code></h5>
+<p>Initialize processor with configuration</p>
+<p>Args:
+    config: Configuration dictionary</p>
+<ul>
+<li><strong>Line:</strong> 21</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>process(self: Any, data: List[str]) -&gt; List[str]</code></h5>
+<p>Process a list of data items</p>
+<p>Args:
+    data: List of strings to process</p>
+<p>Returns:
+    Processed data list</p>
+<ul>
+<li><strong>Line:</strong> 30</li>
+<li><strong>Complexity:</strong> 2</li>
+</ul>
+<h5><code>_transform(self: Any, item: str) -&gt; str</code></h5>
+<p>Internal transformation method</p>
+<ul>
+<li><strong>Line:</strong> 45</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>class ConfigManager</code></h5>
+<p>Manages application configuration</p>
+<p><strong>Attributes:</strong></p>
+<ul>
+<li><code>config_version: str</code></li>
+</ul>
+<p><strong>Methods:</strong></p>
+<h5><code>__init__(self: Any)</code></h5>
+<ul>
+<li><strong>Line:</strong> 90</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>load(self: Any, path: str) -&gt; None</code></h5>
+<p>Load configuration from file</p>
+<ul>
+<li><strong>Line:</strong> 93</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<h5><code>get(self: Any, key: str, default: any) -&gt; any</code></h5>
+<p>Get configuration value</p>
+<ul>
+<li><strong>Line:</strong> 98</li>
+<li><strong>Complexity:</strong> 1</li>
+</ul>
+<hr />
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-06-08T07:22:55.704031",
+  "duration": 2.8834965229034424,
+  "module_failures": [
+    "youtube_transcripts import failed: No module named 'youtube_transcripts.technical_content_mining_interaction'",
+    "arxiv_mcp_server import failed: No module named 'arxiv_mcp_server'",
+    "gitget import failed: cannot import name 'search_repositories' from 'gitget' (unknown location)",
+    "llm_call import failed: cannot import name 'llm_call' from 'llm_call' (/home/graham/workspace/shared_claude_docs/.venv/lib/python3.10/site-packages/llm_call/__init__.py)",
+    "python_arango import failed: No module named 'python_arango'"
+  ],
+  "integration_issues": [
+    "Gemini critique error: cannot import name 'llm_call' from 'llm_call' (/home/graham/workspace/shared_claude_docs/.venv/lib/python3.10/site-packages/llm_call/__init__.py)"
+  ],
+  "successful_operations": [],
+  "checklist_path": null,
+  "report_path": "/home/graham/workspace/shared_claude_docs/docs/06_operations/CODE_ANTIPATTERN_REPORT_REAL.md"
+}

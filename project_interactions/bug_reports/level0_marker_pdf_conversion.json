@@ -1,0 +1,8 @@
+[
+  {
+    "bug": "Marker module import failure",
+    "error": "No module named 'marker.core'",
+    "severity": "CRITICAL",
+    "impact": "Cannot use Marker functionality"
+  }
+]

@@ -1,0 +1,392 @@
+[
+  {
+    "project": "youtube_transcripts",
+    "path": "/home/graham/workspace/experiments/youtube_transcripts/",
+    "timestamp": "2025-06-03T18:04:48.938689",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.4184722900390625,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/youtube_transcripts\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function\ncollecting ... collected 0 items / 1 error\n\n==================================== ERRORS ====================================\n__________________ ERROR collecting tests/mcp/test_prompts.py __________________\nImportError while importing test module '/home/graham/workspace/experiments/youtube_transcripts/tests/mcp/test_prompts.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n../../../.venv/lib/python3.11/site-packages/_pytest/python.py:497: in importtestmodule\n    mod = import_path(\n../../../.venv/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path\n    importlib.import_module(module_name)\n../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1204: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1176: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:690: in _load_unlocked\n    ???\n../../../.venv/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module\n    exec(co, module.__dict__)\ntests/mcp/test_prompts.py:11: in <module>\n    from youtube_transcripts.mcp.prompts import (\nE   ModuleNotFoundError: No module named 'youtube_transcripts.mcp.prompts'\n=========================== short test summary info ============================\nERROR tests/mcp/test_prompts.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.13s ===============================\n",
+        "exit_code": 2,
+        "critical_issues": [
+          "No indicators of real MCP functionality found",
+          "Required prompts test not found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3947334289550781,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/youtube_transcripts/src/youtube_transcripts/mcp/server.py\", line 21, in <module>\n    from ..core.database import search_transcripts, initialize_database, get_transcript_by_video_id\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "MISSING",
+        "critical_issues": [
+          "No CLI file found"
+        ]
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Server validation incomplete",
+      "CLI not integrated",
+      "No CLI implementation"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "darpa_crawl",
+    "path": "/home/graham/workspace/experiments/darpa_crawl/",
+    "timestamp": "2025-06-03T18:04:49.752428",
+    "tests": {
+      "prompts": {
+        "status": "PASS",
+        "duration": 0.30219149589538574,
+        "output": "\u001b[1m============================= test session starts ==============================\u001b[0m\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/darpa_crawl\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\n\u001b[1mcollecting ... \u001b[0mcollected 3 items\n\ntests/mcp/test_prompts.py::TestDarpa_CrawlPrompts::test_required_prompts_exist \u001b[32mPASSED\u001b[0m\ntests/mcp/test_prompts.py::TestDarpa_CrawlPrompts::test_capabilities_prompt \u001b[32mPASSED\u001b[0m\ntests/mcp/test_prompts.py::TestDarpa_CrawlPrompts::test_help_prompt \u001b[32mPASSED\u001b[0m\n\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n\u001b[32m============================== \u001b[32m\u001b[1m3 passed\u001b[0m\u001b[32m in 0.02s\u001b[0m\u001b[32m ===============================\u001b[0m\n",
+        "exit_code": 0,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3996860980987549,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/darpa_crawl/src/darpa_crawl/mcp/server.py\", line 21, in <module>\n    from ..core.database.database_adapter import DatabaseAdapter\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/darpa_crawl/cli/app.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Server validation incomplete"
+    ],
+    "verification_status": "PARTIALLY_VERIFIED"
+  },
+  {
+    "project": "gitget",
+    "path": "/home/graham/workspace/experiments/gitget/",
+    "timestamp": "2025-06-03T18:04:50.454941",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.4232211112976074,
+        "output": "\u001b[1m============================= test session starts ==============================\u001b[0m\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/gitget\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function\n\u001b[1mcollecting ... \u001b[0mcollected 0 items / 1 error\n\n==================================== ERRORS ====================================\n\u001b[31m\u001b[1m__________________ ERROR collecting tests/mcp/test_prompts.py __________________\u001b[0m\n\u001b[31m../../../.venv/lib/python3.11/site-packages/_pytest/python.py:497: in importtestmodule\n    mod = import_path(\n../../../.venv/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path\n    importlib.import_module(module_name)\n../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1204: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1176: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:690: in _load_unlocked\n    ???\n../../../.venv/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../.venv/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/gitget/tests/mcp/test_prompts.py\", line 7\nE       from gitget.egg-info.mcp.gitget.egg-info_prompts import register_all_prompts\nE                      ^\nE   SyntaxError: invalid syntax\u001b[0m\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mERROR\u001b[0m tests/mcp/test_prompts.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n\u001b[31m=============================== \u001b[31m\u001b[1m1 error\u001b[0m\u001b[31m in 0.14s\u001b[0m\u001b[31m ===============================\u001b[0m\n",
+        "exit_code": 2,
+        "critical_issues": [
+          "No indicators of real MCP functionality found",
+          "Required prompts test not found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 6.958387136459351,
+        "output": "2025-06-03 18:04:54.077 | WARNING  | gitget.utils.text_summarizer:<module>:99 - Error handler and enhanced logging not available, falling back to standard error handling\n2025-06-03 18:04:56.632 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:61 - Starting LiteLLM cache initialization (Redis target: localhost:6379)...\n2025-06-03 18:04:56.632 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:66 - Testing Redis connection...\n2025-06-03 18:04:56.634 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:83 - Existing Redis keys: ['a32f7c57e856551909bcdacb0a1fec8f0c9f49627383f5d056b183bcd3637780', '83e26a0d5e4e12cd1f60f50e54bc27a71e3778766a552b52189966a61a03f038', 'acd004eb5db78784afae7ecb4c4e79b42a7d4e2aeade466b77ae4c57185b80fc']\n2025-06-03 18:04:56.634 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:88 - Configuring LiteLLM Redis cache...\n2025-06-03 18:04:56.637 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:99 - Enabling LiteLLM cache...\n2025-06-03 18:04:56.637 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:106 - LiteLLM cache config: {'cache': <litellm.caching.redis_cache.RedisCache object at 0x788a4cecd190>, 'supported_call_types': ['acompletion', 'completion'], 'type': <LiteLLMCacheType.REDIS: 'redis'>, 'namespace': None, 'redis_flush_size': None, 'ttl': 172800, 'mode': <CacheMode.default_on: 'default_on'>}\n2025-06-03 18:04:56.637 | INFO     | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:109 - \u2705 Redis caching enabled on localhost:6379\n2025-06-03 18:04:56.637 | DEBUG    | gitget.utils.initialize_litellm_cache:initialize_litellm_cache:116 - Redis test write/read successful: True\n2025-06-03 18:04:56.672 | INFO     | gitget.cache.repository_cache:__init__:88 - Repository cache initialized at /home/graham/.gitget/cache\n2025-06-03 18:04:56.672 | INFO     | gitget.cache.cache_manager:__init__:38 - Cache manager initialized\nTraceback (most recent call last):\n  File \"/home/graham/workspace/experiments/gitget/src/gitget/mcp/server.py\", line 24, in <module>\n    from gitget.api import analyze_repository\n  File \"/home/graham/workspace/experiments/gitget/src/gitget/__init__.py\", line 170, in <module>\n    from gitget.cli.commands import app\n  File \"/home/graham/workspace/experiments/gitget/src/gitget/cli/__init__.py\", line 17, in <module>\n    from gitget.cli.commands import app\n  File \"/home/graham/workspace/experiments/gitget/src/gitget/cli/commands.py\", line 21, in <module>\n    from .granger_slash_mcp_mixin import add_slash_mcp_commands\n  File \"/home/graham/workspace/experiments/gitget/src/gitget/cli/granger_slash_mcp_mixin.py\", line 42, in <module>\n    prompt_registry: Optional[PromptRegistry] = None,\n                              ^^^^^^^^^^^^^^\nNameError: name 'PromptRegistry' is not defined\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/gitget/cli/commands.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Server validation incomplete"
+    ],
+    "verification_status": "PARTIALLY_VERIFIED"
+  },
+  {
+    "project": "aider-daemon",
+    "path": "/home/graham/workspace/experiments/aider-daemon/",
+    "timestamp": "2025-06-03T18:04:57.837275",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.3275425434112549,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/aider-daemon\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function\ncollecting ... collected 5 items\n\ntests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_required_prompts_exist PASSED [ 20%]\ntests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_capabilities_prompt PASSED [ 40%]\ntests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_help_prompt PASSED [ 60%]\ntests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_quick_start_prompt PASSED [ 80%]\ntests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_prompt_consistency FAILED [100%]\n\n=================================== FAILURES ===================================\n________________ TestAiderDaemonPrompts.test_prompt_consistency ________________\n/home/graham/workspace/experiments/aider-daemon/tests/mcp/test_prompts.py:77: in test_prompt_consistency\n    assert prompt._mcp_prompt.category in [\n           ^^^^^^^^^^^^^^^^^^\nE   AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n--------------------------------- JSON report ----------------------------------\nreport saved to: test-results.json\n=========================== short test summary info ============================\nFAILED tests/mcp/test_prompts.py::TestAiderDaemonPrompts::test_prompt_consistency\n========================= 1 failed, 4 passed in 0.04s ==========================\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.40820980072021484,
+        "output": "/home/graham/workspace/experiments/aider-daemon/src/aider_daemon/mcp/server.py:28: DeprecationWarning: Passing runtime and transport-specific settings as kwargs to the FastMCP constructor is deprecated (as of 2.3.4), including most transport settings. If possible, provide settings when calling run() instead.\n  mcp = FastMCP(\nTraceback (most recent call last):\n  File \"/home/graham/workspace/experiments/aider-daemon/src/aider_daemon/mcp/server.py\", line 202, in <module>\n    uvicorn.run(mcp.get_app(), host=\"localhost\", port=8000)\n                ^^^^^^^^^^^\nAttributeError: 'FastMCP' object has no attribute 'get_app'. Did you mean: 'http_app'?\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/aider_daemon/cli/app.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Server validation incomplete"
+    ],
+    "verification_status": "PARTIALLY_VERIFIED"
+  },
+  {
+    "project": "sparta",
+    "path": "/home/graham/workspace/experiments/sparta/",
+    "timestamp": "2025-06-03T18:04:58.573540",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.44240736961364746,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/sparta\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 5 items\n\ntests/mcp/test_prompts.py::TestSpartaPrompts::test_required_prompts_exist PASSED [ 20%]\ntests/mcp/test_prompts.py::TestSpartaPrompts::test_capabilities_prompt PASSED [ 40%]\ntests/mcp/test_prompts.py::TestSpartaPrompts::test_help_prompt PASSED    [ 60%]\ntests/mcp/test_prompts.py::TestSpartaPrompts::test_quick_start_prompt PASSED [ 80%]\ntests/mcp/test_prompts.py::TestSpartaPrompts::test_prompt_consistency FAILED [100%]\n\n=================================== FAILURES ===================================\n__________________ TestSpartaPrompts.test_prompt_consistency ___________________\ntests/mcp/test_prompts.py:77: in test_prompt_consistency\n    assert prompt._mcp_prompt.category in [\n           ^^^^^^^^^^^^^^^^^^\nE   AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n=============================== warnings summary ===============================\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323\n  /home/graham/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_reports/report.json\n=========================== short test summary info ============================\nFAILED tests/mcp/test_prompts.py::TestSpartaPrompts::test_prompt_consistency - AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n==================== 1 failed, 4 passed, 1 warning in 0.13s ====================\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.39310169219970703,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/sparta/src/sparta/mcp/server.py\", line 8, in <module>\n    from .sparta_prompts import register_all_prompts\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/sparta/cli/app.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 72: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "marker",
+    "path": "/home/graham/workspace/experiments/marker/",
+    "timestamp": "2025-06-03T18:04:59.409623",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.4683351516723633,
+        "output": "ImportError while loading conftest '/home/graham/workspace/experiments/marker/tests/conftest.py'.\ntests/conftest.py:1: in <module>\n    from marker.core.providers.pdf import PdfProvider\nsrc/marker/__init__.py:4: in <module>\n    from marker.core.schema.document import Document\nsrc/marker/core/schema/document.py:12: in <module>\n    from marker.core.schema.groups.page import PageGroup\nsrc/marker/core/schema/groups/__init__.py:6: in <module>\n    from marker.core.schema.groups.page import PageGroup\nsrc/marker/core/schema/groups/page.py:6: in <module>\n    from pdftext.schema import Reference\nE   ModuleNotFoundError: No module named 'pdftext'\n",
+        "exit_code": 4,
+        "critical_issues": [
+          "No indicators of real MCP functionality found",
+          "Required prompts test not found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.257080078125,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/marker/src/marker/mcp/server.py\", line 19, in <module>\n    from marker.core.config.claude_config import (\n  File \"/home/graham/workspace/experiments/marker/src/marker/__init__.py\", line 4, in <module>\n    from marker.core.schema.document import Document\n  File \"/home/graham/workspace/experiments/marker/src/marker/core/schema/document.py\", line 12, in <module>\n    from marker.core.schema.groups.page import PageGroup\n  File \"/home/graham/workspace/experiments/marker/src/marker/core/schema/groups/__init__.py\", line 6, in <module>\n    from marker.core.schema.groups.page import PageGroup\n  File \"/home/graham/workspace/experiments/marker/src/marker/core/schema/groups/page.py\", line 6, in <module>\n    from pdftext.schema import Reference\nModuleNotFoundError: No module named 'pdftext'\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/marker/cli/main.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 825: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "arangodb",
+    "path": "/home/graham/workspace/experiments/arangodb/",
+    "timestamp": "2025-06-03T18:05:00.135559",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 8.48660945892334,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/arangodb\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 5 items\n\ntests/mcp/test_prompts.py::TestArangodbPrompts::test_required_prompts_exist PASSED [ 20%]\ntests/mcp/test_prompts.py::TestArangodbPrompts::test_capabilities_prompt PASSED [ 40%]\ntests/mcp/test_prompts.py::TestArangodbPrompts::test_help_prompt PASSED  [ 60%]\ntests/mcp/test_prompts.py::TestArangodbPrompts::test_quick_start_prompt PASSED [ 80%]\ntests/mcp/test_prompts.py::TestArangodbPrompts::test_prompt_consistency FAILED [100%]\n\n=================================== FAILURES ===================================\n_________________ TestArangodbPrompts.test_prompt_consistency __________________\ntests/mcp/test_prompts.py:77: in test_prompt_consistency\n    assert prompt._mcp_prompt.category in [\n           ^^^^^^^^^^^^^^^^^^\nE   AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n=============================== warnings summary ===============================\nsrc/arangodb/core/utils/config_validator.py:24\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:24: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('host')\n\nsrc/arangodb/core/utils/config_validator.py:38\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:38: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('dimensions')\n\nsrc/arangodb/core/utils/config_validator.py:45\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:45: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('batch_size')\n\nsrc/arangodb/core/utils/config_validator.py:62\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:62: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('vector_index_nlists')\n\nsrc/arangodb/core/utils/config_validator.py:69\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:69: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('insert_batch_size')\n\nsrc/arangodb/core/utils/config_validator.py:76\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:76: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('fields')\n\nsrc/arangodb/core/utils/config_validator.py:90\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:90: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('default_max_tokens')\n\nsrc/arangodb/core/utils/config_validator.py:97\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:97: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('default_min_overlap')\n\nsrc/arangodb/core/utils/config_validator.py:104\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:104: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('default_method')\n\nsrc/arangodb/core/utils/config_validator.py:120\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:120: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('max_traversal_depth')\n\nsrc/arangodb/core/utils/config_validator.py:127\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:127: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('relationship_confidence_threshold', 'semantic_weight', 'graph_weight', 'auto_relationship_threshold')\n\nsrc/arangodb/core/utils/config_validator.py:134\n  /home/graham/workspace/experiments/arangodb/src/arangodb/core/utils/config_validator.py:134: PydanticDeprecatedSince20: Pydantic V1 style `@root_validator` validators are deprecated. You should migrate to Pydantic V2 style `@model_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @root_validator\n\n../../../.venv/lib/python3.11/site-packages/pydantic/deprecated/class_validators.py:234\n  /home/graham/.venv/lib/python3.11/site-packages/pydantic/deprecated/class_validators.py:234: PydanticDeprecatedSince20: Pydantic V1 style `@root_validator` validators are deprecated. You should migrate to Pydantic V2 style `@model_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    return root_validator()(*__args)  # type: ignore\n\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323\n  /home/graham/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)\n\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373\n  /home/graham/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:\n  * 'allow_population_by_field_name' has been renamed to 'validate_by_name'\n    warnings.warn(message, UserWarning)\n\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_generate_schema.py:293\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_generate_schema.py:293\n../../../.venv/lib/python3.11/site-packages/pydantic/_internal/_generate_schema.py:293\n  /home/graham/.venv/lib/python3.11/site-packages/pydantic/_internal/_generate_schema.py:293: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://docs.pydantic.dev/2.11/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(\n\n../../../.venv/lib/python3.11/site-packages/spacy/cli/_util.py:23\n  /home/graham/.venv/lib/python3.11/site-packages/spacy/cli/_util.py:23: DeprecationWarning: Importing 'parser.split_arg_string' is deprecated, it will only be available in 'shell_completion' in Click 9.0.\n    from click.parser import split_arg_string\n\n../../../.venv/lib/python3.11/site-packages/weasel/util/config.py:8\n  /home/graham/.venv/lib/python3.11/site-packages/weasel/util/config.py:8: DeprecationWarning: Importing 'parser.split_arg_string' is deprecated, it will only be available in 'shell_completion' in Click 9.0.\n    from click.parser import split_arg_string\n\nsrc/arangodb/qa_generation/models.py:74\n  /home/graham/workspace/experiments/arangodb/src/arangodb/qa_generation/models.py:74: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('confidence')\n\nsrc/arangodb/qa_generation/models.py:81\n  /home/graham/workspace/experiments/arangodb/src/arangodb/qa_generation/models.py:81: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('temperature_used')\n\nsrc/arangodb/qa_generation/models.py:133\n  /home/graham/workspace/experiments/arangodb/src/arangodb/qa_generation/models.py:133: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('question_type_weights')\n\nsrc/arangodb/qa_generation/models.py:225\n  /home/graham/workspace/experiments/arangodb/src/arangodb/qa_generation/models.py:225: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    @validator('split_ratio')\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/mcp/test_prompts.py::TestArangodbPrompts::test_prompt_consistency\n=================== 1 failed, 4 passed, 26 warnings in 6.20s ===================\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3846571445465088,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/arangodb/src/arangodb/mcp/server.py\", line 8, in <module>\n    from .arangodb_prompts import register_all_prompts\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/arangodb/cli/main.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 72: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "claude_max_proxy",
+    "path": "/home/graham/workspace/experiments/claude_max_proxy/",
+    "timestamp": "2025-06-03T18:05:09.007454",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 2.3830490112304688,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/claude_max_proxy\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 5 items\n\ntests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_required_prompts_exist PASSED [ 20%]\ntests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_capabilities_prompt PASSED [ 40%]\ntests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_help_prompt PASSED [ 60%]\ntests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_quick_start_prompt PASSED [ 80%]\ntests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_prompt_consistency FAILED [100%]\n\ud83d\udcca Test report generated: docs/reports/test_report_20250603_180510.md\n\n\n=================================== FAILURES ===================================\n______________ TestClaudeMaxProxyPrompts.test_prompt_consistency _______________\ntests/mcp/test_prompts.py:77: in test_prompt_consistency\n    assert prompt._mcp_prompt.category in [\n           ^^^^^^^^^^^^^^^^^^\nE   AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_results.json\n=========================== short test summary info ============================\nFAILED tests/mcp/test_prompts.py::TestClaudeMaxProxyPrompts::test_prompt_consistency - AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n========================= 1 failed, 4 passed in 0.09s ==========================\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3902409076690674,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/claude_max_proxy/src/claude_max_proxy/mcp/server.py\", line 8, in <module>\n    from .claude_max_proxy_prompts import register_all_prompts\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/claude_max_proxy/cli/app.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 72: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "arxiv-mcp-server",
+    "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server/",
+    "timestamp": "2025-06-03T18:05:11.781252",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 9.569899082183838,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/mcp-servers/arxiv-mcp-server\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... \n----------------------------- live log collection ------------------------------\n2025-06-03 18:05:17 [    INFO] PyTorch version 2.7.0 available.\n2025-06-03 18:05:17 [    INFO] Sentence transformers loaded successfully\ncollected 5 items\n\ntests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_required_prompts_exist PASSED\ntests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_capabilities_prompt PASSED\ntests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_help_prompt PASSED\ntests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_quick_start_prompt PASSED\ntests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_prompt_consistency FAILED\n\n=================================== FAILURES ===================================\n______________ TestArxivMcpServerPrompts.test_prompt_consistency _______________\ntests/mcp/test_prompts.py:77: in test_prompt_consistency\n    assert prompt._mcp_prompt.category in [\n           ^^^^^^^^^^^^^^^^^^\nE   AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_results.json\n================================ tests coverage ================================\n_______________ coverage: platform linux, python 3.11.12-final-0 _______________\n\nName                                                            Stmts   Miss  Cover   Missing\n---------------------------------------------------------------------------------------------\nsrc/arxiv_mcp_server/__init__.py                                    5      1    80%   11\nsrc/arxiv_mcp_server/__main__.py                                    3      3     0%   3-6\nsrc/arxiv_mcp_server/chunking/__init__.py                           0      0   100%\nsrc/arxiv_mcp_server/chunking/section_chunker.py                  164    164     0%   35-358\nsrc/arxiv_mcp_server/cli/__init__.py                                1      1     0%   1\nsrc/arxiv_mcp_server/cli/__main__.py                              344    344     0%   30-879\nsrc/arxiv_mcp_server/cli/granger_slash_mcp_mixin.py               150    150     0%   16-381\nsrc/arxiv_mcp_server/cli/research_commands.py                     120    120     0%   7-364\nsrc/arxiv_mcp_server/cli/search_commands.py                       136    136     0%   21-272\nsrc/arxiv_mcp_server/cli/slash_command_enhancer.py                144    144     0%   8-780\nsrc/arxiv_mcp_server/cli/slash_mcp_mixin.py                       162    162     0%   14-401\nsrc/arxiv_mcp_server/config.py                                     38     21    45%   30-36, 44-72\nsrc/arxiv_mcp_server/config_improved.py                            76     76     0%   3-140\nsrc/arxiv_mcp_server/converters.py                                234    194    17%   51, 69-70, 75, 79, 87-204, 221-222, 226-240, 244-404, 422-427, 432-448, 453-541\nsrc/arxiv_mcp_server/converters_enhanced.py                        95     95     0%   3-172\nsrc/arxiv_mcp_server/core/__init__.py                               4      0   100%\nsrc/arxiv_mcp_server/core/citations.py                            307    307     0%   19-576\nsrc/arxiv_mcp_server/core/download.py                             169    135    20%   60-62, 66, 70, 75-105, 117-163, 183-206, 232-263, 272-400\nsrc/arxiv_mcp_server/core/json_utils.py                           161    161     0%   1-234\nsrc/arxiv_mcp_server/core/progress.py                              86     86     0%   3-186\nsrc/arxiv_mcp_server/core/search.py                               133    126     5%   51-123, 136-162, 167-278\nsrc/arxiv_mcp_server/core/utils.py                                158    141    11%   44-61, 75-76, 89-97, 111-118, 135-139, 152-155, 170-173, 186-190, 203-227, 240-252, 257-388\nsrc/arxiv_mcp_server/llm_providers.py                             103     73    29%   28, 33, 40-42, 46-93, 101-140, 151-153, 157-207, 215-255, 267, 279-280, 292-303\nsrc/arxiv_mcp_server/logging_config.py                             45     45     0%   3-189\nsrc/arxiv_mcp_server/mcp/__init__.py                                0      0   100%\nsrc/arxiv_mcp_server/mcp/arxiv_mcp_server_prompts.py               73     31    58%   36, 143-150, 267-305, 334, 344-374\nsrc/arxiv_mcp_server/mcp/prompts.py                               113     40    65%   50, 98-117, 140, 160-161, 171, 182, 186, 256-257, 260-262, 275-297\nsrc/arxiv_mcp_server/mcp/server.py                                 26     26     0%   7-75\nsrc/arxiv_mcp_server/prompts/__init__.py                            2      0   100%\nsrc/arxiv_mcp_server/prompts/code_analysis_prompt.py                1      0   100%\nsrc/arxiv_mcp_server/prompts/comprehensive_research_guide.py        3      1    67%   287\nsrc/arxiv_mcp_server/prompts/content_description_prompt.py          1      0   100%\nsrc/arxiv_mcp_server/prompts/conversion_guide_prompt.py             2      0   100%\nsrc/arxiv_mcp_server/prompts/deep_research_analysis_prompt.py       1      0   100%\nsrc/arxiv_mcp_server/prompts/handlers.py                           56     38    32%   24-27, 47, 66-169\nsrc/arxiv_mcp_server/prompts/prompt_manager.py                     11     11     0%   3-31\nsrc/arxiv_mcp_server/prompts/prompts.py                             2      0   100%\nsrc/arxiv_mcp_server/resources/__init__.py                          2      2     0%   3-5\nsrc/arxiv_mcp_server/resources/papers.py                           61     61     0%   3-101\nsrc/arxiv_mcp_server/server.py                                    136    111    18%   64, 72, 78, 100-211, 216-217\nsrc/arxiv_mcp_server/slash_mcp_mixin.py                           175    175     0%   14-425\nsrc/arxiv_mcp_server/storage/__init__.py                            0      0   100%\nsrc/arxiv_mcp_server/storage/search_engine.py                     190    164    14%   36-40, 52-57, 65-120, 124-187, 191-270, 274-307, 311-389, 394-424, 428, 441-463, 467-484, 488-501, 507-543\nsrc/arxiv_mcp_server/storage_backend.py                           385    385     0%   18-900\nsrc/arxiv_mcp_server/test_reporter.py                             166    166     0%   17-379\nsrc/arxiv_mcp_server/tools/__init__.py                             29      0   100%\nsrc/arxiv_mcp_server/tools/analyze_code.py                        167    154     8%   61-106, 112-126, 131-340\nsrc/arxiv_mcp_server/tools/annotations.py                          98     80    18%   68-69, 72, 76-80, 91-98, 102-123, 128-159, 163-191, 195-218\nsrc/arxiv_mcp_server/tools/author_follow.py                       170    141    17%   52-58, 62-88, 93, 97-113, 121-135, 143-160, 165-229, 233-250, 325-331, 335-338, 342-358, 366-407, 412-467\nsrc/arxiv_mcp_server/tools/batch_operations.py                     64     52    19%   58-92, 97-156\nsrc/arxiv_mcp_server/tools/citation_tracking.py                   182    160    12%   93-94, 98-105, 110-112, 116-126, 131-160, 168-197, 205-251, 257-305, 316-364, 375-402, 412-485\nsrc/arxiv_mcp_server/tools/comparative_analysis.py                 70     55    21%   51, 79, 84-93, 100-121, 125-196\nsrc/arxiv_mcp_server/tools/conversion_options.py                   70     63    10%   22-107, 120-195\nsrc/arxiv_mcp_server/tools/daily_digest.py                        195    170    13%   122-128, 132-147, 163-201, 205-227, 231-233, 239-313, 324-353, 364-424, 435-450, 461-485, 495-581\nsrc/arxiv_mcp_server/tools/describe_content.py                    227    191    16%   89-166, 175-236, 244-307, 325-346, 351-466, 479-573\nsrc/arxiv_mcp_server/tools/download.py                             91     65    29%   69-74, 79-114, 119-265\nsrc/arxiv_mcp_server/tools/download_enhanced.py                   130    130     0%   15-345\nsrc/arxiv_mcp_server/tools/evidence_extraction.py                 132    132     0%   3-356\nsrc/arxiv_mcp_server/tools/export_references.py                   251    222    12%   96-109, 116-160, 165-199, 204-220, 225-242, 247-261, 266-293, 299-350, 361-448, 459-509, 519-598\nsrc/arxiv_mcp_server/tools/extract_citations.py                   112     99    12%   38-65, 69-112, 116-147, 151-174, 178-224\nsrc/arxiv_mcp_server/tools/extract_sections.py                     59     49    17%   36-50, 54-77, 81-131\nsrc/arxiv_mcp_server/tools/list_papers.py                          19      9    53%   25, 32-58\nsrc/arxiv_mcp_server/tools/paper_collections.py                   230    200    13%   41-49, 56-62, 66-106, 114-149, 161-192, 204-267, 274-297, 304-354, 370-403, 407-437, 523-530, 537-545, 552-579, 586-607, 615-695\nsrc/arxiv_mcp_server/tools/paper_similarity.py                    101     87    14%   46-58, 63-78, 82-101, 105-195\nsrc/arxiv_mcp_server/tools/paper_updates.py                       121     98    19%   53-56, 60-64, 68-70, 74-76, 80-82, 86-128, 132-133, 137-149, 180-210, 218-268\nsrc/arxiv_mcp_server/tools/pdf_opener.py                          420    420     0%   16-857\nsrc/arxiv_mcp_server/tools/quick_cite.py                          219    192    12%   40-42, 46-54, 61, 65-86, 90-107, 111-127, 131-190, 194-210, 215-232, 291-304, 308-345, 359-425\nsrc/arxiv_mcp_server/tools/read_paper.py                           19     10    47%   29, 34-70\nsrc/arxiv_mcp_server/tools/reading_list.py                        182    158    13%   126-132, 136-165, 171-220, 225-264, 268-282, 286-288, 294-339, 350-383, 394-423, 434-459, 469-552\nsrc/arxiv_mcp_server/tools/report_generator.py                    139    139     0%   3-434\nsrc/arxiv_mcp_server/tools/research_support.py                    274    246    10%   120-122, 126-150, 154-170, 175-204, 209-231, 238-239, 247-395, 404-429, 433-459, 464-555, 560-585, 590-713\nsrc/arxiv_mcp_server/tools/search.py                              193    176     9%   37-46, 51-64, 78-388, 403-462\nsrc/arxiv_mcp_server/tools/search_enhanced.py                      53     53     0%   3-203\nsrc/arxiv_mcp_server/tools/search_templates.py                    185    160    14%   43-49, 53-86, 102-131, 138-170, 177-190, 197-221, 225-243, 247-304, 390-393, 397-422, 426-442, 451-540\nsrc/arxiv_mcp_server/tools/semantic_search.py                      99     82    17%   66-125, 132-227, 234-248\nsrc/arxiv_mcp_server/tools/summarize_paper.py                     190    175     8%   71, 92-195, 200-250, 262-300, 305-498\nsrc/arxiv_mcp_server/tools/summarize_paper_llm.py                 107    107     0%   3-322\nsrc/arxiv_mcp_server/tools/system_stats.py                        134    121    10%   27-49, 54-74, 79-158, 171-269\nsrc/arxiv_mcp_server/tools/tree_sitter_utils.py                   403    380     6%   25-27, 173-174, 187-193, 206-216, 230-246, 260-275, 289-297, 311-367, 381-393, 407-461, 475-781, 797-940, 953-973, 990-997, 1001-1100\nsrc/arxiv_mcp_server/utils/__init__.py                              0      0   100%\nsrc/arxiv_mcp_server/utils/hardware_info.py                        79     68    14%   25-31, 35-42, 50-87, 91-92, 107-126, 130-135, 139-166, 170\nsrc/arxiv_mcp_server/utils/mac_compatibility.py                    66     49    26%   39-49, 63-80, 93, 99-105, 110-127, 132-158\n---------------------------------------------------------------------------------------------\nTOTAL                                                            9524   8589    10%\nCoverage HTML written to dir htmlcov\n=========================== short test summary info ============================\nFAILED tests/mcp/test_prompts.py::TestArxivMcpServerPrompts::test_prompt_consistency - AttributeError: 'MCPPrompt' object has no attribute '_mcp_prompt'\n=================== 1 failed, 4 passed, 7 warnings in 7.48s ====================\n/home/graham/.venv/lib/python3.11/site-packages/coverage/report_core.py:110: CoverageWarning: Couldn't parse Python file '/home/graham/workspace/mcp-servers/arxiv-mcp-server/src/arxiv_mcp_server/cli.py' (couldnt-parse)\n  coverage._warn(msg, slug=\"couldnt-parse\")\nsys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3945741653442383,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/mcp-servers/arxiv-mcp-server/src/arxiv_mcp_server/mcp/server.py\", line 8, in <module>\n    from .arxiv_mcp_server_prompts import register_all_prompts\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/arxiv_mcp_server/cli/__main__.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 72: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "unsloth_wip",
+    "path": "/home/graham/workspace/experiments/unsloth_wip/",
+    "timestamp": "2025-06-03T18:05:21.746321",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.24232053756713867,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/tomlconfig.py\", line 60, in read\n    self.data = tomllib.loads(toml_text)\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/tomllib/_parser.py\", line 102, in loads\n    pos = key_value_rule(src, pos, out, header, parse_float)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/tomllib/_parser.py\", line 349, in key_value_rule\n    raise suffixed_err(src, pos, \"Cannot overwrite a value\")\ntomllib.TOMLDecodeError: Cannot overwrite a value (at line 123, column 22)\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/config.py\", line 300, in from_file\n    files_read = cp.read(filename)\n                 ^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/tomlconfig.py\", line 62, in read\n    raise TomlDecodeError(str(err)) from err\ncoverage.tomlconfig.TomlDecodeError: Cannot overwrite a value (at line 123, column 22)\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest/__main__.py\", line 9, in <module>\n    raise SystemExit(pytest.console_main())\n                     ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 201, in console_main\n    code = main()\n           ^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 156, in main\n    config = _prepareconfig(args, plugins)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 342, in _prepareconfig\n    config = pluginmanager.hook.pytest_cmdline_parse(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_hooks.py\", line 512, in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_manager.py\", line 120, in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 167, in _multicall\n    raise exception\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 139, in _multicall\n    teardown.throw(exception)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/helpconfig.py\", line 112, in pytest_cmdline_parse\n    config = yield\n             ^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 121, in _multicall\n    res = hook_impl.function(*args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 1146, in pytest_cmdline_parse\n    self.parse(args)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 1527, in parse\n    self._preparse(args, addopts=addopts)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/config/__init__.py\", line 1431, in _preparse\n    self.hook.pytest_load_initial_conftests(\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_hooks.py\", line 512, in __call__\n    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_manager.py\", line 120, in _hookexec\n    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 167, in _multicall\n    raise exception\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 139, in _multicall\n    teardown.throw(exception)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/warnings.py\", line 129, in pytest_load_initial_conftests\n    return (yield)\n            ^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 139, in _multicall\n    teardown.throw(exception)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/_pytest/capture.py\", line 173, in pytest_load_initial_conftests\n    yield\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pluggy/_callers.py\", line 121, in _multicall\n    res = hook_impl.function(*args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest_cov/plugin.py\", line 192, in pytest_load_initial_conftests\n    plugin = CovPlugin(options, early_config.pluginmanager)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest_cov/plugin.py\", line 242, in __init__\n    self.start(engine.Central)\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest_cov/plugin.py\", line 255, in start\n    self.cov_controller.start()\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest_cov/engine.py\", line 57, in ensure_topdir_wrapper\n    return meth(self, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/pytest_cov/engine.py\", line 280, in start\n    self.cov = coverage.Coverage(\n               ^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/control.py\", line 302, in __init__\n    self.config = read_coverage_config(\n                  ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/config.py\", line 610, in read_coverage_config\n    config_read = config.from_file(fname, warn, our_file=our_file)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/graham/.venv/lib/python3.11/site-packages/coverage/config.py\", line 302, in from_file\n    raise ConfigError(f\"Couldn't read config file {filename}: {err}\") from err\ncoverage.exceptions.ConfigError: Couldn't read config file pyproject.toml: Cannot overwrite a value (at line 123, column 22)\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "No indicators of real MCP functionality found",
+          "Required prompts test not found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3933279514312744,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/unsloth_wip/src/unsloth_wip/mcp/server.py\", line 8, in <module>\n    from .unsloth_wip_prompts import register_all_prompts\nImportError: attempted relative import with no known parent package\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/unsloth_wip/cli/app.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 46: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  },
+  {
+    "project": "mcp-screenshot",
+    "path": "/home/graham/workspace/experiments/mcp-screenshot/",
+    "timestamp": "2025-06-03T18:05:22.382517",
+    "tests": {
+      "prompts": {
+        "status": "FAIL",
+        "duration": 0.9781308174133301,
+        "output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'claude-test-reporter': '0.2.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/mcp-screenshot\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, claude-test-reporter-0.2.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 0 items / 1 error\n\n==================================== ERRORS ====================================\n__________________ ERROR collecting tests/mcp/test_prompts.py __________________\nImportError while importing test module '/home/graham/workspace/experiments/mcp-screenshot/tests/mcp/test_prompts.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n../../../.venv/lib/python3.11/site-packages/_pytest/python.py:497: in importtestmodule\n    mod = import_path(\n../../../.venv/lib/python3.11/site-packages/_pytest/pathlib.py:587: in import_path\n    importlib.import_module(module_name)\n../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1204: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1176: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1147: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:690: in _load_unlocked\n    ???\n../../../.venv/lib/python3.11/site-packages/_pytest/assertion/rewrite.py:186: in exec_module\n    exec(co, module.__dict__)\ntests/mcp/test_prompts.py:9: in <module>\n    from mcp_screenshot.mcp.mcp_screenshot_prompts import register_all_prompts\nsrc/mcp_screenshot/__init__.py:11: in <module>\n    from mcp_screenshot.core import (\nsrc/mcp_screenshot/core/__init__.py:29: in <module>\n    from mcp_screenshot.core.capture import (\nsrc/mcp_screenshot/core/capture.py:28: in <module>\n    import mss\nE   ModuleNotFoundError: No module named 'mss'\n--------------------------------- JSON report ----------------------------------\nreport saved to: test-report.json\n================================ tests coverage ================================\n_______________ coverage: platform linux, python 3.11.12-final-0 _______________\n\nName                                                       Stmts   Miss  Cover   Missing\n----------------------------------------------------------------------------------------\nsrc/mcp_screenshot/__init__.py                                 4      1    75%   17\nsrc/mcp_screenshot/__main__.py                                 3      3     0%   7-10\nsrc/mcp_screenshot/cli/__init__.py                             2      2     0%   9-11\nsrc/mcp_screenshot/cli/formatters.py                         114    114     0%   11-226\nsrc/mcp_screenshot/cli/granger_slash_mcp_mixin.py            150    150     0%   16-381\nsrc/mcp_screenshot/cli/main.py                               620    620     0%   11-2016\nsrc/mcp_screenshot/cli/validators.py                         161    161     0%   11-387\nsrc/mcp_screenshot/core/__init__.py                            8      6    25%   36-72\nsrc/mcp_screenshot/core/annotate.py                           91     91     0%   3-188\nsrc/mcp_screenshot/core/batch.py                             122    122     0%   11-359\nsrc/mcp_screenshot/core/capture.py                           229    223     3%   29-541\nsrc/mcp_screenshot/core/chunked_capture.py                    84     84     0%   9-267\nsrc/mcp_screenshot/core/chunked_capture_fixed.py              75     75     0%   9-251\nsrc/mcp_screenshot/core/compare.py                            96     96     0%   11-244\nsrc/mcp_screenshot/core/constants.py                          52     39    25%   158-217\nsrc/mcp_screenshot/core/d3_verification.py                   140    140     0%   28-360\nsrc/mcp_screenshot/core/description.py                       134    134     0%   24-357\nsrc/mcp_screenshot/core/history.py                           278    278     0%   11-822\nsrc/mcp_screenshot/core/image_similarity.py                   76     76     0%   11-197\nsrc/mcp_screenshot/core/litellm_cache.py                      69     69     0%   11-197\nsrc/mcp_screenshot/core/playwright_capture.py                 63     63     0%   9-180\nsrc/mcp_screenshot/core/utils.py                             169    169     0%   18-356\nsrc/mcp_screenshot/integrations/__init__.py                    2      2     0%   2-4\nsrc/mcp_screenshot/integrations/mcp_screenshot_module.py      72     72     0%   2-198\nsrc/mcp_screenshot/mcp/__init__.py                             2      2     0%   8-10\nsrc/mcp_screenshot/mcp/mcp_screenshot_prompts.py              73     73     0%   11-374\nsrc/mcp_screenshot/mcp/prompts.py                             36     36     0%   10-256\nsrc/mcp_screenshot/mcp/server.py                              39     39     0%   11-91\nsrc/mcp_screenshot/mcp/tools.py                              150    150     0%   11-559\n----------------------------------------------------------------------------------------\nTOTAL                                                       3114   3090     1%\nCoverage HTML written to dir htmlcov\n=========================== short test summary info ============================\nERROR tests/mcp/test_prompts.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.63s ===============================\n",
+        "exit_code": 2,
+        "critical_issues": [
+          "No indicators of real MCP functionality found",
+          "Required prompts test not found"
+        ]
+      },
+      "server": {
+        "status": "FAIL",
+        "duration": 0.3470485210418701,
+        "output": "Traceback (most recent call last):\n  File \"/home/graham/workspace/experiments/mcp-screenshot/src/mcp_screenshot/mcp/server.py\", line 18, in <module>\n    from mcp_screenshot.core.constants import DEFAULT_MODEL, IMAGE_SETTINGS\n  File \"/home/graham/workspace/experiments/mcp-screenshot/src/mcp_screenshot/__init__.py\", line 11, in <module>\n    from mcp_screenshot.core import (\n  File \"/home/graham/workspace/experiments/mcp-screenshot/src/mcp_screenshot/core/__init__.py\", line 29, in <module>\n    from mcp_screenshot.core.capture import (\n  File \"/home/graham/workspace/experiments/mcp-screenshot/src/mcp_screenshot/core/capture.py\", line 28, in <module>\n    import mss\nModuleNotFoundError: No module named 'mss'\n",
+        "exit_code": 1,
+        "critical_issues": [
+          "Server validation message not found"
+        ]
+      },
+      "cli": {
+        "status": "PASS",
+        "file": "src/mcp_screenshot/cli/main.py"
+      }
+    },
+    "critical_issues": [
+      "No indicators of real MCP functionality found",
+      "Line 91: asyncio.run() inside function (not in __main__)",
+      "Server validation incomplete"
+    ],
+    "verification_status": "FAILED_VERIFICATION"
+  }
+]

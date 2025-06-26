@@ -1,0 +1,15 @@
+[
+  {
+    "weakness": "Excessive data transformation",
+    "overhead": "3816 bytes across 3 transforms",
+    "impact": "Performance and memory waste",
+    "severity": "MEDIUM"
+  },
+  {
+    "weakness": "Inconsistent ID format handling",
+    "supported_formats": 3,
+    "total_formats": 5,
+    "impact": "Integration failures with different sources",
+    "severity": "MEDIUM"
+  }
+]

@@ -1,0 +1,19 @@
+"""
+API Documentation Generator module for intelligent documentation generation.
+"""
+
+from .api_doc_generator_interaction import (
+    APIDocGeneratorInteraction,
+    DocumentationExtractor,
+    OpenAPIGenerator,
+    ExampleGenerator,
+    DocumentationRenderer
+)
+
+__all__ = [
+    'APIDocGeneratorInteraction',
+    'DocumentationExtractor',
+    'OpenAPIGenerator',
+    'ExampleGenerator',
+    'DocumentationRenderer'
+]

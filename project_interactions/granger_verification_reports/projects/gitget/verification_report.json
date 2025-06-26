@@ -1,0 +1,48 @@
+{
+  "project_name": "gitget",
+  "project_path": "/home/graham/workspace/experiments/gitget",
+  "project_type": "Data Collection",
+  "status": "error",
+  "mode": "VerificationMode.FULL",
+  "duration": 2.6963276863098145,
+  "cleanup_result": "passed",
+  "compliance_result": "passed",
+  "test_result": "passed",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 0,
+  "duration_failures": 0,
+  "honeypot_status": "missing",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "missing_honeypot_tests",
+      "description": "No honeypot tests found",
+      "severity": "high",
+      "evidence": [
+        "tests/test_honeypot.py does not exist"
+      ],
+      "files": [],
+      "auto_fixable": true,
+      "fix_attempted": true,
+      "fix_result": "success"
+    },
+    {
+      "type": "verification_error",
+      "description": "'duration'",
+      "severity": "critical",
+      "evidence": [],
+      "files": [],
+      "auto_fixable": false,
+      "fix_attempted": false,
+      "fix_result": ""
+    }
+  ],
+  "auto_fixes_applied": 1,
+  "fix_directive_generated": false
+}

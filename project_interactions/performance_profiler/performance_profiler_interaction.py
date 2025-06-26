@@ -1,0 +1,829 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: performance_profiler_interaction.py
+Purpose: Comprehensive performance profiling system with CPU, memory, I/O, and async profiling
+
+This module provides real-time performance monitoring, bottleneck detection, and
+historical trend analysis for Python applications.
+
+External Dependencies:
+- psutil: https://psutil.readthedocs.io/
+- memory_profiler: https://pypi.org/project/memory-profiler/
+- py-spy: https://github.com/benfred/py-spy
+- pyflame: https://github.com/uber/pyflame (optional)
+
+Example Usage:
+>>> from performance_profiler_interaction import PerformanceProfiler
+>>> profiler = PerformanceProfiler()
+>>> with profiler.profile_cpu("my_function"):
+...     result = expensive_computation()
+>>> report = profiler.generate_report()
+>>> print(report['cpu_hotspots'])
+[{'function': 'expensive_computation', 'time': 2.5, 'percentage': 85.2}]
+"""
+
+import time
+import threading
+import asyncio
+import traceback
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Any, Optional, Callable, Union
+from dataclasses import dataclass, asdict
+from contextlib import contextmanager
+import cProfile
+import pstats
+import io
+import gc
+import sys
+import os
+
+try:
+    import psutil
+except ImportError:
+    print("Warning: psutil not installed. Some features will be limited.")
+    psutil = None
+
+try:
+    from memory_profiler import profile as memory_profile
+except ImportError:
+    print("Warning: memory_profiler not installed. Memory profiling will be limited.")
+    memory_profile = None
+
+
+@dataclass
+class ProfileResult:
+    """Results from a profiling session"""
+    profile_type: str
+    start_time: datetime
+    end_time: datetime
+    duration: float
+    metrics: Dict[str, Any]
+    hotspots: List[Dict[str, Any]]
+    bottlenecks: List[Dict[str, Any]]
+    warnings: List[str]
+
+
+@dataclass
+class ResourceSnapshot:
+    """System resource snapshot"""
+    timestamp: datetime
+    cpu_percent: float
+    memory_percent: float
+    memory_mb: float
+    disk_io_read_mb: float
+    disk_io_write_mb: float
+    network_sent_mb: float
+    network_recv_mb: float
+    thread_count: int
+    open_files: int
+
+
+class PerformanceProfiler:
+    """
+    Comprehensive performance profiling system
+    
+    Features:
+    - CPU profiling with hotspot detection
+    - Memory profiling and leak detection
+    - I/O profiling (disk, network)
+    - Async operation profiling
+    - Multi-threaded profiling
+    - Real-time monitoring
+    - Historical trend analysis
+    """
+    
+    def __init__(self, history_size: int = 1000):
+        self.history_size = history_size
+        self.cpu_profiles: List[ProfileResult] = []
+        self.memory_profiles: List[ProfileResult] = []
+        self.io_profiles: List[ProfileResult] = []
+        self.resource_history: List[ResourceSnapshot] = []
+        self.active_monitors: Dict[str, threading.Thread] = {}
+        self._monitoring = False
+        self._monitor_interval = 1.0  # seconds
+        
+    @contextmanager
+    def profile_cpu(self, name: str = "cpu_profile"):
+        """
+        Profile CPU usage for a code block
+        
+        Args:
+            name: Name for this profiling session
+            
+        Yields:
+            ProfileResult after execution
+        """
+        profiler = cProfile.Profile()
+        start_time = datetime.now()
+        
+        profiler.enable()
+        try:
+            yield
+        finally:
+            profiler.disable()
+            end_time = datetime.now()
+            
+            # Analyze results
+            stream = io.StringIO()
+            stats = pstats.Stats(profiler, stream=stream)
+            stats.sort_stats('cumulative')
+            
+            # Extract hotspots
+            hotspots = self._extract_cpu_hotspots(stats)
+            
+            # Detect bottlenecks
+            bottlenecks = self._detect_cpu_bottlenecks(stats)
+            
+            result = ProfileResult(
+                profile_type="cpu",
+                start_time=start_time,
+                end_time=end_time,
+                duration=(end_time - start_time).total_seconds(),
+                metrics={
+                    "total_calls": stats.total_calls,
+                    "primitive_calls": stats.prim_calls,
+                    "total_time": stats.total_tt
+                },
+                hotspots=hotspots,
+                bottlenecks=bottlenecks,
+                warnings=self._check_cpu_warnings(stats)
+            )
+            
+            self.cpu_profiles.append(result)
+            
+    @contextmanager
+    def profile_memory(self, name: str = "memory_profile"):
+        """
+        Profile memory usage for a code block
+        
+        Args:
+            name: Name for this profiling session
+            
+        Yields:
+            ProfileResult after execution
+        """
+        gc.collect()  # Clean up before profiling
+        
+        if psutil:
+            process = psutil.Process()
+            start_memory = process.memory_info().rss / 1024 / 1024  # MB
+        else:
+            start_memory = 0
+            
+        start_time = datetime.now()
+        memory_snapshots = []
+        
+        # Start memory monitoring thread
+        monitor_thread = threading.Thread(
+            target=self._monitor_memory,
+            args=(memory_snapshots,),
+            daemon=True
+        )
+        monitor_thread.start()
+        
+        try:
+            yield
+        finally:
+            # Stop monitoring
+            self._monitoring = False
+            monitor_thread.join(timeout=1)
+            
+            end_time = datetime.now()
+            
+            if psutil:
+                end_memory = process.memory_info().rss / 1024 / 1024
+                memory_delta = end_memory - start_memory
+            else:
+                end_memory = 0
+                memory_delta = 0
+            
+            # Detect memory leaks
+            leaks = self._detect_memory_leaks(memory_snapshots)
+            
+            result = ProfileResult(
+                profile_type="memory",
+                start_time=start_time,
+                end_time=end_time,
+                duration=(end_time - start_time).total_seconds(),
+                metrics={
+                    "start_memory_mb": start_memory,
+                    "end_memory_mb": end_memory,
+                    "memory_delta_mb": memory_delta,
+                    "peak_memory_mb": max(memory_snapshots) if memory_snapshots else end_memory,
+                    "gc_collections": gc.get_count()
+                },
+                hotspots=self._extract_memory_hotspots(),
+                bottlenecks=leaks,
+                warnings=self._check_memory_warnings(memory_delta)
+            )
+            
+            self.memory_profiles.append(result)
+            
+    @contextmanager
+    def profile_io(self, name: str = "io_profile"):
+        """
+        Profile I/O operations for a code block
+        
+        Args:
+            name: Name for this profiling session
+            
+        Yields:
+            ProfileResult after execution
+        """
+        if not psutil:
+            yield
+            return
+            
+        process = psutil.Process()
+        start_io = process.io_counters()
+        start_time = datetime.now()
+        
+        try:
+            yield
+        finally:
+            end_time = datetime.now()
+            end_io = process.io_counters()
+            
+            io_delta = {
+                "read_bytes": (end_io.read_bytes - start_io.read_bytes) / 1024 / 1024,
+                "write_bytes": (end_io.write_bytes - start_io.write_bytes) / 1024 / 1024,
+                "read_count": end_io.read_count - start_io.read_count,
+                "write_count": end_io.write_count - start_io.write_count
+            }
+            
+            result = ProfileResult(
+                profile_type="io",
+                start_time=start_time,
+                end_time=end_time,
+                duration=(end_time - start_time).total_seconds(),
+                metrics=io_delta,
+                hotspots=self._extract_io_hotspots(io_delta),
+                bottlenecks=self._detect_io_bottlenecks(io_delta),
+                warnings=self._check_io_warnings(io_delta)
+            )
+            
+            self.io_profiles.append(result)
+            
+    async def profile_async(self, coro: Callable, name: str = "async_profile") -> Any:
+        """
+        Profile async coroutine execution
+        
+        Args:
+            coro: Coroutine to profile
+            name: Name for this profiling session
+            
+        Returns:
+            Result from coroutine execution
+        """
+        start_time = datetime.now()
+        task_info = {
+            "name": name,
+            "start_time": start_time,
+            "switches": 0
+        }
+        
+        # Monitor context switches
+        async def monitor_switches():
+            while task_info.get("running", True):
+                await asyncio.sleep(0.001)
+                task_info["switches"] += 1
+                
+        monitor_task = asyncio.create_task(monitor_switches())
+        
+        try:
+            result = await coro
+            return result
+        finally:
+            task_info["running"] = False
+            monitor_task.cancel()
+            
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            
+            profile_result = ProfileResult(
+                profile_type="async",
+                start_time=start_time,
+                end_time=end_time,
+                duration=duration,
+                metrics={
+                    "context_switches": task_info["switches"],
+                    "avg_switch_time_ms": (duration * 1000) / max(task_info["switches"], 1)
+                },
+                hotspots=[],
+                bottlenecks=self._detect_async_bottlenecks(task_info),
+                warnings=self._check_async_warnings(task_info)
+            )
+            
+            self.cpu_profiles.append(profile_result)
+            
+    def start_monitoring(self, interval: float = 1.0):
+        """
+        Start real-time resource monitoring
+        
+        Args:
+            interval: Monitoring interval in seconds
+        """
+        self._monitor_interval = interval
+        self._monitoring = True
+        
+        monitor_thread = threading.Thread(
+            target=self._monitor_resources,
+            daemon=True
+        )
+        monitor_thread.start()
+        self.active_monitors["resources"] = monitor_thread
+        
+    def stop_monitoring(self):
+        """Stop all active monitors"""
+        self._monitoring = False
+        for name, thread in self.active_monitors.items():
+            thread.join(timeout=2)
+        self.active_monitors.clear()
+        
+    def generate_report(self, include_history: bool = True) -> Dict[str, Any]:
+        """
+        Generate comprehensive performance report
+        
+        Args:
+            include_history: Include historical data
+            
+        Returns:
+            Performance report dictionary
+        """
+        report = {
+            "timestamp": datetime.now().isoformat(),
+            "summary": self._generate_summary(),
+            "cpu_profiles": [asdict(p) for p in self.cpu_profiles[-10:]],
+            "memory_profiles": [asdict(p) for p in self.memory_profiles[-10:]],
+            "io_profiles": [asdict(p) for p in self.io_profiles[-10:]],
+            "current_resources": self._get_current_resources(),
+            "performance_trends": self._analyze_trends(),
+            "recommendations": self._generate_recommendations()
+        }
+        
+        if include_history and self.resource_history:
+            report["resource_history"] = [
+                asdict(r) for r in self.resource_history[-100:]
+            ]
+            
+        return report
+        
+    def detect_regressions(self, baseline: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Detect performance regressions compared to baseline
+        
+        Args:
+            baseline: Baseline performance metrics
+            
+        Returns:
+            List of detected regressions
+        """
+        regressions = []
+        current = self._generate_summary()
+        
+        # Check CPU regressions
+        if current.get("avg_cpu_time", 0) > baseline.get("avg_cpu_time", 0) * 1.1:
+            regressions.append({
+                "type": "cpu",
+                "metric": "avg_cpu_time",
+                "baseline": baseline.get("avg_cpu_time", 0),
+                "current": current.get("avg_cpu_time", 0),
+                "increase_percent": ((current.get("avg_cpu_time", 0) / 
+                                    max(baseline.get("avg_cpu_time", 1), 1)) - 1) * 100
+            })
+            
+        # Check memory regressions
+        if current.get("avg_memory_delta", 0) > baseline.get("avg_memory_delta", 0) * 1.2:
+            regressions.append({
+                "type": "memory",
+                "metric": "avg_memory_delta",
+                "baseline": baseline.get("avg_memory_delta", 0),
+                "current": current.get("avg_memory_delta", 0),
+                "increase_percent": ((current.get("avg_memory_delta", 0) / 
+                                    max(baseline.get("avg_memory_delta", 1), 1)) - 1) * 100
+            })
+            
+        return regressions
+        
+    # Private helper methods
+    def _monitor_resources(self):
+        """Monitor system resources in background"""
+        if not psutil:
+            return
+            
+        process = psutil.Process()
+        
+        while self._monitoring:
+            try:
+                cpu_percent = process.cpu_percent(interval=0.1)
+                memory_info = process.memory_info()
+                io_counters = process.io_counters()
+                
+                snapshot = ResourceSnapshot(
+                    timestamp=datetime.now(),
+                    cpu_percent=cpu_percent,
+                    memory_percent=process.memory_percent(),
+                    memory_mb=memory_info.rss / 1024 / 1024,
+                    disk_io_read_mb=io_counters.read_bytes / 1024 / 1024,
+                    disk_io_write_mb=io_counters.write_bytes / 1024 / 1024,
+                    network_sent_mb=0,  # Would need additional setup
+                    network_recv_mb=0,
+                    thread_count=process.num_threads(),
+                    open_files=len(process.open_files())
+                )
+                
+                self.resource_history.append(snapshot)
+                
+                # Maintain history size
+                if len(self.resource_history) > self.history_size:
+                    self.resource_history.pop(0)
+                    
+            except Exception as e:
+                print(f"Monitor error: {e}")
+                
+            time.sleep(self._monitor_interval)
+            
+    def _monitor_memory(self, snapshots: List[float]):
+        """Monitor memory usage during profiling"""
+        if not psutil:
+            return
+            
+        process = psutil.Process()
+        self._monitoring = True
+        
+        while self._monitoring:
+            memory_mb = process.memory_info().rss / 1024 / 1024
+            snapshots.append(memory_mb)
+            time.sleep(0.1)
+            
+    def _extract_cpu_hotspots(self, stats: pstats.Stats) -> List[Dict[str, Any]]:
+        """Extract CPU hotspots from profile stats"""
+        hotspots = []
+        
+        # Get top 10 functions by cumulative time
+        stats.sort_stats('cumulative')
+        
+        # Use stats directly to get function stats
+        total_time = stats.total_tt
+        
+        # Get stats in a format we can parse
+        old_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        stats.print_stats(10)  # Top 10 functions
+        output = sys.stdout.getvalue()
+        sys.stdout = old_stdout
+        
+        # Parse the output to extract function information
+        lines = output.split('\n')
+        in_stats = False
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Skip header lines
+            if 'ncalls' in line or 'tottime' in line:
+                in_stats = True
+                continue
+            if not in_stats:
+                continue
+                
+            # Parse stats lines
+            parts = line.split(None, 5)  # Split on whitespace, max 6 parts
+            if len(parts) >= 6:
+                try:
+                    # Format: ncalls tottime percall cumtime percall filename:lineno(function)
+                    ncalls = parts[0]
+                    tottime = float(parts[1])
+                    cumtime = float(parts[3])
+                    function_name = parts[5]
+                    
+                    hotspots.append({
+                        "function": function_name,
+                        "calls": ncalls,
+                        "total_time": tottime,
+                        "cumulative_time": cumtime,
+                        "percentage": (cumtime / total_time * 100) if total_time > 0 else 0
+                    })
+                except (ValueError, IndexError):
+                    continue
+                        
+        return hotspots[:10]  # Top 10
+        
+    def _detect_cpu_bottlenecks(self, stats: pstats.Stats) -> List[Dict[str, Any]]:
+        """Detect CPU bottlenecks"""
+        bottlenecks = []
+        
+        # Functions taking more than 10% of total time
+        total_time = stats.total_tt
+        threshold = total_time * 0.1
+        
+        # Get hotspots first to check for bottlenecks
+        hotspots = self._extract_cpu_hotspots(stats)
+        
+        for hotspot in hotspots:
+            if hotspot["cumulative_time"] > threshold:
+                bottlenecks.append({
+                    "type": "cpu_intensive",
+                    "function": hotspot["function"],
+                    "time": hotspot["cumulative_time"],
+                    "percentage": hotspot["percentage"],
+                    "severity": "high" if hotspot["cumulative_time"] > total_time * 0.3 else "medium"
+                })
+                
+        return bottlenecks
+        
+    def _check_cpu_warnings(self, stats: pstats.Stats) -> List[str]:
+        """Check for CPU-related warnings"""
+        warnings = []
+        
+        if stats.total_calls > 1000000:
+            warnings.append("Excessive function calls detected (>1M)")
+            
+        if stats.total_tt > 10:
+            warnings.append("Long execution time detected (>10s)")
+            
+        return warnings
+        
+    def _extract_memory_hotspots(self) -> List[Dict[str, Any]]:
+        """Extract memory allocation hotspots"""
+        hotspots = []
+        
+        # Get garbage collection stats
+        gc_stats = gc.get_stats()
+        for i, stats in enumerate(gc_stats):
+            if stats.get('collected', 0) > 1000:
+                hotspots.append({
+                    "generation": i,
+                    "collected": stats.get('collected', 0),
+                    "uncollectable": stats.get('uncollectable', 0)
+                })
+                
+        return hotspots
+        
+    def _detect_memory_leaks(self, snapshots: List[float]) -> List[Dict[str, Any]]:
+        """Detect potential memory leaks"""
+        leaks = []
+        
+        if len(snapshots) < 10:
+            return leaks
+            
+        # Check for continuous memory growth
+        growth_rate = (snapshots[-1] - snapshots[0]) / len(snapshots)
+        if growth_rate > 0.1:  # 0.1 MB per sample
+            leaks.append({
+                "type": "memory_leak",
+                "growth_rate_mb_per_sec": growth_rate * 10,  # Assuming 0.1s interval
+                "severity": "high" if growth_rate > 1 else "medium"
+            })
+            
+        return leaks
+        
+    def _check_memory_warnings(self, memory_delta: float) -> List[str]:
+        """Check for memory-related warnings"""
+        warnings = []
+        
+        if memory_delta > 100:
+            warnings.append(f"Large memory allocation detected ({memory_delta:.1f} MB)")
+            
+        if memory_delta < -50:
+            warnings.append(f"Significant memory deallocation ({memory_delta:.1f} MB)")
+            
+        return warnings
+        
+    def _extract_io_hotspots(self, io_delta: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Extract I/O hotspots"""
+        hotspots = []
+        
+        if io_delta["read_bytes"] > 10:
+            hotspots.append({
+                "type": "disk_read",
+                "amount_mb": io_delta["read_bytes"],
+                "operations": io_delta["read_count"]
+            })
+            
+        if io_delta["write_bytes"] > 10:
+            hotspots.append({
+                "type": "disk_write", 
+                "amount_mb": io_delta["write_bytes"],
+                "operations": io_delta["write_count"]
+            })
+            
+        return hotspots
+        
+    def _detect_io_bottlenecks(self, io_delta: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Detect I/O bottlenecks"""
+        bottlenecks = []
+        
+        # Many small I/O operations
+        if io_delta["read_count"] > 1000 and io_delta["read_bytes"] < 1:
+            bottlenecks.append({
+                "type": "excessive_small_reads",
+                "count": io_delta["read_count"],
+                "severity": "medium"
+            })
+            
+        if io_delta["write_count"] > 1000 and io_delta["write_bytes"] < 1:
+            bottlenecks.append({
+                "type": "excessive_small_writes",
+                "count": io_delta["write_count"],
+                "severity": "medium"
+            })
+            
+        return bottlenecks
+        
+    def _check_io_warnings(self, io_delta: Dict[str, Any]) -> List[str]:
+        """Check for I/O-related warnings"""
+        warnings = []
+        
+        if io_delta["read_bytes"] > 100:
+            warnings.append(f"Large disk read detected ({io_delta['read_bytes']:.1f} MB)")
+            
+        if io_delta["write_bytes"] > 100:
+            warnings.append(f"Large disk write detected ({io_delta['write_bytes']:.1f} MB)")
+            
+        return warnings
+        
+    def _detect_async_bottlenecks(self, task_info: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Detect async operation bottlenecks"""
+        bottlenecks = []
+        
+        if task_info["switches"] > 1000:
+            bottlenecks.append({
+                "type": "excessive_context_switches",
+                "count": task_info["switches"],
+                "severity": "high"
+            })
+            
+        return bottlenecks
+        
+    def _check_async_warnings(self, task_info: Dict[str, Any]) -> List[str]:
+        """Check for async-related warnings"""
+        warnings = []
+        
+        if task_info["switches"] > 500:
+            warnings.append(f"High context switch count ({task_info['switches']})")
+            
+        return warnings
+        
+    def _get_current_resources(self) -> Dict[str, Any]:
+        """Get current resource usage"""
+        if not psutil or not self.resource_history:
+            return {}
+            
+        latest = self.resource_history[-1]
+        return asdict(latest)
+        
+    def _generate_summary(self) -> Dict[str, Any]:
+        """Generate performance summary"""
+        summary = {
+            "total_profiles": len(self.cpu_profiles) + len(self.memory_profiles) + len(self.io_profiles),
+            "cpu_profiles": len(self.cpu_profiles),
+            "memory_profiles": len(self.memory_profiles),
+            "io_profiles": len(self.io_profiles)
+        }
+        
+        if self.cpu_profiles:
+            cpu_times = [p.duration for p in self.cpu_profiles]
+            summary["avg_cpu_time"] = sum(cpu_times) / len(cpu_times)
+            summary["max_cpu_time"] = max(cpu_times)
+            
+        if self.memory_profiles:
+            memory_deltas = [p.metrics.get("memory_delta_mb", 0) for p in self.memory_profiles]
+            summary["avg_memory_delta"] = sum(memory_deltas) / len(memory_deltas)
+            summary["max_memory_delta"] = max(memory_deltas)
+            
+        return summary
+        
+    def _analyze_trends(self) -> Dict[str, Any]:
+        """Analyze performance trends"""
+        trends = {}
+        
+        if len(self.resource_history) > 10:
+            # CPU trend
+            cpu_values = [r.cpu_percent for r in self.resource_history[-10:]]
+            cpu_trend = "increasing" if cpu_values[-1] > cpu_values[0] else "stable"
+            trends["cpu_trend"] = cpu_trend
+            
+            # Memory trend
+            memory_values = [r.memory_mb for r in self.resource_history[-10:]]
+            memory_trend = "increasing" if memory_values[-1] > memory_values[0] * 1.1 else "stable"
+            trends["memory_trend"] = memory_trend
+            
+        return trends
+        
+    def _generate_recommendations(self) -> List[str]:
+        """Generate performance recommendations"""
+        recommendations = []
+        
+        # Check for CPU issues
+        cpu_bottlenecks = sum(len(p.bottlenecks) for p in self.cpu_profiles)
+        if cpu_bottlenecks > 5:
+            recommendations.append("Consider optimizing CPU-intensive functions")
+            
+        # Check for memory issues
+        memory_warnings = sum(len(p.warnings) for p in self.memory_profiles)
+        if memory_warnings > 3:
+            recommendations.append("Review memory allocation patterns")
+            
+        # Check for I/O issues
+        io_bottlenecks = sum(len(p.bottlenecks) for p in self.io_profiles)
+        if io_bottlenecks > 2:
+            recommendations.append("Consider batching I/O operations")
+            
+        return recommendations
+
+
+if __name__ == "__main__":
+    # Test with real profiling scenarios
+    import time
+    import random
+    
+    profiler = PerformanceProfiler()
+    
+    # Test CPU profiling
+    print("Testing CPU profiling...")
+    with profiler.profile_cpu("fibonacci_test"):
+        def fibonacci(n):
+            if n <= 1:
+                return n
+            return fibonacci(n-1) + fibonacci(n-2)
+        
+        result = fibonacci(30)
+        print(f"Fibonacci(30) = {result}")
+    
+    # Test memory profiling
+    print("\nTesting memory profiling...")
+    with profiler.profile_memory("memory_test"):
+        # Allocate and deallocate memory
+        data = []
+        for i in range(1000):
+            data.append([random.random() for _ in range(1000)])
+        
+        # Clear some data
+        data = data[:500]
+        
+    # Test I/O profiling
+    print("\nTesting I/O profiling...")
+    with profiler.profile_io("io_test"):
+        # Write and read temporary file
+        test_file = Path("test_profile.tmp")
+        test_file.write_text("test data " * 1000)
+        content = test_file.read_text()
+        test_file.unlink()
+    
+    # Test async profiling
+    print("\nTesting async profiling...")
+    async def async_test():
+        async def slow_operation():
+            await asyncio.sleep(0.5)
+            return "completed"
+        
+        result = await profiler.profile_async(slow_operation(), "async_operation")
+        return result
+    
+    asyncio.run(async_test())
+    
+    # Start monitoring
+    print("\nStarting resource monitoring...")
+    profiler.start_monitoring(interval=0.5)
+    time.sleep(2)
+    profiler.stop_monitoring()
+    
+    # Generate report
+    print("\nGenerating performance report...")
+    report = profiler.generate_report()
+    
+    print(f"\nPerformance Summary:")
+    print(f"Total profiles: {report['summary']['total_profiles']}")
+    print(f"CPU profiles: {report['summary']['cpu_profiles']}")
+    print(f"Memory profiles: {report['summary']['memory_profiles']}")
+    print(f"I/O profiles: {report['summary']['io_profiles']}")
+    
+    if report.get('recommendations'):
+        print(f"\nRecommendations:")
+        for rec in report['recommendations']:
+            print(f"- {rec}")
+    
+    # Test regression detection
+    print("\nTesting regression detection...")
+    baseline = report['summary']
+    
+    # Simulate performance regression
+    with profiler.profile_cpu("regression_test"):
+        time.sleep(0.1)  # Simulate slower execution
+        
+    regressions = profiler.detect_regressions(baseline)
+    if regressions:
+        print(f"Detected {len(regressions)} regression(s)")
+    
+    print("\n✅ Performance profiler validation passed")

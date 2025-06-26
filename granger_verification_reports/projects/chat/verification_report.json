@@ -1,0 +1,20 @@
+{
+  "project_name": "chat",
+  "project_path": "/home/graham/workspace/experiments/chat",
+  "project_type": "User Interface",
+  "status": "passed",
+  "mode": "VerificationMode.FULL",
+  "duration": 3.8384804725646973,
+  "cleanup_result": "passed",
+  "compliance_result": "passed",
+  "test_result": "passed",
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 0,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "issues": [],
+  "auto_fixes_applied": 0,
+  "fix_directive_generated": false
+}

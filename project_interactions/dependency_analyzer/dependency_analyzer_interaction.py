@@ -1,0 +1,1022 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: dependency_analyzer_interaction.py
+Purpose: Cross-Module Dependency Analyzer for GRANGER modules
+
+Analyzes dependencies across multiple GRANGER modules in parallel to identify
+coupling, circular dependencies, and optimization opportunities.
+
+External Dependencies:
+- asyncio: https://docs.python.org/3/library/asyncio.html
+- ast: https://docs.python.org/3/library/ast.html
+- networkx: https://networkx.org/documentation/stable/
+- matplotlib: https://matplotlib.org/stable/
+
+Example Usage:
+>>> analyzer = DependencyAnalyzer()
+>>> results = asyncio.run(analyzer.analyze_modules([
+...     '/path/to/module1',
+...     '/path/to/module2'
+... ]))
+>>> print(f"Found {len(results['circular_dependencies'])} circular dependencies")
+Found 2 circular dependencies
+"""
+
+import asyncio
+import ast
+import json
+import os
+import time
+from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Set, Tuple, Optional, Any
+import sys
+import importlib.util
+import concurrent.futures
+from functools import lru_cache
+
+# Optional imports for visualization
+try:
+    import networkx as nx
+    import matplotlib.pyplot as plt
+    HAS_VISUALIZATION = True
+except ImportError:
+    HAS_VISUALIZATION = False
+
+
+@dataclass
+class ModuleInfo:
+    """Information about a single module"""
+    path: Path
+    name: str
+    imports: Set[str] = field(default_factory=set)
+    exports: Set[str] = field(default_factory=set)
+    classes: Set[str] = field(default_factory=set)
+    functions: Set[str] = field(default_factory=set)
+    size_lines: int = 0
+    complexity: int = 0
+
+
+@dataclass
+class DependencyEdge:
+    """Represents a dependency between modules"""
+    source: str
+    target: str
+    import_type: str  # 'direct', 'transitive', 'dynamic'
+    imports: List[str] = field(default_factory=list)
+
+
+@dataclass
+class CouplingMetrics:
+    """Coupling metrics for a module"""
+    module: str
+    afferent_coupling: int = 0  # Number of modules that depend on this
+    efferent_coupling: int = 0  # Number of modules this depends on
+    instability: float = 0.0  # Efferent / (Afferent + Efferent)
+    abstractness: float = 0.0  # Abstract classes / Total classes
+    distance_from_main_sequence: float = 0.0  # |Abstractness + Instability - 1|
+
+
+@dataclass
+class AnalysisResult:
+    """Complete analysis results"""
+    modules: Dict[str, ModuleInfo]
+    dependencies: List[DependencyEdge]
+    circular_dependencies: List[List[str]]
+    coupling_metrics: Dict[str, CouplingMetrics]
+    recommendations: List[str]
+    analysis_time: float
+    dependency_graph: Optional[Any] = None  # networkx graph if available
+
+
+class ImportVisitor(ast.NodeVisitor):
+    """AST visitor to extract imports and exports"""
+    
+    def __init__(self):
+        self.imports = set()
+        self.exports = set()
+        self.classes = set()
+        self.functions = set()
+        self.dynamic_imports = set()
+        
+    def visit_Import(self, node):
+        for alias in node.names:
+            self.imports.add(alias.name)
+        self.generic_visit(node)
+        
+    def visit_ImportFrom(self, node):
+        if node.module:
+            self.imports.add(node.module)
+            for alias in node.names:
+                if alias.name != '*':
+                    self.imports.add(f"{node.module}.{alias.name}")
+        self.generic_visit(node)
+        
+    def visit_ClassDef(self, node):
+        self.classes.add(node.name)
+        self.exports.add(node.name)
+        self.generic_visit(node)
+        
+    def visit_FunctionDef(self, node):
+        self.functions.add(node.name)
+        if not node.name.startswith('_'):
+            self.exports.add(node.name)
+        self.generic_visit(node)
+        
+    def visit_Call(self, node):
+        # Detect dynamic imports
+        if isinstance(node.func, ast.Name) and node.func.id == '__import__':
+            if node.args and isinstance(node.args[0], ast.Str):
+                self.dynamic_imports.add(node.args[0].s)
+        elif isinstance(node.func, ast.Attribute):
+            if (isinstance(node.func.value, ast.Name) and 
+                node.func.value.id == 'importlib' and 
+                node.func.attr == 'import_module'):
+                if node.args and isinstance(node.args[0], ast.Str):
+                    self.dynamic_imports.add(node.args[0].s)
+        self.generic_visit(node)
+
+
+class DependencyAnalyzer:
+    """Cross-module dependency analyzer for GRANGER modules"""
+    
+    def __init__(self, max_workers: int = 4):
+        self.max_workers = max_workers
+        self.module_cache: Dict[str, ModuleInfo] = {}
+        
+    async def analyze_modules(self, module_paths: List[str]) -> AnalysisResult:
+        """
+        Analyze dependencies across multiple modules
+        
+        Args:
+            module_paths: List of module directory paths to analyze
+            
+        Returns:
+            AnalysisResult with complete dependency analysis
+        """
+        start_time = time.time()
+        
+        # Scan modules in parallel
+        modules = await self._scan_modules_parallel(module_paths)
+        
+        # Build dependency graph
+        dependencies = self._build_dependency_graph(modules)
+        
+        # Detect circular dependencies
+        circular_deps = self._detect_circular_dependencies(modules, dependencies)
+        
+        # Calculate coupling metrics
+        coupling_metrics = self._calculate_coupling_metrics(modules, dependencies)
+        
+        # Generate recommendations
+        recommendations = self._generate_recommendations(
+            modules, dependencies, circular_deps, coupling_metrics
+        )
+        
+        # Create visualization if available
+        dep_graph = None
+        if HAS_VISUALIZATION:
+            dep_graph = self._create_dependency_graph(modules, dependencies)
+        
+        analysis_time = time.time() - start_time
+        
+        return AnalysisResult(
+            modules=modules,
+            dependencies=dependencies,
+            circular_dependencies=circular_deps,
+            coupling_metrics=coupling_metrics,
+            recommendations=recommendations,
+            analysis_time=analysis_time,
+            dependency_graph=dep_graph
+        )
+    
+    async def _scan_modules_parallel(self, module_paths: List[str]) -> Dict[str, ModuleInfo]:
+        """Scan multiple modules in parallel"""
+        modules = {}
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all module scans
+            future_to_path = {
+                executor.submit(self._scan_module, Path(path)): path 
+                for path in module_paths
+            }
+            
+            # Collect results
+            for future in concurrent.futures.as_completed(future_to_path):
+                path = future_to_path[future]
+                try:
+                    module_info = future.result()
+                    if module_info:
+                        modules[module_info.name] = module_info
+                except Exception as e:
+                    print(f"Error scanning {path}: {e}")
+                    
+        return modules
+    
+    def _scan_module(self, module_path: Path) -> Optional[ModuleInfo]:
+        """Scan a single module for dependencies"""
+        if not module_path.exists():
+            return None
+            
+        module_name = module_path.name
+        module_info = ModuleInfo(path=module_path, name=module_name)
+        
+        # Scan all Python files in the module
+        for py_file in module_path.rglob("*.py"):
+            if '__pycache__' in str(py_file):
+                continue
+                
+            try:
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    module_info.size_lines += len(content.splitlines())
+                    
+                # Parse AST
+                tree = ast.parse(content, filename=str(py_file))
+                
+                # Extract imports and exports
+                visitor = ImportVisitor()
+                visitor.visit(tree)
+                
+                module_info.imports.update(visitor.imports)
+                module_info.exports.update(visitor.exports)
+                module_info.classes.update(visitor.classes)
+                module_info.functions.update(visitor.functions)
+                
+                # Calculate complexity (simplified McCabe)
+                module_info.complexity += self._calculate_complexity(tree)
+                
+            except Exception as e:
+                print(f"Error parsing {py_file}: {e}")
+                
+        return module_info
+    
+    def _calculate_complexity(self, tree: ast.AST) -> int:
+        """Calculate simplified cyclomatic complexity"""
+        complexity = 1
+        
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.If, ast.While, ast.For, ast.ExceptHandler)):
+                complexity += 1
+            elif isinstance(node, ast.BoolOp):
+                complexity += len(node.values) - 1
+                
+        return complexity
+    
+    def _build_dependency_graph(self, modules: Dict[str, ModuleInfo]) -> List[DependencyEdge]:
+        """Build dependency graph from module imports"""
+        dependencies = []
+        
+        for source_name, source_module in modules.items():
+            for import_name in source_module.imports:
+                # Check if import refers to another analyzed module
+                target_name = None
+                
+                # Direct module import
+                if import_name in modules:
+                    target_name = import_name
+                else:
+                    # Check if it's a submodule import
+                    for module_name in modules:
+                        if import_name.startswith(f"{module_name}."):
+                            target_name = module_name
+                            break
+                            
+                if target_name and target_name != source_name:
+                    edge = DependencyEdge(
+                        source=source_name,
+                        target=target_name,
+                        import_type='direct',
+                        imports=[import_name]
+                    )
+                    dependencies.append(edge)
+                    
+        return dependencies
+    
+    def _detect_circular_dependencies(self, 
+                                    modules: Dict[str, ModuleInfo],
+                                    dependencies: List[DependencyEdge]) -> List[List[str]]:
+        """Detect circular dependencies using DFS"""
+        # Build adjacency list
+        graph = defaultdict(list)
+        for dep in dependencies:
+            graph[dep.source].append(dep.target)
+            
+        circular_deps = []
+        visited = set()
+        rec_stack = set()
+        path = []
+        
+        def dfs(node: str) -> bool:
+            visited.add(node)
+            rec_stack.add(node)
+            path.append(node)
+            
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    if dfs(neighbor):
+                        return True
+                elif neighbor in rec_stack:
+                    # Found circular dependency
+                    cycle_start = path.index(neighbor)
+                    cycle = path[cycle_start:] + [neighbor]
+                    circular_deps.append(cycle)
+                    
+            path.pop()
+            rec_stack.remove(node)
+            return False
+            
+        # Check each module
+        for module in modules:
+            if module not in visited:
+                dfs(module)
+                
+        # Remove duplicate cycles
+        unique_cycles = []
+        for cycle in circular_deps:
+            # Normalize cycle (start with smallest element)
+            min_idx = cycle.index(min(cycle))
+            normalized = cycle[min_idx:] + cycle[:min_idx]
+            if normalized not in unique_cycles:
+                unique_cycles.append(normalized)
+                
+        return unique_cycles
+    
+    def _calculate_coupling_metrics(self, 
+                                  modules: Dict[str, ModuleInfo],
+                                  dependencies: List[DependencyEdge]) -> Dict[str, CouplingMetrics]:
+        """Calculate coupling metrics for each module"""
+        metrics = {}
+        
+        # Count dependencies
+        afferent = defaultdict(int)  # Modules depending on this
+        efferent = defaultdict(int)  # This depends on modules
+        
+        for dep in dependencies:
+            efferent[dep.source] += 1
+            afferent[dep.target] += 1
+            
+        for module_name, module_info in modules.items():
+            metric = CouplingMetrics(module=module_name)
+            
+            metric.afferent_coupling = afferent[module_name]
+            metric.efferent_coupling = efferent[module_name]
+            
+            # Calculate instability
+            total_coupling = metric.afferent_coupling + metric.efferent_coupling
+            if total_coupling > 0:
+                metric.instability = metric.efferent_coupling / total_coupling
+            else:
+                metric.instability = 0.0
+                
+            # Calculate abstractness (ratio of abstract classes)
+            if module_info.classes:
+                # Simplified: assume classes starting with 'Abstract' or 'Base' are abstract
+                abstract_classes = sum(1 for c in module_info.classes 
+                                     if c.startswith(('Abstract', 'Base', 'I')))
+                metric.abstractness = abstract_classes / len(module_info.classes)
+            else:
+                metric.abstractness = 0.0
+                
+            # Distance from main sequence
+            metric.distance_from_main_sequence = abs(metric.abstractness + metric.instability - 1)
+            
+            metrics[module_name] = metric
+            
+        return metrics
+    
+    def _generate_recommendations(self,
+                                modules: Dict[str, ModuleInfo],
+                                dependencies: List[DependencyEdge],
+                                circular_deps: List[List[str]],
+                                coupling_metrics: Dict[str, CouplingMetrics]) -> List[str]:
+        """Generate recommendations for improving module structure"""
+        recommendations = []
+        
+        # Check for circular dependencies
+        if circular_deps:
+            recommendations.append(
+                f"🔴 CRITICAL: Found {len(circular_deps)} circular dependencies that should be resolved:"
+            )
+            for cycle in circular_deps:
+                recommendations.append(f"  - Cycle: {' -> '.join(cycle)}")
+                
+        # Check for high coupling
+        high_coupling_threshold = 5
+        for metric in coupling_metrics.values():
+            if metric.efferent_coupling > high_coupling_threshold:
+                recommendations.append(
+                    f"⚠️  Module '{metric.module}' has high efferent coupling ({metric.efferent_coupling}). "
+                    f"Consider reducing dependencies."
+                )
+                
+        # Check for unstable dependencies
+        for metric in coupling_metrics.values():
+            if metric.instability > 0.8 and metric.afferent_coupling > 2:
+                recommendations.append(
+                    f"⚠️  Module '{metric.module}' is highly unstable (I={metric.instability:.2f}) "
+                    f"but has {metric.afferent_coupling} dependents. Consider stabilizing."
+                )
+                
+        # Check for modules far from main sequence
+        for metric in coupling_metrics.values():
+            if metric.distance_from_main_sequence > 0.7:
+                recommendations.append(
+                    f"📊 Module '{metric.module}' is far from the main sequence "
+                    f"(D={metric.distance_from_main_sequence:.2f}). Consider rebalancing."
+                )
+                
+        # Check for large modules
+        for module_name, module_info in modules.items():
+            if module_info.size_lines > 500:
+                recommendations.append(
+                    f"📏 Module '{module_name}' is large ({module_info.size_lines} lines). "
+                    f"Consider splitting into smaller modules."
+                )
+                
+        # Check for complex modules
+        for module_name, module_info in modules.items():
+            if module_info.complexity > 50:
+                recommendations.append(
+                    f"🧩 Module '{module_name}' has high complexity ({module_info.complexity}). "
+                    f"Consider refactoring."
+                )
+                
+        if not recommendations:
+            recommendations.append("✅ No major dependency issues detected.")
+            
+        return recommendations
+    
+    def _create_dependency_graph(self, 
+                               modules: Dict[str, ModuleInfo],
+                               dependencies: List[DependencyEdge]) -> Any:
+        """Create NetworkX dependency graph for visualization"""
+        if not HAS_VISUALIZATION:
+            return None
+            
+        G = nx.DiGraph()
+        
+        # Add nodes
+        for module_name, module_info in modules.items():
+            G.add_node(
+                module_name,
+                size=module_info.size_lines,
+                complexity=module_info.complexity,
+                classes=len(module_info.classes),
+                functions=len(module_info.functions)
+            )
+            
+        # Add edges
+        for dep in dependencies:
+            G.add_edge(dep.source, dep.target, imports=dep.imports)
+            
+        return G
+    
+    def visualize_dependencies(self, result: AnalysisResult, output_path: str = "dependencies.png"):
+        """Visualize dependency graph"""
+        if not HAS_VISUALIZATION or not result.dependency_graph:
+            print("Visualization not available. Install networkx and matplotlib.")
+            return
+            
+        G = result.dependency_graph
+        
+        plt.figure(figsize=(12, 8))
+        
+        # Layout
+        pos = nx.spring_layout(G, k=2, iterations=50)
+        
+        # Node colors based on coupling
+        node_colors = []
+        for node in G.nodes():
+            metric = result.coupling_metrics.get(node)
+            if metric:
+                # Color based on instability
+                color_value = metric.instability
+                node_colors.append(plt.cm.RdYlGn(1 - color_value))
+            else:
+                node_colors.append('gray')
+                
+        # Node sizes based on module size
+        node_sizes = [G.nodes[node].get('size', 100) / 10 for node in G.nodes()]
+        
+        # Draw
+        nx.draw(G, pos, 
+                node_color=node_colors,
+                node_size=node_sizes,
+                with_labels=True,
+                font_size=10,
+                font_weight='bold',
+                arrows=True,
+                edge_color='gray',
+                alpha=0.7)
+                
+        # Highlight circular dependencies
+        if result.circular_dependencies:
+            for cycle in result.circular_dependencies:
+                cycle_edges = [(cycle[i], cycle[(i+1) % len(cycle)]) 
+                              for i in range(len(cycle))]
+                nx.draw_networkx_edges(G, pos, cycle_edges, 
+                                     edge_color='red', 
+                                     width=3, 
+                                     alpha=0.8)
+                                     
+        plt.title("Module Dependency Graph")
+        plt.axis('off')
+        plt.tight_layout()
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"Dependency graph saved to {output_path}")
+    
+    def generate_report(self, result: AnalysisResult, output_path: str = "dependency_report.md"):
+        """Generate markdown report of analysis results"""
+        report = []
+        report.append("# Dependency Analysis Report")
+        report.append(f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        report.append(f"Analysis Time: {result.analysis_time:.2f}s")
+        
+        # Module summary
+        report.append("\n## Module Summary")
+        report.append("\n| Module | Lines | Classes | Functions | Imports | Exports | Complexity |")
+        report.append("|--------|-------|---------|-----------|---------|---------|------------|")
+        
+        for name, info in result.modules.items():
+            report.append(
+                f"| {name} | {info.size_lines} | {len(info.classes)} | "
+                f"{len(info.functions)} | {len(info.imports)} | "
+                f"{len(info.exports)} | {info.complexity} |"
+            )
+            
+        # Coupling metrics
+        report.append("\n## Coupling Metrics")
+        report.append("\n| Module | Afferent | Efferent | Instability | Abstractness | Distance |")
+        report.append("|--------|----------|----------|-------------|--------------|----------|")
+        
+        for metric in result.coupling_metrics.values():
+            report.append(
+                f"| {metric.module} | {metric.afferent_coupling} | "
+                f"{metric.efferent_coupling} | {metric.instability:.2f} | "
+                f"{metric.abstractness:.2f} | {metric.distance_from_main_sequence:.2f} |"
+            )
+            
+        # Circular dependencies
+        if result.circular_dependencies:
+            report.append("\n## Circular Dependencies")
+            for i, cycle in enumerate(result.circular_dependencies, 1):
+                report.append(f"\n{i}. {' → '.join(cycle)}")
+        else:
+            report.append("\n## Circular Dependencies\n\nNone detected ✅")
+            
+        # Recommendations
+        report.append("\n## Recommendations")
+        for rec in result.recommendations:
+            report.append(f"\n- {rec}")
+            
+        # Write report
+        with open(output_path, 'w') as f:
+            f.write('\n'.join(report))
+            
+        print(f"Report saved to {output_path}")
+
+
+# Test methods for the dependency analyzer
+class TestDependencyAnalyzer:
+    """Test methods for dependency analyzer"""
+    
+    @staticmethod
+    def test_simple_analysis():
+        """Test basic dependency analysis (5-10s)"""
+        print("\n=== Testing Simple Dependency Analysis ===")
+        start = time.time()
+        
+        analyzer = DependencyAnalyzer()
+        
+        # Create test modules
+        test_dir = Path("/tmp/dep_test")
+        test_dir.mkdir(exist_ok=True)
+        
+        # Module A
+        module_a = test_dir / "module_a"
+        module_a.mkdir(exist_ok=True)
+        (module_a / "__init__.py").write_text("")
+        (module_a / "core.py").write_text("""
+import os
+import sys
+from module_b import utils
+
+class ServiceA:
+    def process(self):
+        return utils.helper()
+""")
+        
+        # Module B
+        module_b = test_dir / "module_b"
+        module_b.mkdir(exist_ok=True)
+        (module_b / "__init__.py").write_text("")
+        (module_b / "utils.py").write_text("""
+def helper():
+    return "helping"
+    
+class UtilityB:
+    pass
+""")
+        
+        # Run analysis
+        result = asyncio.run(analyzer.analyze_modules([
+            str(module_a),
+            str(module_b)
+        ]))
+        
+        duration = time.time() - start
+        
+        print(f"Analysis completed in {duration:.2f}s")
+        print(f"Found {len(result.modules)} modules")
+        print(f"Found {len(result.dependencies)} dependencies")
+        print(f"Circular dependencies: {len(result.circular_dependencies)}")
+        
+        # Cleanup
+        import shutil
+        shutil.rmtree(test_dir)
+        
+        assert len(result.modules) == 2, "Should find 2 modules"
+        assert len(result.dependencies) >= 1, "Should find at least 1 dependency"
+        print("✅ Simple analysis test passed")
+        
+    @staticmethod
+    def test_circular_dependency_detection():
+        """Test circular dependency detection (10-15s)"""
+        print("\n=== Testing Circular Dependency Detection ===")
+        start = time.time()
+        
+        analyzer = DependencyAnalyzer()
+        
+        # Create test modules with circular dependencies
+        test_dir = Path("/tmp/circular_test")
+        test_dir.mkdir(exist_ok=True)
+        
+        # Module A imports B
+        module_a = test_dir / "module_a"
+        module_a.mkdir(exist_ok=True)
+        (module_a / "__init__.py").write_text("")
+        (module_a / "service.py").write_text("""
+from module_b.handler import HandlerB
+
+class ServiceA:
+    def __init__(self):
+        self.handler = HandlerB()
+""")
+        
+        # Module B imports C
+        module_b = test_dir / "module_b"
+        module_b.mkdir(exist_ok=True)
+        (module_b / "__init__.py").write_text("")
+        (module_b / "handler.py").write_text("""
+from module_c.processor import ProcessorC
+
+class HandlerB:
+    def __init__(self):
+        self.processor = ProcessorC()
+""")
+        
+        # Module C imports A (circular!)
+        module_c = test_dir / "module_c"
+        module_c.mkdir(exist_ok=True)
+        (module_c / "__init__.py").write_text("")
+        (module_c / "processor.py").write_text("""
+from module_a.service import ServiceA
+
+class ProcessorC:
+    def __init__(self):
+        self.service = ServiceA()
+""")
+        
+        # Run analysis
+        result = asyncio.run(analyzer.analyze_modules([
+            str(module_a),
+            str(module_b),
+            str(module_c)
+        ]))
+        
+        duration = time.time() - start
+        
+        print(f"Analysis completed in {duration:.2f}s")
+        print(f"Found {len(result.circular_dependencies)} circular dependencies")
+        
+        if result.circular_dependencies:
+            print("Circular dependency chains:")
+            for cycle in result.circular_dependencies:
+                print(f"  {' -> '.join(cycle)}")
+                
+        # Cleanup
+        import shutil
+        shutil.rmtree(test_dir)
+        
+        assert len(result.circular_dependencies) >= 1, "Should detect circular dependency"
+        print("✅ Circular dependency detection test passed")
+        
+    @staticmethod
+    def test_coupling_metrics():
+        """Test coupling metrics calculation (15-20s)"""
+        print("\n=== Testing Coupling Metrics ===")
+        start = time.time()
+        
+        analyzer = DependencyAnalyzer()
+        
+        # Create test modules with various coupling patterns
+        test_dir = Path("/tmp/coupling_test")
+        test_dir.mkdir(exist_ok=True)
+        
+        # Core module (many depend on it)
+        core = test_dir / "core"
+        core.mkdir(exist_ok=True)
+        (core / "__init__.py").write_text("")
+        (core / "base.py").write_text("""
+class BaseService:
+    pass
+    
+class AbstractProcessor:
+    pass
+    
+def utility_function():
+    return True
+""")
+        
+        # Service module (depends on core, others depend on it)
+        service = test_dir / "service"
+        service.mkdir(exist_ok=True)
+        (service / "__init__.py").write_text("")
+        (service / "api.py").write_text("""
+from core.base import BaseService
+import logging
+
+class APIService(BaseService):
+    def handle_request(self):
+        pass
+""")
+        
+        # Client module (depends on many)
+        client = test_dir / "client"
+        client.mkdir(exist_ok=True)
+        (client / "__init__.py").write_text("")
+        (client / "app.py").write_text("""
+from core.base import utility_function
+from service.api import APIService
+import requests
+import json
+
+class ClientApp:
+    def __init__(self):
+        self.api = APIService()
+""")
+        
+        # Run analysis
+        result = asyncio.run(analyzer.analyze_modules([
+            str(core),
+            str(service),
+            str(client)
+        ]))
+        
+        duration = time.time() - start
+        
+        print(f"Analysis completed in {duration:.2f}s")
+        print("\nCoupling Metrics:")
+        for name, metric in result.coupling_metrics.items():
+            print(f"  {name}:")
+            print(f"    Afferent: {metric.afferent_coupling}")
+            print(f"    Efferent: {metric.efferent_coupling}")
+            print(f"    Instability: {metric.instability:.2f}")
+            print(f"    Distance: {metric.distance_from_main_sequence:.2f}")
+            
+        # Cleanup
+        import shutil
+        shutil.rmtree(test_dir)
+        
+        # Verify metrics
+        core_metric = result.coupling_metrics.get('core')
+        assert core_metric is not None, "Should have core metrics"
+        assert core_metric.afferent_coupling >= 2, "Core should have high afferent coupling"
+        
+        print("✅ Coupling metrics test passed")
+        
+    @staticmethod
+    def test_parallel_scanning():
+        """Test parallel module scanning (20-30s)"""
+        print("\n=== Testing Parallel Module Scanning ===")
+        start = time.time()
+        
+        analyzer = DependencyAnalyzer(max_workers=4)
+        
+        # Create many test modules
+        test_dir = Path("/tmp/parallel_test")
+        test_dir.mkdir(exist_ok=True)
+        
+        num_modules = 10
+        for i in range(num_modules):
+            module = test_dir / f"module_{i}"
+            module.mkdir(exist_ok=True)
+            (module / "__init__.py").write_text("")
+            
+            # Create multiple files per module
+            for j in range(5):
+                content = f"""
+import os
+import sys
+{'from module_' + str((i+1) % num_modules) + ' import something' if j == 0 else ''}
+
+class Service{i}_{j}:
+    def method{j}(self):
+        pass
+        
+def function_{i}_{j}():
+    for k in range(10):
+        if k > 5:
+            continue
+    return True
+"""
+                (module / f"file_{j}.py").write_text(content)
+                
+        # Run analysis
+        module_paths = [str(test_dir / f"module_{i}") for i in range(num_modules)]
+        result = asyncio.run(analyzer.analyze_modules(module_paths))
+        
+        duration = time.time() - start
+        
+        print(f"Analysis of {num_modules} modules completed in {duration:.2f}s")
+        print(f"Total modules analyzed: {len(result.modules)}")
+        print(f"Total dependencies found: {len(result.dependencies)}")
+        print(f"Average time per module: {duration/num_modules:.2f}s")
+        
+        # Cleanup
+        import shutil
+        shutil.rmtree(test_dir)
+        
+        assert len(result.modules) == num_modules, f"Should analyze all {num_modules} modules"
+        assert duration < 30, "Parallel scanning should complete within 30s"
+        print("✅ Parallel scanning test passed")
+        
+    @staticmethod
+    def test_report_generation():
+        """Test report generation (5-10s)"""
+        print("\n=== Testing Report Generation ===")
+        start = time.time()
+        
+        analyzer = DependencyAnalyzer()
+        
+        # Create simple test structure
+        test_dir = Path("/tmp/report_test")
+        test_dir.mkdir(exist_ok=True)
+        
+        # Module with various characteristics
+        module = test_dir / "test_module"
+        module.mkdir(exist_ok=True)
+        (module / "__init__.py").write_text("")
+        (module / "main.py").write_text("""
+import os
+import sys
+import json
+
+class AbstractBase:
+    pass
+
+class ConcreteService(AbstractBase):
+    def complex_method(self):
+        if True:
+            for i in range(10):
+                if i > 5:
+                    while i < 8:
+                        i += 1
+        return True
+        
+def utility():
+    pass
+""")
+        
+        # Run analysis
+        result = asyncio.run(analyzer.analyze_modules([str(module)]))
+        
+        # Generate report
+        report_path = test_dir / "test_report.md"
+        analyzer.generate_report(result, str(report_path))
+        
+        # Generate visualization if available
+        if HAS_VISUALIZATION:
+            viz_path = test_dir / "test_graph.png"
+            analyzer.visualize_dependencies(result, str(viz_path))
+            
+        duration = time.time() - start
+        
+        print(f"Report generation completed in {duration:.2f}s")
+        
+        # Verify report exists and contains expected sections
+        assert report_path.exists(), "Report should be generated"
+        report_content = report_path.read_text()
+        assert "Module Summary" in report_content, "Report should have module summary"
+        assert "Coupling Metrics" in report_content, "Report should have metrics"
+        assert "Recommendations" in report_content, "Report should have recommendations"
+        
+        print(f"Report generated at: {report_path}")
+        
+        # Cleanup
+        import shutil
+        shutil.rmtree(test_dir)
+        
+        print("✅ Report generation test passed")
+
+
+def run_all_tests():
+    """Run all dependency analyzer tests"""
+    print("\n" + "="*60)
+    print("DEPENDENCY ANALYZER TEST SUITE")
+    print("="*60)
+    
+    test_methods = [
+        ("Simple Analysis", TestDependencyAnalyzer.test_simple_analysis, "5-10s"),
+        ("Circular Dependencies", TestDependencyAnalyzer.test_circular_dependency_detection, "10-15s"),
+        ("Coupling Metrics", TestDependencyAnalyzer.test_coupling_metrics, "15-20s"),
+        ("Parallel Scanning", TestDependencyAnalyzer.test_parallel_scanning, "20-30s"),
+        ("Report Generation", TestDependencyAnalyzer.test_report_generation, "5-10s"),
+    ]
+    
+    total_start = time.time()
+    passed = 0
+    failed = 0
+    
+    for name, test_func, expected_time in test_methods:
+        print(f"\nRunning: {name} (Expected: {expected_time})")
+        try:
+            test_func()
+            passed += 1
+        except Exception as e:
+            print(f"❌ {name} failed: {e}")
+            failed += 1
+            import traceback
+            traceback.print_exc()
+            
+    total_duration = time.time() - total_start
+    
+    print("\n" + "="*60)
+    print("TEST SUMMARY")
+    print("="*60)
+    print(f"Total Tests: {len(test_methods)}")
+    print(f"Passed: {passed}")
+    print(f"Failed: {failed}")
+    print(f"Total Duration: {total_duration:.2f}s")
+    print("="*60)
+    
+    return failed == 0
+
+
+if __name__ == "__main__":
+    # Run validation with real example
+    print("Running Dependency Analyzer Validation...")
+    
+    # Test with real GRANGER modules if available
+    granger_base = Path("/home/graham/workspace/shared_claude_docs")
+    if granger_base.exists():
+        print("\nAnalyzing real GRANGER modules...")
+        
+        analyzer = DependencyAnalyzer()
+        
+        # Analyze some project interactions
+        module_paths = [
+            str(granger_base / "project_interactions" / "knowledge-evolution"),
+            str(granger_base / "project_interactions" / "satellite-swarm"),
+            str(granger_base / "utils" / "claude_interactions"),
+        ]
+        
+        # Filter to existing paths
+        existing_paths = [p for p in module_paths if Path(p).exists()]
+        
+        if existing_paths:
+            result = asyncio.run(analyzer.analyze_modules(existing_paths))
+            
+            print(f"\nAnalyzed {len(result.modules)} modules")
+            print(f"Found {len(result.dependencies)} dependencies")
+            print(f"Circular dependencies: {len(result.circular_dependencies)}")
+            
+            print("\nTop recommendations:")
+            for rec in result.recommendations[:5]:
+                print(f"  - {rec}")
+                
+            # Generate report
+            analyzer.generate_report(result, "granger_dependencies.md")
+            print("\nReport saved to granger_dependencies.md")
+    
+    # Run test suite
+    print("\nRunning test suite...")
+    success = run_all_tests()
+    
+    if success:
+        print("\n✅ All dependency analyzer tests passed!")
+    else:
+        print("\n❌ Some tests failed!")
+        sys.exit(1)

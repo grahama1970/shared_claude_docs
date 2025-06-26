@@ -1,0 +1,126 @@
+{
+  "task": "Task #014: ArangoDB-Unsloth Pipeline",
+  "module": "arangodb-unsloth-integration",
+  "duration": "0.00s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 12,
+  "bug_details": [
+    {
+      "type": "field_limit_exceeded",
+      "severity": "medium",
+      "description": "Export fails with 100 fields",
+      "expected": "Handle arbitrary field count",
+      "actual": "Hard limit at 50 fields"
+    },
+    {
+      "type": "no_deduplication",
+      "severity": "high",
+      "description": "Duplicate training data not detected",
+      "expected": "Automatic deduplication before training",
+      "actual": "Duplicates cause overfitting"
+    },
+    {
+      "type": "class_imbalance_ignored",
+      "severity": "medium",
+      "description": "Class imbalance 100:1 not flagged",
+      "expected": "Warning for imbalanced datasets",
+      "actual": "No imbalance detection"
+    },
+    {
+      "type": "no_model_versioning",
+      "severity": "high",
+      "description": "No automatic model versioning for incremental training",
+      "expected": "Version tracking with rollback capability",
+      "actual": "Overwrites previous model"
+    },
+    {
+      "type": "graph_features_ignored",
+      "severity": "medium",
+      "description": "Graph feature 'path_context' not used",
+      "expected": "Leverage graph structure for training",
+      "actual": "Only uses node attributes"
+    },
+    {
+      "type": "graph_features_ignored",
+      "severity": "medium",
+      "description": "Graph feature 'subgraph_patterns' not used",
+      "expected": "Leverage graph structure for training",
+      "actual": "Only uses node attributes"
+    },
+    {
+      "type": "no_temporal_awareness",
+      "severity": "low",
+      "description": "Temporal ordering lost in export",
+      "expected": "Preserve time-based sequences",
+      "actual": "Random ordering"
+    },
+    {
+      "type": "unbalanced_shards",
+      "severity": "medium",
+      "description": "Uneven distribution across 16 shards",
+      "expected": "Balanced shards for even GPU load",
+      "actual": "Some shards 2x larger than others"
+    },
+    {
+      "type": "unbalanced_shards",
+      "severity": "medium",
+      "description": "Uneven distribution across 32 shards",
+      "expected": "Balanced shards for even GPU load",
+      "actual": "Some shards 2x larger than others"
+    },
+    {
+      "type": "poor_data_locality",
+      "severity": "high",
+      "description": "Related data split across shards",
+      "expected": "Locality-aware sharding",
+      "actual": "Random distribution breaks context"
+    },
+    {
+      "type": "no_embedding_feedback",
+      "severity": "medium",
+      "description": "Learned embeddings not stored back in graph",
+      "expected": "Update node embeddings with trained values",
+      "actual": "Embeddings discarded after training"
+    },
+    {
+      "type": "predictions_not_linked",
+      "severity": "low",
+      "description": "Model predictions not linked to source data",
+      "expected": "Track predictions for analysis",
+      "actual": "No prediction provenance"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Training Data Export",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Data Quality Validation",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Incremental Training",
+      "passed": true,
+      "bugs": 1
+    },
+    {
+      "test": "Graph Traversal Features",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Distributed Training Prep",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Feedback Loop",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

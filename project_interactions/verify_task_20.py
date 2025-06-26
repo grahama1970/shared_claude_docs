@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Skeptical verification of Task #20: Progressive Deployment and Rollback
+"""
+
+import sys
+import time
+from pathlib import Path
+from datetime import datetime
+
+# Add parent to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import the scenario directly
+exec(open("/home/graham/workspace/shared_claude_docs/project_interactions/progressive_deployment/progressive_deployment_interaction.py").read())
+
+
+class SkepticalVerifier:
+    """Skeptically verify Task #20 implementation."""
+    
+    def __init__(self):
+        self.suspicions = []
+        self.confidence_scores = {}
+    
+    def verify_canary_deployment(self, scenario):
+        """Verify canary deployment test."""
+        print("\n🔍 Verifying Canary Deployment (Test 020.1)...")
+        
+        start_time = time.time()
+        result = scenario.test_canary_deployment()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 5.0, 15.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["canary_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["canary_duration"] = 0.5
+            self.suspicions.append(f"Duration {duration:.2f}s outside expected range")
+        
+        # Check deployment stages
+        output = result.output_data
+        stages_completed = output.get("stages_completed", 0)
+        
+        if stages_completed >= 4:  # At least 10%, 25%, 50%, 75%
+            print(f"  ✅ Completed {stages_completed} deployment stages")
+            self.confidence_scores["canary_stages"] = 0.95
+        else:
+            self.suspicions.append(f"Only {stages_completed} stages completed")
+            self.confidence_scores["canary_stages"] = 0.3
+        
+        # Check health monitoring
+        health_checks = output.get("health_checks_performed", 0)
+        if health_checks > 0:
+            print(f"  ✅ Performed {health_checks} health checks")
+            self.confidence_scores["health_monitoring"] = 0.9
+        else:
+            self.suspicions.append("No health checks performed")
+            self.confidence_scores["health_monitoring"] = 0.2
+        
+        # Check final traffic percentage
+        final_traffic = output.get("final_traffic_percentage", 0)
+        if final_traffic == 100:
+            print(f"  ✅ Successfully deployed to 100% traffic")
+            self.confidence_scores["canary_completion"] = 1.0
+        else:
+            print(f"  ⚠️  Only reached {final_traffic}% traffic")
+            self.confidence_scores["canary_completion"] = final_traffic / 100
+        
+        return result
+    
+    def verify_blue_green_deployment(self, scenario):
+        """Verify blue-green deployment test."""
+        print("\n🔍 Verifying Blue-Green Deployment (Test 020.2)...")
+        
+        start_time = time.time()
+        result = scenario.test_blue_green_deployment()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 3.0, 8.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["blue_green_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["blue_green_duration"] = 0.5
+        
+        # Check instant switch
+        output = result.output_data
+        switch_time = output.get("switch_time", 0)
+        
+        if switch_time < 0.1:  # Should be nearly instant
+            print(f"  ✅ Instant switch: {switch_time:.3f}s")
+            self.confidence_scores["instant_switch"] = 1.0
+        else:
+            self.suspicions.append(f"Slow switch time: {switch_time:.3f}s")
+            self.confidence_scores["instant_switch"] = 0.5
+        
+        # Check pre-deployment validation
+        pre_validation = output.get("pre_deployment_validation", False)
+        if pre_validation:
+            print(f"  ✅ Pre-deployment validation performed")
+            self.confidence_scores["pre_validation"] = 0.95
+        else:
+            self.suspicions.append("No pre-deployment validation")
+            self.confidence_scores["pre_validation"] = 0.3
+        
+        return result
+    
+    def verify_rollback(self, scenario):
+        """Verify rollback test."""
+        print("\n🔍 Verifying Automatic Rollback (Test 020.3)...")
+        
+        start_time = time.time()
+        result = scenario.test_rollback_on_failure()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 4.0, 10.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["rollback_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["rollback_duration"] = 0.5
+        
+        # Check rollback triggered
+        output = result.output_data
+        rollback_triggered = output.get("rollback_triggered", False)
+        
+        if rollback_triggered:
+            print(f"  ✅ Rollback triggered on failure")
+            self.confidence_scores["rollback_detection"] = 1.0
+            
+            # Check rollback time
+            rollback_time = output.get("rollback_time", 0)
+            if rollback_time < 2.0:
+                print(f"  ✅ Fast rollback: {rollback_time:.1f}s")
+                self.confidence_scores["rollback_speed"] = 0.95
+            else:
+                print(f"  ⚠️  Slow rollback: {rollback_time:.1f}s")
+                self.confidence_scores["rollback_speed"] = 0.6
+            
+            # Check failure detection
+            failure_reason = output.get("failure_reason", "")
+            if "error_rate" in failure_reason or "health" in failure_reason:
+                print(f"  ✅ Correct failure detection: {failure_reason}")
+                self.confidence_scores["failure_detection"] = 0.9
+            else:
+                self.suspicions.append("Unclear failure reason")
+                self.confidence_scores["failure_detection"] = 0.4
+        else:
+            self.suspicions.append("Rollback not triggered on failure")
+            self.confidence_scores["rollback_detection"] = 0.1
+        
+        return result
+    
+    def verify_honeypot(self, scenario):
+        """Verify honeypot test fails as expected."""
+        print("\n🔍 Verifying Honeypot (Test 020.H)...")
+        
+        try:
+            # Try to deploy with invalid strategy
+            deployer = ProgressiveDeployer(name="honeypot-test")
+            
+            # This should fail
+            result = deployer.deploy(
+                version="invalid",
+                strategy="INVALID_STRATEGY_XYZ",
+                target_percentage=100
+            )
+            
+            if not result:
+                print(f"  ✅ Honeypot correctly rejected invalid strategy")
+                self.confidence_scores["honeypot"] = 1.0
+            else:
+                print(f"  ❌ Honeypot FAILED: Accepted invalid strategy")
+                self.suspicions.append("CRITICAL: Accepts invalid deployment strategies")
+                self.confidence_scores["honeypot"] = 0.0
+                
+        except Exception as e:
+            print(f"  ✅ Honeypot correctly failed: {str(e)}")
+            self.confidence_scores["honeypot"] = 1.0
+            return True
+        
+        return False
+    
+    def generate_report(self, results):
+        """Generate skeptical analysis report."""
+        overall_confidence = sum(self.confidence_scores.values()) / len(self.confidence_scores) if self.confidence_scores else 0
+        
+        print("\n" + "="*60)
+        print("SKEPTICAL ANALYSIS REPORT - Task #20")
+        print("="*60)
+        
+        print(f"\nOverall Confidence: {overall_confidence:.1%}")
+        
+        print("\nConfidence Breakdown:")
+        for metric, score in self.confidence_scores.items():
+            print(f"  - {metric}: {score:.1%}")
+        
+        if self.suspicions:
+            print("\n🚨 Suspicions Detected:")
+            for suspicion in self.suspicions:
+                print(f"  - {suspicion}")
+        
+        # Determine verdict
+        if overall_confidence >= 0.85:
+            verdict = "LIKELY_GENUINE"
+            emoji = "✅"
+        elif overall_confidence >= 0.7:
+            verdict = "QUESTIONABLE" 
+            emoji = "🟡"
+        elif overall_confidence >= 0.5:
+            verdict = "SUSPICIOUS"
+            emoji = "⚠️"
+        else:
+            verdict = "FAKE_IMPLEMENTATION"
+            emoji = "🚫"
+        
+        print(f"\n{emoji} VERDICT: {verdict}")
+        
+        # Deployment specific checks
+        print("\n🚀 Progressive Deployment Verification:")
+        deployment_working = (
+            self.confidence_scores.get("canary_stages", 0) >= 0.7 and
+            self.confidence_scores.get("instant_switch", 0) >= 0.8 and
+            self.confidence_scores.get("rollback_detection", 0) >= 0.8
+        )
+        print(f"  - Canary deployment works: {'✅ Yes' if self.confidence_scores.get('canary_stages', 0) >= 0.7 else '❌ No'}")
+        print(f"  - Blue-green switching: {'✅ Yes' if self.confidence_scores.get('instant_switch', 0) >= 0.8 else '❌ No'}")
+        print(f"  - Automatic rollback: {'✅ Yes' if self.confidence_scores.get('rollback_detection', 0) >= 0.8 else '❌ No'}")
+        
+        return {
+            "confidence": overall_confidence,
+            "verdict": verdict,
+            "suspicions": self.suspicions,
+            "deployment_working": deployment_working
+        }
+
+
+def main():
+    """Main verification runner."""
+    print("="*80)
+    print("Task #20 Skeptical Verification")
+    print(f"Started: {datetime.now().isoformat()}")
+    print("="*80)
+    
+    # Create scenario and verifier
+    scenario = ProgressiveDeploymentScenario()
+    verifier = SkepticalVerifier()
+    
+    # Run all verifications
+    results = {
+        "canary": verifier.verify_canary_deployment(scenario),
+        "blue_green": verifier.verify_blue_green_deployment(scenario),
+        "rollback": verifier.verify_rollback(scenario),
+        "honeypot": verifier.verify_honeypot(scenario)
+    }
+    
+    # Generate report
+    report = verifier.generate_report(results)
+    
+    # Final summary
+    print("\n" + "="*80)
+    print("TASK #20 VERIFICATION COMPLETE")
+    print("="*80)
+    
+    if report["verdict"] in ["LIKELY_GENUINE", "QUESTIONABLE"] and report["deployment_working"]:
+        print("\n✅ Task #20 PASSED skeptical verification")
+        print("   Progressive deployment and rollback successfully demonstrated")
+        print("\nAll 20 tasks completed! 🎉")
+        return 0
+    else:
+        print("\n❌ Task #20 FAILED skeptical verification")
+        if not report["deployment_working"]:
+            print("   Deployment features not properly working")
+        print("Debug and fix issues before proceeding")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

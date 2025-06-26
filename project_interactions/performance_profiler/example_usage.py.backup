@@ -1,0 +1,265 @@
+"""
+Example usage of the Performance Profiler module
+Demonstrates CPU, memory, I/O, and async profiling capabilities
+"""
+
+import asyncio
+import time
+from pathlib import Path
+import tempfile
+from performance_profiler_interaction import PerformanceProfiler
+
+
+def demo_cpu_intensive():
+    """Simulate CPU-intensive operation"""
+    print("\n1. CPU Profiling Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    # Profile a CPU-intensive task
+    with profiler.profile_cpu("matrix_multiplication"):
+        # Simulate matrix multiplication
+        matrix_a = [[i * j for j in range(100)] for i in range(100)]
+        matrix_b = [[i + j for j in range(100)] for i in range(100)]
+        
+        result = []
+        for i in range(100):
+            row = []
+            for j in range(100):
+                cell = sum(matrix_a[i][k] * matrix_b[k][j] for k in range(100))
+                row.append(cell)
+            result.append(row)
+    
+    # Show results
+    profile = profiler.cpu_profiles[0]
+    print(f"Duration: {profile.duration:.3f} seconds")
+    print(f"Total function calls: {profile.metrics['total_calls']}")
+    
+    if profile.hotspots:
+        print("\nTop CPU Hotspots:")
+        for hotspot in profile.hotspots[:3]:
+            print(f"  - {hotspot['function']}: {hotspot['percentage']:.1f}%")
+    
+    if profile.bottlenecks:
+        print("\nCPU Bottlenecks:")
+        for bottleneck in profile.bottlenecks:
+            print(f"  - {bottleneck['function']} ({bottleneck['severity']})")
+
+
+def demo_memory_profiling():
+    """Simulate memory allocation patterns"""
+    print("\n2. Memory Profiling Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    # Profile memory usage
+    with profiler.profile_memory("data_processing"):
+        # Allocate memory
+        data_chunks = []
+        for i in range(50):
+            chunk = [j * i for j in range(10000)]
+            data_chunks.append(chunk)
+            time.sleep(0.01)  # Allow monitoring
+        
+        # Process data
+        processed = []
+        for chunk in data_chunks:
+            processed.append(sum(chunk))
+        
+        # Clear some memory
+        data_chunks = data_chunks[:10]
+    
+    # Show results
+    profile = profiler.memory_profiles[0]
+    print(f"Memory change: {profile.metrics['memory_delta_mb']:.2f} MB")
+    print(f"Peak memory: {profile.metrics['peak_memory_mb']:.2f} MB")
+    
+    if profile.bottlenecks:
+        print("\nMemory Issues:")
+        for issue in profile.bottlenecks:
+            print(f"  - {issue['type']}: {issue.get('severity', 'info')}")
+
+
+def demo_io_profiling():
+    """Simulate I/O operations"""
+    print("\n3. I/O Profiling Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmppath = Path(tmpdir)
+        
+        # Profile I/O operations
+        with profiler.profile_io("file_operations"):
+            # Write multiple files
+            for i in range(100):
+                file_path = tmppath / f"data_{i}.txt"
+                file_path.write_text(f"Sample data {i}\n" * 100)
+            
+            # Read files
+            total_size = 0
+            for file_path in tmppath.glob("*.txt"):
+                content = file_path.read_text()
+                total_size += len(content)
+    
+    # Show results
+    profile = profiler.io_profiles[0]
+    print(f"Read: {profile.metrics['read_bytes']:.2f} MB in {profile.metrics['read_count']} operations")
+    print(f"Write: {profile.metrics['write_bytes']:.2f} MB in {profile.metrics['write_count']} operations")
+    
+    if profile.bottlenecks:
+        print("\nI/O Bottlenecks:")
+        for bottleneck in profile.bottlenecks:
+            print(f"  - {bottleneck['type']}: {bottleneck['count']} operations")
+
+
+async def demo_async_profiling():
+    """Simulate async operations"""
+    print("\n4. Async Profiling Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    async def simulate_api_calls():
+        """Simulate multiple concurrent API calls"""
+        tasks = []
+        for i in range(20):
+            async def api_call(n):
+                await asyncio.sleep(0.01)  # Simulate network delay
+                return f"Result {n}"
+            
+            tasks.append(api_call(i))
+        
+        results = await asyncio.gather(*tasks)
+        return results
+    
+    # Profile async execution
+    results = await profiler.profile_async(
+        simulate_api_calls(),
+        "concurrent_api_calls"
+    )
+    
+    # Show results
+    profile = [p for p in profiler.cpu_profiles if p.profile_type == "async"][0]
+    print(f"Context switches: {profile.metrics['context_switches']}")
+    print(f"Avg switch time: {profile.metrics['avg_switch_time_ms']:.2f} ms")
+    
+    if profile.warnings:
+        print("\nAsync Warnings:")
+        for warning in profile.warnings:
+            print(f"  - {warning}")
+
+
+def demo_real_time_monitoring():
+    """Demonstrate real-time resource monitoring"""
+    print("\n5. Real-time Monitoring Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    # Start monitoring
+    print("Starting resource monitoring...")
+    profiler.start_monitoring(interval=0.5)
+    
+    # Simulate workload
+    print("Running workload...")
+    for i in range(3):
+        # CPU spike
+        sum(j ** 2 for j in range(100000))
+        time.sleep(0.5)
+        
+        # Memory allocation
+        data = [i] * 100000
+        time.sleep(0.5)
+    
+    # Stop monitoring
+    profiler.stop_monitoring()
+    
+    # Generate report
+    report = profiler.generate_report()
+    
+    print(f"\nResource History: {len(profiler.resource_history)} snapshots")
+    
+    if profiler.resource_history:
+        latest = profiler.resource_history[-1]
+        print(f"Latest CPU: {latest.cpu_percent:.1f}%")
+        print(f"Latest Memory: {latest.memory_mb:.1f} MB")
+        print(f"Thread count: {latest.thread_count}")
+    
+    if report.get("performance_trends"):
+        print(f"\nTrends:")
+        for metric, trend in report["performance_trends"].items():
+            print(f"  - {metric}: {trend}")
+
+
+def demo_regression_detection():
+    """Demonstrate performance regression detection"""
+    print("\n6. Performance Regression Detection Demo")
+    print("-" * 40)
+    
+    profiler = PerformanceProfiler()
+    
+    # Baseline performance
+    print("Establishing baseline...")
+    with profiler.profile_cpu("baseline"):
+        time.sleep(0.01)
+        sum(range(10000))
+    
+    with profiler.profile_memory("baseline"):
+        data = list(range(10000))
+    
+    baseline_report = profiler.generate_report()
+    baseline = baseline_report["summary"]
+    
+    # Simulate performance regression
+    print("\nSimulating performance regression...")
+    with profiler.profile_cpu("regression"):
+        time.sleep(0.05)  # 5x slower
+        sum(range(50000))  # More work
+    
+    with profiler.profile_memory("regression"):
+        data = list(range(100000))  # 10x more memory
+    
+    # Detect regressions
+    regressions = profiler.detect_regressions(baseline)
+    
+    if regressions:
+        print(f"\nDetected {len(regressions)} regression(s):")
+        for reg in regressions:
+            print(f"  - {reg['type']}: {reg['metric']} increased by {reg['increase_percent']:.1f}%")
+    else:
+        print("\nNo regressions detected")
+
+
+def main():
+    """Run all demos"""
+    print("Performance Profiler Demo")
+    print("=" * 60)
+    
+    # Run CPU demo
+    demo_cpu_intensive()
+    
+    # Run memory demo
+    demo_memory_profiling()
+    
+    # Run I/O demo
+    demo_io_profiling()
+    
+    # Run async demo
+    asyncio.run(demo_async_profiling())
+    
+    # Run monitoring demo
+    demo_real_time_monitoring()
+    
+    # Run regression demo
+    demo_regression_detection()
+    
+    print("\n" + "=" * 60)
+    print("Demo completed!")
+
+
+if __name__ == "__main__":
+    main()

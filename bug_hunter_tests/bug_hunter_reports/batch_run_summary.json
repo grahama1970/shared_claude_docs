@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-06-09 10:27:04",
+  "tasks_run": 4,
+  "total_bugs": 0,
+  "results": [
+    {
+      "task": "task_008_youtube_transcripts_test",
+      "error": "No report generated",
+      "stdout": "\n============================================================\n\ud83d\udc1b Bug Hunter - Task #008: YouTube Transcript Reliability\n============================================================\n\n\ud83d\udd0d Testing basic functionality...\n  \u2713 Module imports successfully\n  \u2713 Basic operations work\n\n\ud83d\udcca Bugs Found: 1\n  - transcript_timeout: Transcript extraction times out for long videos\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_008_youtube_transcripts_test.py\", line 85, in <module>\n    asyncio.run(main())\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/runners.py\", line 44, in run\n    return loop.run_until_complete(main)\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/base_events.py\", line 649, in run_until_complete\n    return future.result()\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_008_youtube_transcripts_test.py\", line 80, in main\n    json.dump(report, f, indent=2)\nNameError: name 'json' is not defined\n"
+    },
+    {
+      "task": "task_009_unsloth_wip_test",
+      "error": "No report generated",
+      "stdout": "\n============================================================\n\ud83d\udc1b Bug Hunter - Task #009: Unsloth Training Validation\n============================================================\n\n\ud83d\udd0d Testing basic functionality...\n  \u2713 Module imports successfully\n  \u2713 Basic operations work\n\n\ud83d\udcca Bugs Found: 0\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_009_unsloth_wip_test.py\", line 85, in <module>\n    asyncio.run(main())\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/runners.py\", line 44, in run\n    return loop.run_until_complete(main)\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/base_events.py\", line 649, in run_until_complete\n    return future.result()\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_009_unsloth_wip_test.py\", line 80, in main\n    json.dump(report, f, indent=2)\nNameError: name 'json' is not defined\n"
+    },
+    {
+      "task": "task_010_claude-test-reporter_test",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "task": "task_011_rl_commons_test",
+      "error": "No report generated",
+      "stdout": "\n============================================================\n\ud83d\udc1b Bug Hunter - Task #011: RL Commons Learning\n============================================================\n\n\ud83d\udd0d Testing basic functionality...\n  \u2713 Module imports successfully\n  \u2713 Basic operations work\n\n\ud83d\udcca Bugs Found: 0\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_011_rl_commons_test.py\", line 85, in <module>\n    asyncio.run(main())\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/runners.py\", line 44, in run\n    return loop.run_until_complete(main)\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/asyncio/base_events.py\", line 649, in run_until_complete\n    return future.result()\n  File \"/home/graham/workspace/shared_claude_docs/bug_hunter_tests/bug_hunter_tests/task_011_rl_commons_test.py\", line 80, in main\n    json.dump(report, f, indent=2)\nNameError: name 'json' is not defined\n"
+    }
+  ]
+}

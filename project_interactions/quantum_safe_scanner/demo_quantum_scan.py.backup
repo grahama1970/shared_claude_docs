@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""
+Demo script for Quantum-Safe Cryptography Migration Scanner
+
+This script demonstrates how to use the quantum-safe scanner to identify
+and analyze quantum-vulnerable cryptography in a codebase.
+"""
+
+from quantum_safe_scanner_interaction import QuantumSafeScanner
+from pathlib import Path
+import sys
+
+
+def main():
+    """Demonstrate quantum-safe scanning capabilities"""
+    scanner = QuantumSafeScanner()
+    
+    # Get target directory from command line or use current directory
+    if len(sys.argv) > 1:
+        target_dir = sys.argv[1]
+    else:
+        target_dir = "."
+    
+    print(f"🔍 Scanning directory: {Path(target_dir).absolute()}")
+    print("-" * 60)
+    
+    try:
+        # Perform the scan
+        vulnerabilities = scanner.scan_directory(target_dir)
+        
+        if not vulnerabilities:
+            print("✨ No quantum-vulnerable cryptography found!")
+            return
+        
+        # Generate report
+        report = scanner.generate_migration_report(vulnerabilities)
+        
+        # Display summary
+        print(f"\n📊 SCAN SUMMARY")
+        print(f"Files scanned: {report.total_files_scanned}")
+        print(f"Vulnerabilities found: {len(vulnerabilities)}")
+        print(f"Estimated migration effort: {report.estimated_total_effort_hours} hours\n")
+        
+        # Show vulnerability breakdown
+        print("🔐 VULNERABILITY BREAKDOWN:")
+        for algo, count in report.summary_statistics.items():
+            print(f"  • {algo}: {count} instances")
+        
+        # Show migration recommendations
+        print(f"\n🚀 MIGRATION RECOMMENDATIONS:")
+        for rec in report.recommendations:
+            print(f"\n{rec.current_algorithm} → {', '.join(rec.recommended_algorithms[:2])}")
+            print(f"  Effort: {rec.migration_effort} ({rec.estimated_hours} hours)")
+            print(f"  Note: {rec.implementation_notes}")
+        
+        # Show sample vulnerabilities
+        print(f"\n⚠️  SAMPLE VULNERABILITIES (showing first 5):")
+        for vuln in vulnerabilities[:5]:
+            print(f"\n  File: {vuln.file_path}")
+            print(f"  Line {vuln.line_number}: {vuln.code_snippet}")
+            print(f"  Algorithm: {vuln.algorithm} (Key size: {vuln.key_size or 'Unknown'})")
+            print(f"  Risk: {vuln.vulnerability_level}")
+        
+        # Export reports
+        output_dir = Path("quantum_scan_reports")
+        output_dir.mkdir(exist_ok=True)
+        
+        json_path = output_dir / "migration_report.json"
+        md_path = output_dir / "migration_report.md"
+        
+        scanner.export_report_json(report, str(json_path))
+        scanner.export_report_markdown(report, str(md_path))
+        
+        print(f"\n📁 Reports saved to:")
+        print(f"  • JSON: {json_path}")
+        print(f"  • Markdown: {md_path}")
+        
+    except Exception as e:
+        print(f"❌ Error during scan: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

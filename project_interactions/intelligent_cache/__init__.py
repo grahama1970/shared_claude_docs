@@ -1,0 +1,31 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Intelligent Cache Manager - Multi-level caching with advanced features
+
+This module provides intelligent caching capabilities with multi-level storage,
+adaptive eviction policies, and distributed cache coherence.
+"""
+
+from .intelligent_cache_interaction import (
+    IntelligentCacheInteraction,
+    CacheLevel,
+    CacheEntry,
+    CachePartition,
+    EvictionPolicy,
+    CacheStats
+)
+
+__all__ = [
+    "IntelligentCacheInteraction",
+    "CacheLevel",
+    "CacheEntry",
+    "CachePartition",
+    "EvictionPolicy",
+    "CacheStats"
+]

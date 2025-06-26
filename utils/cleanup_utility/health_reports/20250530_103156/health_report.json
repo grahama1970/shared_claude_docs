@@ -1,0 +1,261 @@
+{
+  "timestamp": "20250530_103156",
+  "summary": {
+    "good": 3,
+    "critical": 8
+  },
+  "results": [
+    {
+      "project": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": true,
+        "has_test_reporter": true,
+        "python_files": 9796,
+        "todo_count": 0
+      },
+      "issues": [],
+      "warnings": [],
+      "health": "good"
+    },
+    {
+      "project": "marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 51119,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 71 char 236)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "arangodb",
+      "path": "/home/graham/workspace/experiments/arangodb",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 19256,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 70 column 19 char 1889)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 3,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 23489,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 11 char 85)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "claude_max_proxy",
+      "path": "/home/graham/workspace/experiments/claude_max_proxy",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 36238,
+        "todo_count": 1
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 11 char 85)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "arxiv-mcp-server",
+      "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 11945,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Key group not on a line by itself. (line 14 column 1 char 1152)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "claude-module-communicator",
+      "path": "/home/graham/workspace/experiments/claude-module-communicator",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": true,
+        "has_test_reporter": true,
+        "python_files": 9260,
+        "todo_count": 0
+      },
+      "issues": [],
+      "warnings": [],
+      "health": "good"
+    },
+    {
+      "project": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 65,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 11 char 85)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    },
+    {
+      "project": "unsloth_wip",
+      "path": "/home/graham/workspace/experiments/unsloth_wip",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": false,
+        "test_count": 0,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 14335,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 11 char 107)"
+      ],
+      "warnings": [
+        "No tests directory"
+      ],
+      "health": "critical"
+    },
+    {
+      "project": "marker-ground-truth",
+      "path": "/home/graham/workspace/experiments/marker-ground-truth",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 8,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": true,
+        "has_test_reporter": true,
+        "python_files": 7802,
+        "todo_count": 0
+      },
+      "issues": [],
+      "warnings": [],
+      "health": "good"
+    },
+    {
+      "project": "mcp-screenshot",
+      "path": "/home/graham/workspace/experiments/mcp-screenshot",
+      "checks": {
+        "exists": true,
+        "has_README.md": true,
+        "has_pyproject.toml": true,
+        "has_.gitignore": true,
+        "has_src": true,
+        "has_tests": true,
+        "test_count": 8,
+        "has_git": true,
+        "has_venv": true,
+        "valid_toml": false,
+        "python_files": 7831,
+        "todo_count": 0
+      },
+      "issues": [
+        "Invalid pyproject.toml: Unbalanced quotes (line 5 column 69 char 203)"
+      ],
+      "warnings": [],
+      "health": "critical"
+    }
+  ]
+}

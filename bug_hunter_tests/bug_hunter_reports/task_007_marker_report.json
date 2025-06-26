@@ -1,0 +1,84 @@
+{
+  "task": "Task #007: Marker Edge Cases",
+  "module": "marker",
+  "duration": "0.14s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 6,
+  "bug_details": [
+    {
+      "type": "poor_error_message",
+      "severity": "medium",
+      "description": "Encrypted PDF error message not helpful",
+      "expected": "Clear message about encryption and password requirement",
+      "actual": "Generic processing error"
+    },
+    {
+      "type": "memory_usage",
+      "severity": "high",
+      "description": "High memory usage for 2500MB PDF",
+      "expected": "Streaming processing with low memory footprint",
+      "actual": "Loads entire PDF into memory"
+    },
+    {
+      "type": "rtl_text_issue",
+      "severity": "medium",
+      "description": "Poor handling of right-to-left text",
+      "expected": "Correct RTL text extraction",
+      "actual": "Text direction mixed up"
+    },
+    {
+      "type": "poor_ocr_quality",
+      "severity": "medium",
+      "description": "Poor OCR results for 72 DPI scans",
+      "expected": "Readable text extraction",
+      "actual": "Many OCR errors and gibberish"
+    },
+    {
+      "type": "table_extraction_failure",
+      "severity": "medium",
+      "description": "Poor extraction of merged_cells",
+      "expected": "Accurate table structure preservation",
+      "actual": "Table structure lost or corrupted"
+    },
+    {
+      "type": "table_extraction_failure",
+      "severity": "medium",
+      "description": "Poor extraction of borderless_tables",
+      "expected": "Accurate table structure preservation",
+      "actual": "Table structure lost or corrupted"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Corrupted PDF Handling",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Large PDF Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Special Characters",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Scanned PDF OCR",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Table Extraction",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Concurrent Processing",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

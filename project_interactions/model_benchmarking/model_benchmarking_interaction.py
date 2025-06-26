@@ -1,0 +1,764 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: model_benchmarking_interaction.py
+Purpose: Comprehensive ML model benchmarking system with cross-framework support
+
+External Dependencies:
+- numpy: https://numpy.org/doc/stable/
+- pandas: https://pandas.pydata.org/docs/
+- matplotlib: https://matplotlib.org/stable/
+- seaborn: https://seaborn.pydata.org/
+- psutil: https://psutil.readthedocs.io/
+- scipy: https://docs.scipy.org/doc/scipy/
+- torch: https://pytorch.org/docs/ (optional)
+- tensorflow: https://www.tensorflow.org/api_docs (optional)
+- scikit-learn: https://scikit-learn.org/stable/ (optional)
+
+Example Usage:
+>>> from model_benchmarking_interaction import ModelBenchmarkingSuite
+>>> suite = ModelBenchmarkingSuite()
+>>> results = suite.benchmark_model(model, test_data, test_labels)
+>>> suite.generate_report(results, "benchmark_report.html")
+"""
+
+import time
+import json
+import psutil
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+from typing import Dict, List, Any, Optional, Tuple, Union, Callable
+from dataclasses import dataclass, field, asdict
+from datetime import datetime
+from contextlib import contextmanager
+from functools import wraps
+import warnings
+from scipy import stats
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score,
+    confusion_matrix, classification_report, roc_auc_score,
+    mean_squared_error, mean_absolute_error, r2_score
+)
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+import tracemalloc
+import gc
+from loguru import logger
+
+# Optional framework imports
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+
+try:
+    import tensorflow as tf
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
+
+
+@dataclass
+class BenchmarkMetrics:
+    """Container for benchmark metrics"""
+    model_name: str
+    framework: str
+    dataset_name: str
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    
+    # Performance metrics
+    accuracy: Optional[float] = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1_score: Optional[float] = None
+    auc_roc: Optional[float] = None
+    mse: Optional[float] = None
+    mae: Optional[float] = None
+    r2: Optional[float] = None
+    
+    # Timing metrics
+    inference_time_mean: Optional[float] = None
+    inference_time_std: Optional[float] = None
+    inference_throughput: Optional[float] = None
+    training_time: Optional[float] = None
+    
+    # Resource metrics
+    memory_usage_mb: Optional[float] = None
+    model_size_mb: Optional[float] = None
+    cpu_usage_percent: Optional[float] = None
+    gpu_usage_percent: Optional[float] = None
+    gpu_memory_mb: Optional[float] = None
+    
+    # Statistical metrics
+    cross_val_scores: List[float] = field(default_factory=list)
+    confidence_interval: Tuple[float, float] = field(default=(0.0, 0.0))
+    p_value: Optional[float] = None
+    
+    # Additional metadata
+    hyperparameters: Dict[str, Any] = field(default_factory=dict)
+    hardware_info: Dict[str, str] = field(default_factory=dict)
+    dataset_info: Dict[str, Any] = field(default_factory=dict)
+    error_analysis: Dict[str, Any] = field(default_factory=dict)
+
+
+class ModelBenchmarkingSuite:
+    """Comprehensive ML model benchmarking system"""
+    
+    def __init__(self, output_dir: str = "benchmark_results"):
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True)
+        self.results_history: List[BenchmarkMetrics] = []
+        self._setup_logging()
+        
+    def _setup_logging(self):
+        """Configure logging for benchmarking"""
+        logger.add(
+            self.output_dir / "benchmark_{time}.log",
+            rotation="100 MB",
+            retention="7 days",
+            level="INFO"
+        )
+        
+    @contextmanager
+    def _memory_tracking(self):
+        """Context manager for memory tracking"""
+        gc.collect()
+        tracemalloc.start()
+        initial_memory = psutil.Process().memory_info().rss / 1024 / 1024
+        
+        yield
+        
+        current, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        final_memory = psutil.Process().memory_info().rss / 1024 / 1024
+        
+        self._current_memory_usage = peak / 1024 / 1024
+        self._memory_delta = final_memory - initial_memory
+        
+    @contextmanager
+    def _cpu_tracking(self):
+        """Context manager for CPU usage tracking"""
+        process = psutil.Process()
+        process.cpu_percent()  # Initialize
+        
+        yield
+        
+        self._cpu_usage = process.cpu_percent(interval=0.1)
+        
+    def _detect_framework(self, model: Any) -> str:
+        """Detect ML framework of the model"""
+        model_class = str(type(model))
+        
+        if TORCH_AVAILABLE and isinstance(model, torch.nn.Module):
+            return "pytorch"
+        elif TF_AVAILABLE and (
+            hasattr(tf.keras, 'Model') and isinstance(model, tf.keras.Model)
+        ):
+            return "tensorflow"
+        elif hasattr(model, 'fit') and hasattr(model, 'predict'):
+            return "sklearn"
+        else:
+            return "unknown"
+            
+    def _get_model_size(self, model: Any, framework: str) -> float:
+        """Calculate model size in MB"""
+        if framework == "pytorch" and TORCH_AVAILABLE:
+            param_size = sum(p.numel() * p.element_size() for p in model.parameters())
+            buffer_size = sum(b.numel() * b.element_size() for b in model.buffers())
+            return (param_size + buffer_size) / 1024 / 1024
+            
+        elif framework == "tensorflow" and TF_AVAILABLE:
+            return sum(
+                tf.size(v).numpy() * v.dtype.size 
+                for v in model.trainable_variables
+            ) / 1024 / 1024
+            
+        elif framework == "sklearn":
+            import pickle
+            return len(pickle.dumps(model)) / 1024 / 1024
+            
+        return 0.0
+        
+    def _get_hardware_info(self) -> Dict[str, str]:
+        """Get current hardware information"""
+        info = {
+            "cpu_count": psutil.cpu_count(),
+            "cpu_freq": f"{psutil.cpu_freq().current:.2f} MHz",
+            "total_memory": f"{psutil.virtual_memory().total / 1024**3:.2f} GB",
+            "platform": f"{psutil.os.name} {psutil.os.uname().release}"
+        }
+        
+        if TORCH_AVAILABLE and torch.cuda.is_available():
+            info["gpu"] = torch.cuda.get_device_name(0)
+            info["gpu_count"] = torch.cuda.device_count()
+            
+        return info
+        
+    def benchmark_inference(
+        self,
+        model: Any,
+        test_data: np.ndarray,
+        batch_size: int = 32,
+        num_runs: int = 100,
+        warmup_runs: int = 10
+    ) -> Dict[str, float]:
+        """Benchmark model inference performance"""
+        framework = self._detect_framework(model)
+        
+        # Warmup runs
+        for _ in range(warmup_runs):
+            self._run_inference(model, test_data[:batch_size], framework)
+            
+        # Actual benchmark runs
+        times = []
+        num_samples = len(test_data)
+        actual_runs = min(num_runs, num_samples // batch_size)
+        
+        if actual_runs == 0:
+            # If not enough data, use all data in one batch
+            actual_runs = 1
+            batch_size = num_samples
+            
+        with self._cpu_tracking():
+            for i in range(actual_runs):
+                idx_start = (i * batch_size) % num_samples
+                idx_end = min(idx_start + batch_size, num_samples)
+                
+                if idx_end <= idx_start:
+                    # Wrap around to beginning
+                    idx_start = 0
+                    idx_end = min(batch_size, num_samples)
+                    
+                batch_data = test_data[idx_start:idx_end]
+                
+                start = time.perf_counter()
+                self._run_inference(model, batch_data, framework)
+                times.append(time.perf_counter() - start)
+                
+        times = np.array(times)
+        return {
+            "mean_time": np.mean(times),
+            "std_time": np.std(times),
+            "min_time": np.min(times),
+            "max_time": np.max(times),
+            "throughput": batch_size / np.mean(times),
+            "cpu_usage": self._cpu_usage
+        }
+        
+    def _run_inference(self, model: Any, data: np.ndarray, framework: str) -> np.ndarray:
+        """Run inference based on framework"""
+        if framework == "pytorch" and TORCH_AVAILABLE:
+            with torch.no_grad():
+                if not isinstance(data, torch.Tensor):
+                    data = torch.FloatTensor(data)
+                
+                # Move data to same device as model
+                if hasattr(model, 'device'):
+                    device = model.device
+                else:
+                    # Get device from first parameter
+                    device = next(model.parameters()).device
+                
+                data = data.to(device)
+                output = model(data)
+                
+                # Move back to CPU for numpy conversion
+                return output.cpu().numpy()
+                
+        elif framework == "tensorflow" and TF_AVAILABLE:
+            return model.predict(data, verbose=0)
+            
+        else:  # sklearn or unknown
+            # Handle both predict and predict_proba for sklearn
+            if hasattr(model, 'predict_proba'):
+                return model.predict_proba(data)
+            else:
+                predictions = model.predict(data)
+                # Convert to 2D array for consistency
+                if len(predictions.shape) == 1:
+                    # Binary classification - create probability-like output
+                    n_classes = len(np.unique(predictions))
+                    if n_classes == 2:
+                        proba = np.zeros((len(predictions), 2))
+                        proba[predictions == 0, 0] = 1.0
+                        proba[predictions == 1, 1] = 1.0
+                        return proba
+                return predictions
+            
+    def benchmark_model(
+        self,
+        model: Any,
+        test_data: np.ndarray,
+        test_labels: np.ndarray,
+        model_name: str,
+        dataset_name: str = "unknown",
+        task_type: str = "classification",
+        batch_size: int = 32,
+        cross_validate: bool = True
+    ) -> BenchmarkMetrics:
+        """Comprehensive model benchmarking"""
+        logger.info(f"Starting benchmark for {model_name}")
+        
+        framework = self._detect_framework(model)
+        metrics = BenchmarkMetrics(
+            model_name=model_name,
+            framework=framework,
+            dataset_name=dataset_name,
+            hardware_info=self._get_hardware_info()
+        )
+        
+        # Memory tracking
+        with self._memory_tracking():
+            # Get predictions
+            predictions = self._run_inference(model, test_data, framework)
+            
+        metrics.memory_usage_mb = self._current_memory_usage
+        metrics.model_size_mb = self._get_model_size(model, framework)
+        
+        # Performance metrics
+        if task_type == "classification":
+            # Handle both 1D and 2D predictions
+            if len(predictions.shape) == 2:
+                pred_labels = predictions.argmax(axis=1)
+            else:
+                pred_labels = predictions
+                
+            metrics.accuracy = accuracy_score(test_labels, pred_labels)
+            metrics.precision = precision_score(
+                test_labels, pred_labels, average='weighted', zero_division=0
+            )
+            metrics.recall = recall_score(
+                test_labels, pred_labels, average='weighted', zero_division=0
+            )
+            metrics.f1_score = f1_score(
+                test_labels, pred_labels, average='weighted', zero_division=0
+            )
+            
+            if len(predictions.shape) == 2 and predictions.shape[1] == 2:  # Binary classification
+                metrics.auc_roc = roc_auc_score(test_labels, predictions[:, 1])
+                
+        else:  # Regression
+            metrics.mse = mean_squared_error(test_labels, predictions)
+            metrics.mae = mean_absolute_error(test_labels, predictions)
+            metrics.r2 = r2_score(test_labels, predictions)
+            
+        # Inference benchmarking
+        inference_results = self.benchmark_inference(
+            model, test_data, batch_size=batch_size
+        )
+        metrics.inference_time_mean = inference_results["mean_time"]
+        metrics.inference_time_std = inference_results["std_time"]
+        metrics.inference_throughput = inference_results["throughput"]
+        metrics.cpu_usage_percent = inference_results["cpu_usage"]
+        
+        # Cross-validation if applicable
+        if cross_validate and framework == "sklearn":
+            cv_scores = cross_val_score(
+                model, test_data, test_labels, 
+                cv=StratifiedKFold(n_splits=5), 
+                scoring='accuracy' if task_type == 'classification' else 'r2'
+            )
+            metrics.cross_val_scores = cv_scores.tolist()
+            metrics.confidence_interval = (
+                np.mean(cv_scores) - 1.96 * np.std(cv_scores),
+                np.mean(cv_scores) + 1.96 * np.std(cv_scores)
+            )
+            
+        # Dataset info
+        metrics.dataset_info = {
+            "num_samples": len(test_data),
+            "num_features": test_data.shape[1] if len(test_data.shape) > 1 else 1,
+            "num_classes": len(np.unique(test_labels)) if task_type == "classification" else None
+        }
+        
+        self.results_history.append(metrics)
+        logger.info(f"Benchmark completed for {model_name}")
+        
+        return metrics
+        
+    def compare_models(
+        self,
+        models: Dict[str, Any],
+        test_data: np.ndarray,
+        test_labels: np.ndarray,
+        dataset_name: str = "unknown",
+        task_type: str = "classification"
+    ) -> pd.DataFrame:
+        """Compare multiple models"""
+        results = []
+        
+        for name, model in models.items():
+            metrics = self.benchmark_model(
+                model, test_data, test_labels, 
+                name, dataset_name, task_type
+            )
+            results.append(metrics)
+            
+        # Statistical significance testing
+        if len(results) > 1:
+            self._test_statistical_significance(results)
+            
+        return self._create_comparison_dataframe(results)
+        
+    def _test_statistical_significance(self, results: List[BenchmarkMetrics]):
+        """Test statistical significance between models"""
+        if not all(r.cross_val_scores for r in results):
+            return
+            
+        # Pairwise t-tests
+        for i in range(len(results)):
+            for j in range(i + 1, len(results)):
+                scores1 = results[i].cross_val_scores
+                scores2 = results[j].cross_val_scores
+                
+                if scores1 and scores2:
+                    _, p_value = stats.ttest_rel(scores1, scores2)
+                    logger.info(
+                        f"T-test {results[i].model_name} vs {results[j].model_name}: "
+                        f"p-value = {p_value:.4f}"
+                    )
+                    
+    def _create_comparison_dataframe(self, results: List[BenchmarkMetrics]) -> pd.DataFrame:
+        """Create comparison dataframe from results"""
+        data = []
+        for r in results:
+            row = {
+                "Model": r.model_name,
+                "Framework": r.framework,
+                "Accuracy": r.accuracy,
+                "F1 Score": r.f1_score,
+                "Inference Time (ms)": r.inference_time_mean * 1000,
+                "Throughput (samples/s)": r.inference_throughput,
+                "Memory (MB)": r.memory_usage_mb,
+                "Model Size (MB)": r.model_size_mb,
+                "CPU Usage (%)": r.cpu_usage_percent
+            }
+            data.append(row)
+            
+        return pd.DataFrame(data)
+        
+    def generate_report(
+        self,
+        results: Union[BenchmarkMetrics, List[BenchmarkMetrics]],
+        output_file: str = "benchmark_report.html"
+    ):
+        """Generate comprehensive benchmark report"""
+        if isinstance(results, BenchmarkMetrics):
+            results = [results]
+            
+        output_path = self.output_dir / output_file
+        
+        # Create visualizations
+        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        
+        # Performance comparison
+        if len(results) > 1:
+            df = self._create_comparison_dataframe(results)
+            
+            # Accuracy/F1 comparison
+            ax = axes[0, 0]
+            metrics_df = df[["Model", "Accuracy", "F1 Score"]].melt(
+                id_vars="Model", var_name="Metric", value_name="Score"
+            )
+            sns.barplot(data=metrics_df, x="Model", y="Score", hue="Metric", ax=ax)
+            ax.set_title("Model Performance Comparison")
+            ax.set_ylim(0, 1)
+            
+            # Speed comparison
+            ax = axes[0, 1]
+            df.plot(x="Model", y="Throughput (samples/s)", kind="bar", ax=ax)
+            ax.set_title("Inference Throughput")
+            ax.set_ylabel("Samples/second")
+            
+            # Resource usage
+            ax = axes[1, 0]
+            resource_df = df[["Model", "Memory (MB)", "Model Size (MB)"]].melt(
+                id_vars="Model", var_name="Resource", value_name="MB"
+            )
+            sns.barplot(data=resource_df, x="Model", y="MB", hue="Resource", ax=ax)
+            ax.set_title("Resource Usage")
+            
+            # Efficiency radar chart
+            ax = axes[1, 1]
+            self._create_efficiency_radar(df, ax)
+            
+        plt.tight_layout()
+        
+        # Generate HTML report
+        html_content = self._generate_html_report(results, fig)
+        output_path.write_text(html_content)
+        
+        # Save raw results
+        json_path = output_path.with_suffix('.json')
+        with open(json_path, 'w') as f:
+            json.dump([asdict(r) for r in results], f, indent=2)
+            
+        logger.info(f"Report generated: {output_path}")
+        
+    def _create_efficiency_radar(self, df: pd.DataFrame, ax):
+        """Create radar chart for model efficiency"""
+        categories = ['Accuracy', 'Speed', 'Memory\nEfficiency', 'Size\nEfficiency']
+        
+        # Normalize metrics to 0-1 scale
+        for _, row in df.iterrows():
+            values = [
+                row['Accuracy'] if pd.notna(row['Accuracy']) else 0,
+                min(row['Throughput (samples/s)'] / df['Throughput (samples/s)'].max(), 1),
+                1 - (row['Memory (MB)'] / df['Memory (MB)'].max()),
+                1 - (row['Model Size (MB)'] / df['Model Size (MB)'].max())
+            ]
+            
+            angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False)
+            values = np.concatenate((values, [values[0]]))
+            angles = np.concatenate((angles, [angles[0]]))
+            
+            ax.plot(angles, values, 'o-', linewidth=2, label=row['Model'])
+            ax.fill(angles, values, alpha=0.25)
+            
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(categories)
+        ax.set_ylim(0, 1)
+        ax.set_title("Model Efficiency Comparison")
+        ax.legend()
+        ax.grid(True)
+        
+    def _generate_html_report(self, results: List[BenchmarkMetrics], fig) -> str:
+        """Generate HTML report content"""
+        import base64
+        from io import BytesIO
+        
+        # Convert plot to base64
+        buffer = BytesIO()
+        fig.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+        buffer.seek(0)
+        plot_base64 = base64.b64encode(buffer.read()).decode()
+        plt.close(fig)
+        
+        # Create results table
+        df = self._create_comparison_dataframe(results)
+        table_html = df.to_html(classes='table table-striped', index=False)
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Model Benchmark Report</title>
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body {{ padding: 20px; }}
+                .metric-card {{ margin: 10px 0; }}
+                .plot-container {{ text-align: center; margin: 20px 0; }}
+            </style>
+        </head>
+        <body>
+            <h1>Model Benchmark Report</h1>
+            <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            
+            <h2>Summary</h2>
+            <div class="row">
+                <div class="col-md-12">
+                    {table_html}
+                </div>
+            </div>
+            
+            <h2>Visualizations</h2>
+            <div class="plot-container">
+                <img src="data:image/png;base64,{plot_base64}" class="img-fluid">
+            </div>
+            
+            <h2>Detailed Results</h2>
+            {"".join(self._format_detailed_results(r) for r in results)}
+            
+            <h2>Hardware Information</h2>
+            <pre>{json.dumps(results[0].hardware_info, indent=2)}</pre>
+        </body>
+        </html>
+        """
+        
+        return html
+        
+    def _format_detailed_results(self, result: BenchmarkMetrics) -> str:
+        """Format detailed results for a single model"""
+        # Format individual metrics
+        acc_str = f"{result.accuracy:.4f}" if result.accuracy is not None else "N/A"
+        f1_str = f"{result.f1_score:.4f}" if result.f1_score is not None else "N/A"
+        prec_str = f"{result.precision:.4f}" if result.precision is not None else "N/A"
+        rec_str = f"{result.recall:.4f}" if result.recall is not None else "N/A"
+        
+        inf_time_str = f"{result.inference_time_mean*1000:.2f}" if result.inference_time_mean else "N/A"
+        inf_std_str = f"{result.inference_time_std*1000:.2f}" if result.inference_time_std else "N/A"
+        throughput_str = f"{result.inference_throughput:.2f}" if result.inference_throughput else "N/A"
+        
+        mem_str = f"{result.memory_usage_mb:.2f}" if result.memory_usage_mb else "N/A"
+        size_str = f"{result.model_size_mb:.2f}" if result.model_size_mb else "N/A"
+        cpu_str = f"{result.cpu_usage_percent:.1f}" if result.cpu_usage_percent else "N/A"
+        
+        cv_scores_html = f'<p>Cross-validation scores: {result.cross_val_scores}</p>' if result.cross_val_scores else ''
+        ci_html = f'<p>95% CI: [{result.confidence_interval[0]:.4f}, {result.confidence_interval[1]:.4f}]</p>' if result.confidence_interval[0] > 0 else ''
+        
+        return f"""
+        <div class="card metric-card">
+            <div class="card-header">
+                <h3>{result.model_name} ({result.framework})</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>Performance Metrics</h4>
+                        <ul>
+                            <li>Accuracy: {acc_str}</li>
+                            <li>F1 Score: {f1_str}</li>
+                            <li>Precision: {prec_str}</li>
+                            <li>Recall: {rec_str}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Speed Metrics</h4>
+                        <ul>
+                            <li>Inference Time: {inf_time_str} ± {inf_std_str} ms</li>
+                            <li>Throughput: {throughput_str} samples/s</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Resource Metrics</h4>
+                        <ul>
+                            <li>Memory Usage: {mem_str} MB</li>
+                            <li>Model Size: {size_str} MB</li>
+                            <li>CPU Usage: {cpu_str}%</li>
+                        </ul>
+                    </div>
+                </div>
+                {cv_scores_html}
+                {ci_html}
+            </div>
+        </div>
+        """
+        
+    def export_results(self, format: str = "csv"):
+        """Export benchmark results to file"""
+        if not self.results_history:
+            logger.warning("No results to export")
+            return
+            
+        df = self._create_comparison_dataframe(self.results_history)
+        
+        if format == "csv":
+            output_path = self.output_dir / f"benchmark_results_{datetime.now():%Y%m%d_%H%M%S}.csv"
+            df.to_csv(output_path, index=False)
+        elif format == "excel":
+            output_path = self.output_dir / f"benchmark_results_{datetime.now():%Y%m%d_%H%M%S}.xlsx"
+            df.to_excel(output_path, index=False)
+        elif format == "json":
+            output_path = self.output_dir / f"benchmark_results_{datetime.now():%Y%m%d_%H%M%S}.json"
+            with open(output_path, 'w') as f:
+                json.dump([asdict(r) for r in self.results_history], f, indent=2)
+                
+        logger.info(f"Results exported to {output_path}")
+        
+    def detect_performance_regression(
+        self,
+        current_metrics: BenchmarkMetrics,
+        baseline_metrics: BenchmarkMetrics,
+        threshold: float = 0.05
+    ) -> Dict[str, bool]:
+        """Detect performance regression compared to baseline"""
+        regressions = {}
+        
+        # Check accuracy regression
+        if current_metrics.accuracy and baseline_metrics.accuracy:
+            regression = (baseline_metrics.accuracy - current_metrics.accuracy) / baseline_metrics.accuracy
+            regressions['accuracy'] = regression > threshold
+            
+        # Check speed regression
+        if current_metrics.inference_time_mean and baseline_metrics.inference_time_mean:
+            regression = (current_metrics.inference_time_mean - baseline_metrics.inference_time_mean) / baseline_metrics.inference_time_mean
+            regressions['speed'] = regression > threshold
+            
+        # Check memory regression
+        if current_metrics.memory_usage_mb and baseline_metrics.memory_usage_mb:
+            regression = (current_metrics.memory_usage_mb - baseline_metrics.memory_usage_mb) / baseline_metrics.memory_usage_mb
+            regressions['memory'] = regression > threshold
+            
+        return regressions
+
+
+if __name__ == "__main__":
+    # Validation with real sklearn models
+    from sklearn.datasets import make_classification, load_iris
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.svm import SVC
+    
+    # Create dataset
+    print("Generating test dataset...")
+    X, y = make_classification(
+        n_samples=10000, n_features=20, n_informative=15,
+        n_redundant=5, n_classes=3, random_state=42
+    )
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+    
+    # Train models
+    print("\nTraining models...")
+    models = {
+        "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
+        "SVM": SVC(probability=True, random_state=42)
+    }
+    
+    for name, model in models.items():
+        print(f"Training {name}...")
+        model.fit(X_train, y_train)
+    
+    # Benchmark models
+    print("\nBenchmarking models...")
+    suite = ModelBenchmarkingSuite()
+    
+    # Individual benchmarks
+    results = []
+    for name, model in models.items():
+        print(f"\nBenchmarking {name}...")
+        metrics = suite.benchmark_model(
+            model, X_test, y_test, name, 
+            dataset_name="synthetic_classification",
+            batch_size=64
+        )
+        results.append(metrics)
+        print(f"Accuracy: {metrics.accuracy:.4f}")
+        print(f"Inference time: {metrics.inference_time_mean*1000:.2f} ms")
+        print(f"Memory usage: {metrics.memory_usage_mb:.2f} MB")
+    
+    # Model comparison
+    print("\nComparing models...")
+    comparison_df = suite.compare_models(
+        models, X_test, y_test,
+        dataset_name="synthetic_classification"
+    )
+    print("\nComparison Results:")
+    print(comparison_df)
+    
+    # Generate report
+    print("\nGenerating benchmark report...")
+    suite.generate_report(results, "validation_benchmark_report.html")
+    
+    # Export results
+    suite.export_results("json")
+    
+    # Test regression detection
+    if len(results) >= 2:
+        print("\nTesting regression detection...")
+        regressions = suite.detect_performance_regression(results[1], results[0])
+        print(f"Regressions detected: {regressions}")
+    
+    print("\n✅ Model benchmarking validation completed successfully!")
+    print(f"Reports saved in: {suite.output_dir}")

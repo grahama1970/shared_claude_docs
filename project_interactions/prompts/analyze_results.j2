@@ -1,0 +1,43 @@
+You are analyzing test results. You MUST report these EXACT facts:
+
+IMMUTABLE TEST RESULTS:
+=======================
+{{ immutable_facts | tojson(indent=2) }}
+
+TEST SUMMARY:
+============
+Total Tests: {{ total }}
+Passed: {{ passed }}
+Failed: {{ failed }}
+{% if total > 0 %}
+Success Rate: {{ "%.1f" | format((passed / total * 100)) }}%
+{% endif %}
+
+{% if failed > 0 and failed_tests %}
+FAILED TESTS:
+============
+{% for test in failed_tests %}
+- {{ test.name }}: {{ test.error }}
+{% endfor %}
+{% endif %}
+
+{% if warnings %}
+WARNINGS:
+=========
+{% for warning in warnings %}
+⚠️  {{ warning }}
+{% endfor %}
+{% endif %}
+
+ANALYSIS INSTRUCTIONS:
+===================
+1. Summarize the overall test health
+2. Identify patterns in failures
+3. Suggest priority fixes
+4. Estimate impact on production
+
+{% if context %}
+ADDITIONAL CONTEXT:
+==================
+{{ context }}
+{% endif %}

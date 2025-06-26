@@ -1,0 +1,157 @@
+{
+  "timestamp": "20250530_103446",
+  "total_projects": 11,
+  "total_tests": 0,
+  "total_passed": 0,
+  "total_failed": 0,
+  "status_counts": {
+    "no_test_files": 7,
+    "setup_failed": 3,
+    "no_tests": 1
+  },
+  "results": [
+    {
+      "project": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "timestamp": "2025-05-30T10:34:46.958809",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "timestamp": "2025-05-30T10:34:46.959079",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "arangodb",
+      "path": "/home/graham/workspace/experiments/arangodb",
+      "timestamp": "2025-05-30T10:34:46.959200",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "timestamp": "2025-05-30T10:34:46.959299",
+      "status": "setup_failed",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "Failed to install test dependencies"
+      ]
+    },
+    {
+      "project": "claude_max_proxy",
+      "path": "/home/graham/workspace/experiments/claude_max_proxy",
+      "timestamp": "2025-05-30T10:34:56.322425",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "arxiv-mcp-server",
+      "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server",
+      "timestamp": "2025-05-30T10:34:56.322699",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "claude-module-communicator",
+      "path": "/home/graham/workspace/experiments/claude-module-communicator",
+      "timestamp": "2025-05-30T10:34:56.322961",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "timestamp": "2025-05-30T10:34:56.323147",
+      "status": "no_test_files",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No test files found in tests directory"
+      ]
+    },
+    {
+      "project": "unsloth_wip",
+      "path": "/home/graham/workspace/experiments/unsloth_wip",
+      "timestamp": "2025-05-30T10:34:56.323334",
+      "status": "no_tests",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "No tests directory found"
+      ]
+    },
+    {
+      "project": "marker-ground-truth",
+      "path": "/home/graham/workspace/experiments/marker-ground-truth",
+      "timestamp": "2025-05-30T10:34:56.323438",
+      "status": "setup_failed",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "Failed to install test dependencies"
+      ]
+    },
+    {
+      "project": "mcp-screenshot",
+      "path": "/home/graham/workspace/experiments/mcp-screenshot",
+      "timestamp": "2025-05-30T10:35:01.542432",
+      "status": "setup_failed",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0,
+      "coverage": null,
+      "errors": [
+        "Failed to install test dependencies"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+"""
+Example usage of the Distributed Training Orchestration module
+"""
+
+import asyncio
+from distributed_training_interaction import (
+    DistributedTrainingOrchestrator,
+    AggregationStrategy
+)
+
+
+async def simple_training_example():
+    """Simple example of distributed training"""
+    print("🚀 Simple Distributed Training Example")
+    print("=" * 50)
+    
+    # Initialize with 4 workers
+    orchestrator = DistributedTrainingOrchestrator(num_workers=4)
+    await orchestrator.initialize_workers()
+    
+    # Small model configuration
+    model_config = {
+        "size": 10000,
+        "batch_size": 64,
+        "learning_rate": 0.01,
+        "epochs": 3
+    }
+    
+    data_config = {
+        "total_samples": 5000
+    }
+    
+    # Run training
+    result = await orchestrator.train_distributed(model_config, data_config)
+    
+    print(f"\n✅ Training completed!")
+    print(f"   Epochs: {result['epochs_completed']}")
+    print(f"   Final loss: {result['final_loss']:.4f}")
+    print(f"   Active workers: {result['workers_used']}")
+    
+    await orchestrator.cleanup()
+
+
+async def advanced_training_example():
+    """Advanced example with custom configuration and fault simulation"""
+    print("\n🎯 Advanced Distributed Training Example")
+    print("=" * 50)
+    
+    # Initialize with 8 workers
+    orchestrator = DistributedTrainingOrchestrator(
+        num_workers=8,
+        heartbeat_interval=2.0
+    )
+    await orchestrator.initialize_workers()
+    
+    # Larger model with custom settings
+    model_config = {
+        "size": 1000000,
+        "batch_size": 128,
+        "learning_rate": 0.001,
+        "epochs": 5,
+        "gradient_clip": 5.0,
+        "checkpoint_interval": 2,
+        "aggregation_strategy": AggregationStrategy.RING_ALL_REDUCE
+    }
+    
+    data_config = {
+        "total_samples": 50000
+    }
+    
+    # Simulate some worker failures
+    print("\n⚠️ Simulating worker failures...")
+    orchestrator.workers["worker_002"].status = orchestrator.workers["worker_002"].status.__class__.FAILED
+    orchestrator.workers["worker_005"].status = orchestrator.workers["worker_005"].status.__class__.FAILED
+    
+    # Run training with failures
+    result = await orchestrator.train_distributed(model_config, data_config)
+    
+    # Get detailed summary
+    summary = await orchestrator.get_training_summary()
+    
+    print(f"\n📊 Training Summary:")
+    print(f"   Total workers: {summary['total_workers']}")
+    print(f"   Active workers: {summary['active_workers']}")
+    print(f"   Failed workers: {summary['failed_workers']}")
+    print(f"   Epochs completed: {summary['epochs_completed']}")
+    print(f"   Final loss: {summary['final_loss']:.4f}")
+    print(f"   Avg gradient norm: {summary['average_gradient_norm']:.4f}")
+    print(f"   Checkpoints saved: {summary['checkpoints_saved']}")
+    
+    await orchestrator.cleanup()
+
+
+async def comparison_example():
+    """Compare different aggregation strategies"""
+    print("\n🔬 Aggregation Strategy Comparison")
+    print("=" * 50)
+    
+    strategies = [
+        AggregationStrategy.ALL_REDUCE,
+        AggregationStrategy.RING_ALL_REDUCE,
+        AggregationStrategy.HIERARCHICAL,
+        AggregationStrategy.ASYNC_SGD
+    ]
+    
+    model_config_base = {
+        "size": 100000,
+        "batch_size": 32,
+        "learning_rate": 0.01,
+        "epochs": 3
+    }
+    
+    data_config = {
+        "total_samples": 10000
+    }
+    
+    results = {}
+    
+    for strategy in strategies:
+        print(f"\n📈 Testing {strategy.value}...")
+        
+        orchestrator = DistributedTrainingOrchestrator(num_workers=6)
+        await orchestrator.initialize_workers()
+        
+        # Update config with strategy
+        model_config = model_config_base.copy()
+        model_config["aggregation_strategy"] = strategy
+        
+        # Run training
+        result = await orchestrator.train_distributed(model_config, data_config)
+        
+        results[strategy.value] = {
+            "final_loss": result["final_loss"],
+            "workers_used": result["workers_used"]
+        }
+        
+        await orchestrator.cleanup()
+    
+    # Display comparison
+    print("\n📊 Strategy Comparison Results:")
+    print("-" * 50)
+    print(f"{'Strategy':<20} {'Final Loss':<15} {'Workers Used':<15}")
+    print("-" * 50)
+    for strategy, metrics in results.items():
+        print(f"{strategy:<20} {metrics['final_loss']:<15.4f} {metrics['workers_used']:<15}")
+
+
+async def main():
+    """Run all examples"""
+    await simple_training_example()
+    await advanced_training_example()
+    await comparison_example()
+    
+    print("\n✅ All examples completed!")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

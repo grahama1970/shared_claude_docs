@@ -1,0 +1,14 @@
+Enhanced Cleanup Summary - 2025-05-29 11:51:32
+==================================================
+Total: 10 | Success: 3 | Failed: 0 | Issues: 7
+==================================================
+sparta........................ issues......... 2 issues
+marker........................ issues......... 2 issues
+arangodb...................... issues......... 2 issues
+youtube_transcripts........... issues......... 2 issues
+claude_max_proxy.............. issues......... 2 issues
+arxiv-mcp-server.............. issues......... 3 issues
+granger_hub................... issues......... 2 issues
+claude-test-reporter.......... success........ 0 issues
+unsloth_wip................... success........ 0 issues
+marker-ground-truth........... success........ 0 issues

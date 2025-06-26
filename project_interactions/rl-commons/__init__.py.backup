@@ -1,0 +1,6 @@
+"""
+RL Commons Interactions Package
+
+This package contains GRANGER-compliant interaction tests for rl-commons,
+implementing contextual bandit and reinforcement learning capabilities for Task #004.
+"""

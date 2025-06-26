@@ -1,0 +1,123 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Demo script for GRANGER Task #26: Performance Monitor
+
+This demonstrates the real-time performance monitoring capabilities
+"""
+
+import asyncio
+from performance_monitor_interaction import PerformanceMonitor
+
+
+async def demo_performance_monitoring():
+    """Demonstrate performance monitoring features"""
+    print("=== GRANGER Performance Monitor Demo ===\n")
+    
+    # Create monitor
+    monitor = PerformanceMonitor()
+    
+    # Define modules to monitor (simulating GRANGER pipeline)
+    modules = [
+        'sparta_ingestion',      # Document ingestion
+        'marker_conversion',     # PDF processing
+        'arangodb_storage',      # Database operations
+        'llm_proxy',            # LLM requests
+        'module_communicator'    # Inter-module coordination
+    ]
+    
+    print(f"Monitoring {len(modules)} GRANGER modules for 15 seconds...")
+    print("Modules:", ', '.join(modules))
+    print("\nWatch for:")
+    print("- Real-time metric collection")
+    print("- Performance alerts")
+    print("- Anomaly detection")
+    print("- Bottleneck identification\n")
+    
+    # Run monitoring
+    dashboard = await monitor.monitor_modules(modules, duration=15.0)
+    
+    # Display results
+    print("\n=== Monitoring Results ===\n")
+    
+    # Show metrics for each module
+    print("Module Performance Metrics:")
+    print("-" * 70)
+    print(f"{'Module':<25} {'Latency (p95)':<15} {'Throughput':<15} {'Error Rate':<10}")
+    print("-" * 70)
+    
+    for module_name, data in dashboard['modules'].items():
+        metrics = data['metrics']
+        print(f"{module_name:<25} {metrics['latency_p95']:.3f}s{'':<10} "
+              f"{metrics['requests_per_second']:.1f} req/s{'':<5} "
+              f"{metrics['error_rate']:.1%}")
+    
+    # Identify bottleneck
+    print("\n=== Performance Analysis ===")
+    slowest_module = None
+    max_latency = 0
+    
+    for module_name, data in dashboard['modules'].items():
+        latency = data['metrics']['latency_p95']
+        if latency > max_latency:
+            max_latency = latency
+            slowest_module = module_name
+    
+    print(f"Bottleneck identified: {slowest_module} (p95 latency: {max_latency:.3f}s)")
+    
+    # Show alerts summary
+    print(f"\n=== Alert Summary ===")
+    print(f"Total alerts generated: {len(dashboard['alerts'])}")
+    
+    # Group alerts by type
+    alert_types = {}
+    for alert in dashboard['alerts']:
+        metric = alert['metric']
+        if metric not in alert_types:
+            alert_types[metric] = 0
+        alert_types[metric] += 1
+    
+    print("\nAlerts by type:")
+    for metric, count in sorted(alert_types.items(), key=lambda x: x[1], reverse=True):
+        print(f"  {metric}: {count}")
+    
+    # Show critical alerts
+    critical_alerts = [a for a in dashboard['alerts'] if a['level'] == 'critical']
+    if critical_alerts:
+        print(f"\nCritical Alerts ({len(critical_alerts)}):")
+        for alert in critical_alerts[:5]:  # Show first 5
+            print(f"  - {alert['message']}")
+    
+    # Performance recommendations
+    print("\n=== Recommendations ===")
+    
+    for module_name, data in dashboard['modules'].items():
+        metrics = data['metrics']
+        recommendations = []
+        
+        if metrics['latency_p95'] > 0.5:
+            recommendations.append(f"{module_name}: High latency detected - consider scaling or optimization")
+        if metrics['error_rate'] > 0.05:
+            recommendations.append(f"{module_name}: High error rate - investigate failures")
+        if metrics['requests_per_second'] < 10:
+            recommendations.append(f"{module_name}: Low throughput - check for blocking operations")
+    
+        for rec in recommendations:
+            print(f"⚠️  {rec}")
+    
+    return dashboard
+
+
+if __name__ == "__main__":
+    # Run the demo
+    dashboard_data = asyncio.run(demo_performance_monitoring())
+    
+    print("\n✅ Performance monitoring demo completed!")
+    print(f"   Monitored {len(dashboard_data['modules'])} modules")
+    print(f"   Generated {len(dashboard_data['alerts'])} alerts")
+    print(f"   Dashboard data ready for visualization")

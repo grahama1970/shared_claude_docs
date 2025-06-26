@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""
+Direct Gemini caller using vertex AI
+"""
+
+import os
+import sys
+import json
+from pathlib import Path
+
+def call_gemini_with_prompt(prompt: str) -> str:
+    """Call Gemini directly using vertex AI"""
+    try:
+        # Set up authentication
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/graham/workspace/shared_claude_docs/vertex_ai_service_account.json"
+        
+        # Import vertex AI
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+        
+        # Initialize
+        vertexai.init(project="grahama1970", location="us-central1")
+        
+        # Create model
+        model = GenerativeModel("gemini-1.5-flash")
+        
+        # Generate response
+        response = model.generate_content(prompt)
+        
+        return response.text
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+if __name__ == "__main__":
+    # Read prompt from stdin or command line
+    if len(sys.argv) > 1:
+        prompt = " ".join(sys.argv[1:])
+    else:
+        prompt = sys.stdin.read()
+    
+    result = call_gemini_with_prompt(prompt)
+    print(result)

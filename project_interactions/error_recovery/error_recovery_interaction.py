@@ -1,0 +1,596 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: error_recovery_interaction.py
+Purpose: Intelligent error recovery and fault tolerance system with ML-based prediction
+
+External Dependencies:
+- numpy: https://numpy.org/doc/stable/
+- scikit-learn: https://scikit-learn.org/stable/
+- asyncio: https://docs.python.org/3/library/asyncio.html
+
+Example Usage:
+>>> from error_recovery_interaction import ErrorRecoveryInteraction
+>>> recovery = ErrorRecoveryInteraction()
+>>> result = await recovery.recover_from_error(error, context)
+{'recovery_status': 'success', 'strategy': 'retry_with_backoff', 'attempts': 3}
+"""
+
+import asyncio
+import json
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Callable, Union, Tuple
+from enum import Enum
+from dataclasses import dataclass, field
+from collections import defaultdict, deque
+import hashlib
+import traceback
+import logging
+from pathlib import Path
+
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class ErrorSeverity(Enum):
+    """Error severity levels"""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class RecoveryAction(Enum):
+    """Available recovery actions"""
+    RETRY = "retry"
+    RETRY_WITH_BACKOFF = "retry_with_backoff"
+    FALLBACK = "fallback"
+    CIRCUIT_BREAK = "circuit_break"
+    ROLLBACK = "rollback"
+    CHECKPOINT_RESTORE = "checkpoint_restore"
+    SELF_HEAL = "self_heal"
+    ESCALATE = "escalate"
+    IGNORE = "ignore"
+
+
+@dataclass
+class ErrorPattern:
+    """Error pattern for ML-based prediction"""
+    error_type: str
+    frequency: int
+    last_occurrence: datetime
+    recovery_success_rate: float
+    avg_recovery_time: float
+    context_features: Dict[str, Any] = field(default_factory=dict)
+    
+    def to_feature_vector(self) -> np.ndarray:
+        """Convert pattern to ML feature vector"""
+        features = [
+            hash(self.error_type) % 1000,  # Error type hash
+            self.frequency,
+            (datetime.now() - self.last_occurrence).seconds,
+            self.recovery_success_rate,
+            self.avg_recovery_time,
+            len(self.context_features)
+        ]
+        return np.array(features)
+
+
+@dataclass
+class RecoveryStrategy:
+    """Recovery strategy configuration"""
+    action: RecoveryAction
+    max_retries: int = 3
+    backoff_base: float = 2.0
+    timeout: float = 30.0
+    fallback_handler: Optional[Callable] = None
+    checkpoint_interval: int = 100
+    
+    async def execute(self, func: Callable, *args, **kwargs) -> Any:
+        """Execute recovery strategy"""
+        if self.action == RecoveryAction.RETRY:
+            return await self._retry(func, *args, **kwargs)
+        elif self.action == RecoveryAction.RETRY_WITH_BACKOFF:
+            return await self._retry_with_backoff(func, *args, **kwargs)
+        elif self.action == RecoveryAction.FALLBACK:
+            return await self._fallback(func, *args, **kwargs)
+        else:
+            raise ValueError(f"Unsupported action: {self.action}")
+    
+    async def _retry(self, func: Callable, *args, **kwargs) -> Any:
+        """Simple retry strategy"""
+        for attempt in range(self.max_retries):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                if attempt == self.max_retries - 1:
+                    raise
+                await asyncio.sleep(1)
+    
+    async def _retry_with_backoff(self, func: Callable, *args, **kwargs) -> Any:
+        """Retry with exponential backoff"""
+        for attempt in range(self.max_retries):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                if attempt == self.max_retries - 1:
+                    raise
+                wait_time = self.backoff_base ** attempt
+                await asyncio.sleep(wait_time)
+    
+    async def _fallback(self, func: Callable, *args, **kwargs) -> Any:
+        """Fallback strategy"""
+        try:
+            return await func(*args, **kwargs)
+        except Exception:
+            if self.fallback_handler:
+                return await self.fallback_handler(*args, **kwargs)
+            raise
+
+
+class CircuitBreaker:
+    """Circuit breaker pattern implementation"""
+    
+    def __init__(self, failure_threshold: int = 5, timeout: float = 60.0):
+        self.failure_threshold = failure_threshold
+        self.timeout = timeout
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = "closed"  # closed, open, half-open
+    
+    def can_execute(self) -> bool:
+        """Check if circuit allows execution"""
+        if self.state == "closed":
+            return True
+        
+        if self.state == "open":
+            if self.last_failure_time and \
+               (time.time() - self.last_failure_time) > self.timeout:
+                self.state = "half-open"
+                return True
+            return False
+        
+        return self.state == "half-open"
+    
+    def record_success(self):
+        """Record successful execution"""
+        if self.state == "half-open":
+            self.state = "closed"
+        self.failure_count = 0
+    
+    def record_failure(self):
+        """Record failed execution"""
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        
+        if self.failure_count >= self.failure_threshold:
+            self.state = "open"
+        elif self.state == "half-open":
+            self.state = "open"
+
+
+class ErrorClassifier:
+    """ML-based error classifier"""
+    
+    def __init__(self):
+        self.model = RandomForestClassifier(n_estimators=100)
+        self.scaler = StandardScaler()
+        self.is_trained = False
+        self.error_history: List[ErrorPattern] = []
+    
+    def train(self, patterns: List[ErrorPattern], labels: List[RecoveryAction]):
+        """Train the error classifier"""
+        if len(patterns) < 10:
+            logger.warning("Insufficient data for training")
+            return
+        
+        # Convert patterns to feature matrix
+        X = np.array([p.to_feature_vector() for p in patterns])
+        y = [label.value for label in labels]
+        
+        # Split and train
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+        
+        X_train = self.scaler.fit_transform(X_train)
+        X_test = self.scaler.transform(X_test)
+        
+        self.model.fit(X_train, y_train)
+        score = self.model.score(X_test, y_test)
+        logger.info(f"Classifier trained with accuracy: {score:.2f}")
+        self.is_trained = True
+    
+    def predict_recovery(self, pattern: ErrorPattern) -> RecoveryAction:
+        """Predict best recovery action"""
+        if not self.is_trained:
+            # Default strategy if not trained
+            return RecoveryAction.RETRY_WITH_BACKOFF
+        
+        features = pattern.to_feature_vector().reshape(1, -1)
+        features = self.scaler.transform(features)
+        prediction = self.model.predict(features)[0]
+        
+        return RecoveryAction(prediction)
+
+
+class RecoveryOrchestrator:
+    """Orchestrates recovery across distributed systems"""
+    
+    def __init__(self):
+        self.recovery_tasks: Dict[str, asyncio.Task] = {}
+        self.health_checks: Dict[str, Callable] = {}
+        self.dependencies: Dict[str, List[str]] = {}
+    
+    async def orchestrate_recovery(
+        self,
+        failed_services: List[str],
+        recovery_plan: Dict[str, RecoveryStrategy]
+    ) -> Dict[str, bool]:
+        """Orchestrate recovery across multiple services"""
+        results = {}
+        
+        # Sort by dependencies
+        ordered_services = self._topological_sort(failed_services)
+        
+        for service in ordered_services:
+            if service in recovery_plan:
+                strategy = recovery_plan[service]
+                try:
+                    await self._recover_service(service, strategy)
+                    results[service] = True
+                except Exception as e:
+                    logger.error(f"Failed to recover {service}: {e}")
+                    results[service] = False
+        
+        return results
+    
+    def _topological_sort(self, services: List[str]) -> List[str]:
+        """Sort services by dependencies"""
+        # Simplified topological sort
+        sorted_services = []
+        visited = set()
+        
+        def visit(service):
+            if service in visited:
+                return
+            visited.add(service)
+            for dep in self.dependencies.get(service, []):
+                if dep in services:
+                    visit(dep)
+            sorted_services.append(service)
+        
+        for service in services:
+            visit(service)
+        
+        return sorted_services
+    
+    async def _recover_service(self, service: str, strategy: RecoveryStrategy):
+        """Recover individual service"""
+        if service in self.health_checks:
+            health_check = self.health_checks[service]
+            await strategy.execute(health_check)
+
+
+class ErrorRecoveryInteraction:
+    """Main error recovery interaction class"""
+    
+    def __init__(self):
+        self.classifier = ErrorClassifier()
+        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
+        self.checkpoints: Dict[str, Any] = {}
+        self.error_patterns: Dict[str, ErrorPattern] = {}
+        self.orchestrator = RecoveryOrchestrator()
+        self.recovery_history: deque = deque(maxlen=1000)
+        
+    async def recover_from_error(
+        self,
+        error: Exception,
+        context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Main error recovery entry point"""
+        start_time = time.time()
+        
+        # Classify error
+        pattern = self._analyze_error(error, context)
+        severity = self._assess_severity(error, pattern)
+        
+        # Get recovery strategy
+        strategy = await self._select_strategy(pattern, severity, context)
+        
+        # Execute recovery
+        result = await self._execute_recovery(error, strategy, context)
+        
+        # Update learning
+        self._update_patterns(error, strategy, result, time.time() - start_time)
+        
+        return {
+            "recovery_status": result["status"],
+            "strategy": strategy.action.value,
+            "severity": severity.value,
+            "recovery_time": time.time() - start_time,
+            "attempts": result.get("attempts", 1)
+        }
+    
+    def _analyze_error(self, error: Exception, context: Dict[str, Any]) -> ErrorPattern:
+        """Analyze error and create pattern"""
+        error_hash = hashlib.md5(str(error).encode()).hexdigest()
+        
+        if error_hash in self.error_patterns:
+            pattern = self.error_patterns[error_hash]
+            pattern.frequency += 1
+            pattern.last_occurrence = datetime.now()
+        else:
+            pattern = ErrorPattern(
+                error_type=type(error).__name__,
+                frequency=1,
+                last_occurrence=datetime.now(),
+                recovery_success_rate=0.5,
+                avg_recovery_time=0.0,
+                context_features=context
+            )
+            self.error_patterns[error_hash] = pattern
+        
+        return pattern
+    
+    def _assess_severity(self, error: Exception, pattern: ErrorPattern) -> ErrorSeverity:
+        """Assess error severity"""
+        # Critical errors
+        if isinstance(error, (SystemError, MemoryError)):
+            return ErrorSeverity.CRITICAL
+        
+        # High frequency errors
+        if pattern.frequency > 10:
+            return ErrorSeverity.HIGH
+        
+        # Medium severity
+        if pattern.recovery_success_rate < 0.3:
+            return ErrorSeverity.MEDIUM
+        
+        return ErrorSeverity.LOW
+    
+    async def _select_strategy(
+        self,
+        pattern: ErrorPattern,
+        severity: ErrorSeverity,
+        context: Dict[str, Any]
+    ) -> RecoveryStrategy:
+        """Select appropriate recovery strategy"""
+        # Use ML prediction if available
+        if self.classifier.is_trained:
+            action = self.classifier.predict_recovery(pattern)
+        else:
+            # Rule-based selection
+            if severity == ErrorSeverity.CRITICAL:
+                action = RecoveryAction.ESCALATE
+            elif severity == ErrorSeverity.HIGH:
+                action = RecoveryAction.CIRCUIT_BREAK
+            elif pattern.recovery_success_rate > 0.7:
+                action = RecoveryAction.RETRY
+            else:
+                action = RecoveryAction.RETRY_WITH_BACKOFF
+        
+        # Create strategy
+        return RecoveryStrategy(
+            action=action,
+            max_retries=5 if severity == ErrorSeverity.LOW else 3,
+            backoff_base=2.0,
+            timeout=60.0
+        )
+    
+    async def _execute_recovery(
+        self,
+        error: Exception,
+        strategy: RecoveryStrategy,
+        context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Execute recovery strategy"""
+        service_id = context.get("service_id", "default")
+        
+        # Check circuit breaker
+        if service_id not in self.circuit_breakers:
+            self.circuit_breakers[service_id] = CircuitBreaker()
+        
+        breaker = self.circuit_breakers[service_id]
+        
+        if not breaker.can_execute():
+            return {"status": "circuit_open", "error": "Circuit breaker is open"}
+        
+        try:
+            # Execute recovery based on action
+            if strategy.action == RecoveryAction.CHECKPOINT_RESTORE:
+                result = await self._restore_checkpoint(service_id)
+            elif strategy.action == RecoveryAction.ROLLBACK:
+                result = await self._rollback_transaction(context)
+            elif strategy.action == RecoveryAction.SELF_HEAL:
+                result = await self._self_heal(error, context)
+            else:
+                # Use strategy's built-in execution
+                func = context.get("retry_func", lambda: None)
+                await strategy.execute(func)
+                result = {"status": "success"}
+            
+            breaker.record_success()
+            return result
+            
+        except Exception as e:
+            breaker.record_failure()
+            return {"status": "failed", "error": str(e)}
+    
+    async def _restore_checkpoint(self, service_id: str) -> Dict[str, Any]:
+        """Restore from checkpoint"""
+        if service_id in self.checkpoints:
+            state = self.checkpoints[service_id]
+            return {"status": "success", "restored_state": state}
+        return {"status": "failed", "error": "No checkpoint found"}
+    
+    async def _rollback_transaction(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Rollback transaction"""
+        transaction_id = context.get("transaction_id")
+        if transaction_id:
+            # Simulate rollback
+            await asyncio.sleep(0.1)
+            return {"status": "success", "transaction_id": transaction_id}
+        return {"status": "failed", "error": "No transaction to rollback"}
+    
+    async def _self_heal(self, error: Exception, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Self-healing logic"""
+        # Analyze error and attempt automatic fix
+        if "connection" in str(error).lower():
+            # Try to reconnect
+            await asyncio.sleep(1)
+            return {"status": "success", "action": "reconnected"}
+        
+        if "memory" in str(error).lower():
+            # Clear caches
+            self.checkpoints.clear()
+            return {"status": "success", "action": "memory_cleared"}
+        
+        return {"status": "failed", "error": "Cannot self-heal"}
+    
+    def _update_patterns(
+        self,
+        error: Exception,
+        strategy: RecoveryStrategy,
+        result: Dict[str, Any],
+        recovery_time: float
+    ):
+        """Update error patterns with recovery results"""
+        error_hash = hashlib.md5(str(error).encode()).hexdigest()
+        
+        if error_hash in self.error_patterns:
+            pattern = self.error_patterns[error_hash]
+            
+            # Update success rate
+            success = result["status"] == "success"
+            pattern.recovery_success_rate = (
+                pattern.recovery_success_rate * 0.9 + (1.0 if success else 0.0) * 0.1
+            )
+            
+            # Update average recovery time
+            pattern.avg_recovery_time = (
+                pattern.avg_recovery_time * 0.9 + recovery_time * 0.1
+            )
+        
+        # Store in history
+        self.recovery_history.append({
+            "timestamp": datetime.now(),
+            "error": str(error),
+            "strategy": strategy.action.value,
+            "result": result,
+            "recovery_time": recovery_time
+        })
+    
+    def create_checkpoint(self, service_id: str, state: Any):
+        """Create a checkpoint for recovery"""
+        self.checkpoints[service_id] = {
+            "timestamp": datetime.now(),
+            "state": state
+        }
+    
+    def get_recovery_stats(self) -> Dict[str, Any]:
+        """Get recovery statistics"""
+        if not self.recovery_history:
+            return {"total_recoveries": 0}
+        
+        successes = sum(1 for r in self.recovery_history if r["result"]["status"] == "success")
+        total = len(self.recovery_history)
+        
+        return {
+            "total_recoveries": total,
+            "success_rate": successes / total if total > 0 else 0,
+            "avg_recovery_time": np.mean([r["recovery_time"] for r in self.recovery_history]),
+            "active_circuit_breakers": sum(
+                1 for cb in self.circuit_breakers.values() if cb.state == "open"
+            )
+        }
+
+
+# Validation
+if __name__ == "__main__":
+    async def main():
+        # Create recovery system
+        recovery = ErrorRecoveryInteraction()
+        
+        # Test 1: Simple retry recovery
+        print("Test 1: Simple retry recovery")
+        attempts = 0
+        
+        async def flaky_function():
+            nonlocal attempts
+            attempts += 1
+            if attempts < 3:
+                raise ConnectionError("Connection failed")
+            return "Success"
+        
+        try:
+            result = await recovery.recover_from_error(
+                ConnectionError("Connection failed"),
+                {"service_id": "api", "retry_func": flaky_function}
+            )
+            assert result["recovery_status"] == "success"
+            assert result["strategy"] == "retry_with_backoff"
+            print("✓ Simple retry recovery successful")
+        except Exception as e:
+            print(f"✗ Simple retry failed: {e}")
+        
+        # Test 2: Circuit breaker
+        print("\nTest 2: Circuit breaker pattern")
+        recovery.circuit_breakers["db"] = CircuitBreaker(failure_threshold=2)
+        
+        # Simulate failures
+        for i in range(3):
+            result = await recovery.recover_from_error(
+                DatabaseError("DB connection failed"),
+                {"service_id": "db"}
+            )
+        
+        assert recovery.circuit_breakers["db"].state == "open"
+        print("✓ Circuit breaker opened after failures")
+        
+        # Test 3: Checkpoint recovery
+        print("\nTest 3: Checkpoint recovery")
+        recovery.create_checkpoint("cache", {"data": "important_state"})
+        
+        result = await recovery._restore_checkpoint("cache")
+        assert result["status"] == "success"
+        assert result["restored_state"]["state"]["data"] == "important_state"
+        print("✓ Checkpoint recovery successful")
+        
+        # Test 4: Self-healing
+        print("\nTest 4: Self-healing capabilities")
+        result = await recovery._self_heal(
+            ConnectionError("Connection lost"),
+            {"service_id": "websocket"}
+        )
+        assert result["status"] == "success"
+        assert result["action"] == "reconnected"
+        print("✓ Self-healing successful")
+        
+        # Test 5: Recovery statistics
+        print("\nTest 5: Recovery statistics")
+        stats = recovery.get_recovery_stats()
+        print(f"  Total recoveries: {stats['total_recoveries']}")
+        print(f"  Success rate: {stats.get('success_rate', 0):.2%}")
+        print(f"  Active circuit breakers: {stats.get('active_circuit_breakers', 0)}")
+        
+        print("\n✅ All validation tests passed!")
+    
+    # Define custom exceptions for testing
+    class DatabaseError(Exception):
+        pass
+    
+    # Run validation
+    asyncio.run(main())

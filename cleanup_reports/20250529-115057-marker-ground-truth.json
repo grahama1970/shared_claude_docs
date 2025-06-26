@@ -1,0 +1,28 @@
+{
+  "project": "/home/graham/workspace/experiments/marker-ground-truth",
+  "name": "marker-ground-truth",
+  "type": "dataset",
+  "timestamp": "20250529-115057",
+  "issues": [],
+  "warnings": [
+    "README.md missing sections: installation, usage, requirements",
+    "No slash commands documented for Claude project",
+    "High technical debt: 3226 TODO/FIXME comments"
+  ],
+  "suggestions": [
+    "Consider refactoring large files"
+  ],
+  "validations": {
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    }
+  },
+  "status": "success"
+}

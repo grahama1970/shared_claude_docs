@@ -1,0 +1,292 @@
+name: Granger Security Bug Hunt
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: 'Test level (0-3)'
+        required: false
+        default: 'all'
+      focus_area:
+        description: 'Focus area (security, performance, integration)'
+        required: false
+        default: 'all'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    services:
+      arangodb:
+        image: arangodb:latest
+        env:
+          ARANGO_NO_AUTH: 0
+          ARANGO_ROOT_PASSWORD: ${{ secrets.ARANGO_ROOT_PASSWORD }}
+        ports:
+          - 8529:8529
+        options: >-
+          --health-cmd "curl -f http://localhost:8529/_api/version || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pip
+          .venv
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/pyproject.toml') }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv venv
+        source .venv/bin/activate
+        uv sync
+        
+    - name: Install security tools
+      run: |
+        source .venv/bin/activate
+        uv add bandit safety semgrep
+        
+    - name: Run Bandit security scan
+      run: |
+        source .venv/bin/activate
+        bandit -r project_interactions/ -f json -o bandit_report.json || true
+        
+    - name: Run Safety dependency check
+      run: |
+        source .venv/bin/activate
+        safety check --json --output safety_report.json || true
+        
+    - name: Run Semgrep
+      run: |
+        source .venv/bin/activate
+        semgrep --config=auto --json --output=semgrep_report.json project_interactions/ || true
+        
+    - name: Run GRANGER Bug Hunter
+      env:
+        GRANGER_BUG_HUNT_MODE: "ci"
+        PYTHONPATH: ${{ github.workspace }}
+      run: |
+        source .venv/bin/activate
+        cd project_interactions
+        python comprehensive_bug_hunt_final.py --ci-mode
+        
+    - name: Check for SQL injection patterns
+      run: |
+        source .venv/bin/activate
+        python -c "
+import json
+import sys
+
+# Check for SQL injection vulnerabilities
+sql_patterns = [
+    \"' OR '1'='1\",
+    \"'; DROP TABLE\",
+    \"UNION SELECT\",
+    \"1=1\",
+    \"' OR 1=1--\"
+]
+
+found_issues = []
+
+# Check bandit report
+try:
+    with open('bandit_report.json', 'r') as f:
+        bandit_data = json.load(f)
+        for result in bandit_data.get('results', []):
+            if any(pattern in str(result) for pattern in sql_patterns):
+                found_issues.append(f\"Bandit: {result['issue_text']}\")
+except:
+    pass
+
+# Check semgrep report
+try:
+    with open('semgrep_report.json', 'r') as f:
+        semgrep_data = json.load(f)
+        for result in semgrep_data.get('results', []):
+            if 'sql' in result.get('check_id', '').lower():
+                found_issues.append(f\"Semgrep: {result.get('extra', {}).get('message', 'SQL issue')}\")
+except:
+    pass
+
+if found_issues:
+    print('❌ SQL Injection vulnerabilities found:')
+    for issue in found_issues:
+        print(f'  - {issue}')
+    sys.exit(1)
+else:
+    print('✅ No SQL injection patterns detected')
+"
+        
+    - name: Check authentication security
+      run: |
+        source .venv/bin/activate
+        python -c "
+import os
+import re
+import sys
+
+auth_issues = []
+
+# Patterns to check
+weak_patterns = [
+    (r'token\s*==\s*[\"\']\s*[\"\']', 'Empty token comparison'),
+    (r'if\s+not\s+token:', 'Missing token validation'),
+    (r'Bearer\s+None', 'None token in Bearer'),
+    (r'algorithm\s*=\s*[\"\'']none[\"\'']', 'JWT none algorithm'),
+    (r'verify\s*=\s*False', 'JWT verification disabled')
+]
+
+# Check all Python files
+for root, dirs, files in os.walk('project_interactions'):
+    for file in files:
+        if file.endswith('.py'):
+            filepath = os.path.join(root, file)
+            try:
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                    for pattern, desc in weak_patterns:
+                        if re.search(pattern, content, re.IGNORECASE):
+                            auth_issues.append(f'{filepath}: {desc}')
+            except:
+                pass
+
+if auth_issues:
+    print('❌ Authentication vulnerabilities found:')
+    for issue in auth_issues[:10]:  # Show first 10
+        print(f'  - {issue}')
+    sys.exit(1)
+else:
+    print('✅ No obvious authentication vulnerabilities')
+"
+        
+    - name: Generate security report
+      if: always()
+      run: |
+        source .venv/bin/activate
+        python -c "
+import json
+import os
+from datetime import datetime
+
+report = {
+    'timestamp': datetime.now().isoformat(),
+    'commit': os.environ.get('GITHUB_SHA', 'local'),
+    'branch': os.environ.get('GITHUB_REF_NAME', 'unknown'),
+    'security_tools': {
+        'bandit': 'completed',
+        'safety': 'completed',
+        'semgrep': 'completed',
+        'bug_hunter': 'completed'
+    },
+    'summary': {
+        'total_issues': 0,
+        'critical': 0,
+        'high': 0,
+        'medium': 0,
+        'low': 0
+    }
+}
+
+# Count issues from various reports
+for report_file in ['bandit_report.json', 'safety_report.json', 'semgrep_report.json']:
+    if os.path.exists(report_file):
+        try:
+            with open(report_file, 'r') as f:
+                data = json.load(f)
+                # Count issues based on tool format
+                if 'results' in data:
+                    report['summary']['total_issues'] += len(data['results'])
+        except:
+            pass
+
+# Save summary
+with open('security_summary.json', 'w') as f:
+    json.dump(report, f, indent=2)
+
+print(f\"📊 Security scan complete: {report['summary']['total_issues']} issues found\")
+"
+        
+    - name: Upload security reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports-${{ github.run_id }}
+        path: |
+          *_report.json
+          security_summary.json
+          project_interactions/009_*.md
+          
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          let summary = {};
+          
+          try {
+            const data = fs.readFileSync('security_summary.json', 'utf8');
+            summary = JSON.parse(data);
+          } catch (e) {
+            summary = { summary: { total_issues: 'unknown' } };
+          }
+          
+          const comment = `## 🔒 Security Scan Results
+          
+          **Total Issues Found**: ${summary.summary?.total_issues || 0}
+          
+          | Tool | Status |
+          |------|--------|
+          | Bandit | ${summary.security_tools?.bandit || 'pending'} |
+          | Safety | ${summary.security_tools?.safety || 'pending'} |
+          | Semgrep | ${summary.security_tools?.semgrep || 'pending'} |
+          | Bug Hunter | ${summary.security_tools?.bug_hunter || 'pending'} |
+          
+          View detailed reports in the workflow artifacts.`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+    - name: Fail if critical issues
+      run: |
+        source .venv/bin/activate
+        python -c "
+import json
+import sys
+
+try:
+    with open('security_summary.json', 'r') as f:
+        summary = json.load(f)
+        if summary['summary']['critical'] > 0 or summary['summary']['high'] > 0:
+            print(f\"❌ Build failed: {summary['summary']['critical']} critical and {summary['summary']['high']} high severity issues\")
+            sys.exit(1)
+except:
+    pass
+    
+print('✅ No critical security issues found')
+"

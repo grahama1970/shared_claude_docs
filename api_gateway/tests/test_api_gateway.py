@@ -1,0 +1,324 @@
+"""
+Module: test_api_gateway.py
+Purpose: Unit tests for API gateway core functionality
+
+External Dependencies:
+- pytest: https://docs.pytest.org/
+- pytest-asyncio: https://github.com/pytest-dev/pytest-asyncio
+
+Example Usage:
+>>> pytest test_api_gateway.py -v
+"""
+
+import asyncio
+# REMOVED: 
+import pytest
+import pytest_asyncio
+from aiohttp import web
+
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from api_gateway_interaction import (
+    APIGateway, Route, RateLimitConfig, RateLimitAlgorithm,
+    APIKeyManager, CircuitBreaker, CircuitBreakerState
+)
+
+
+@pytest.fixture
+async def gateway():
+    """Create test gateway instance"""
+    gw = APIGateway()
+    await gw.setup()
+    yield gw
+    await gw.cleanup()
+
+
+@pytest.fixture
+def mock_request():
+    """Create mock request"""
+    request = None  # TODO: Replace with real object
+    request.path = "/api/test"
+    request.method = "GET"
+    request.headers = {}
+    request.query_string = ""
+    request.remote = "127.0.0.1"
+    request.__getitem__ = None  # TODO: Replace with real object
+    request.__setitem__ = None  # TODO: Replace with real object
+    request.__contains__ = None  # TODO: Replace with real object
+    return request
+
+
+class TestRouteMatching:
+    """Test route matching functionality"""
+    
+    def test_exact_route_match(self, gateway):
+        """Test exact route matching"""
+        gateway.register_route("/api/users", "http://backend:8001")
+        route = gateway._match_route("/api/users")
+        assert route is not None
+        assert route.path == "/api/users"
+        assert route.backend_url == "http://backend:8001"
+    
+    def test_prefix_route_match(self, gateway):
+        """Test prefix route matching"""
+        gateway.register_route("/api", "http://backend:8001")
+        route = gateway._match_route("/api/users/123")
+        assert route is not None
+        assert route.path == "/api"
+    
+    def test_longest_prefix_wins(self, gateway):
+        """Test that longest matching prefix wins"""
+        gateway.register_route("/api", "http://backend1:8001")
+        gateway.register_route("/api/users", "http://backend2:8002")
+        
+        route = gateway._match_route("/api/users/123")
+        assert route.backend_url == "http://backend2:8002"
+    
+    def test_no_route_match(self, gateway):
+        """Test when no route matches"""
+        gateway.register_route("/api", "http://backend:8001")
+        route = gateway._match_route("/other/path")
+        assert route is None
+
+
+class TestAuthentication:
+    """Test authentication functionality"""
+    
+    @pytest.mark.asyncio
+    async def test_auth_required_no_key(self, gateway, mock_request):
+        """Test auth required but no key provided"""
+        route = Route(
+            path="/api/test",
+            backend_url="http://backend:8001",
+            require_auth=True
+        )
+        
+        response = await gateway._check_authentication(mock_request, route)
+        assert response is not None
+        assert response.status == 401
+    
+    @pytest.mark.asyncio
+    async def test_auth_with_valid_key(self, gateway, mock_request):
+        """Test auth with valid API key"""
+        mock_request.headers = {"X-API-Key": "test-key-123"}
+        route = Route(
+            path="/api/test",
+            backend_url="http://backend:8001",
+            require_auth=True
+        )
+        
+        response = await gateway._check_authentication(mock_request, route)
+        assert response is None  # No error response
+    
+    @pytest.mark.asyncio
+    async def test_auth_with_invalid_key(self, gateway, mock_request):
+        """Test auth with invalid API key"""
+        mock_request.headers = {"X-API-Key": "invalid-key"}
+        route = Route(
+            path="/api/test",
+            backend_url="http://backend:8001",
+            require_auth=True
+        )
+        
+        response = await gateway._check_authentication(mock_request, route)
+        assert response is not None
+        assert response.status == 401
+
+
+class TestAPIKeyManager:
+    """Test API key management"""
+    
+    def test_create_api_key(self):
+        """Test creating new API key"""
+        manager = APIKeyManager()
+        key = manager.create_api_key("Test App")
+        
+        assert key.startswith("key-")
+        assert manager.validate_api_key(key) is not None
+    
+    def test_validate_existing_key(self):
+        """Test validating existing key"""
+        manager = APIKeyManager()
+        key_data = manager.validate_api_key("test-key-123")
+        
+        assert key_data is not None
+        assert key_data["name"] == "Test Application"
+        assert key_data["active"] is True
+    
+    def test_validate_invalid_key(self):
+        """Test validating invalid key"""
+        manager = APIKeyManager()
+        key_data = manager.validate_api_key("invalid-key")
+        assert key_data is None
+    
+    def test_custom_rate_limit(self):
+        """Test API key with custom rate limit"""
+        manager = APIKeyManager()
+        custom_limit = RateLimitConfig(requests_per_minute=500)
+        key = manager.create_api_key("Premium App", custom_limit)
+        
+        key_data = manager.validate_api_key(key)
+        assert key_data["rate_limit"].requests_per_minute == 500
+
+
+class TestCircuitBreaker:
+    """Test circuit breaker functionality"""
+    
+    @pytest.mark.asyncio
+    async def test_circuit_breaker_closed_state(self):
+        """Test circuit breaker in closed state"""
+        cb = CircuitBreaker(failure_threshold=3)
+        
+        async def success_func():
+            return "success"
+        
+        result = await cb.call("test", success_func)
+        assert result == "success"
+        assert cb.states["test"].state == "closed"
+    
+    @pytest.mark.asyncio
+    async def test_circuit_breaker_opens_after_failures(self):
+        """Test circuit breaker opens after threshold failures"""
+        cb = CircuitBreaker(failure_threshold=3)
+        
+        async def failing_func():
+            raise Exception("Failed")
+        
+        # Fail 3 times
+        for i in range(3):
+            with pytest.raises(Exception):
+                await cb.call("test", failing_func)
+        
+        assert cb.states["test"].state == "open"
+        assert cb.states["test"].failures == 3
+    
+    @pytest.mark.asyncio
+    async def test_circuit_breaker_half_open_recovery(self):
+        """Test circuit breaker recovery through half-open state"""
+        cb = CircuitBreaker(failure_threshold=2, recovery_timeout=0.1)
+        
+        async def failing_func():
+            raise Exception("Failed")
+        
+        async def success_func():
+            return "success"
+        
+        # Open the circuit
+        for i in range(2):
+            with pytest.raises(Exception):
+                await cb.call("test", failing_func)
+        
+        assert cb.states["test"].state == "open"
+        
+        # Wait for recovery timeout
+        await asyncio.sleep(0.2)
+        
+        # Should be half-open now, test with success
+        for i in range(3):
+            result = await cb.call("test", success_func)
+            assert result == "success"
+        
+        # Should be closed after 3 successes
+        assert cb.states["test"].state == "closed"
+
+
+class TestMiddleware:
+    """Test middleware functionality"""
+    
+    @pytest.mark.asyncio
+    async def test_middleware_chain(self, gateway):
+        """Test middleware chain execution"""
+        calls = []
+        
+        async def middleware1(request, route):
+            calls.append("middleware1")
+            return None
+        
+        async def middleware2(request, route):
+            calls.append("middleware2")
+            return None
+        
+        gateway.add_middleware(middleware1)
+        gateway.add_middleware(middleware2)
+        
+        # Would need to mock the full request handling
+        # This tests the registration
+        assert len(gateway.middlewares) == 2
+    
+    @pytest.mark.asyncio
+    async def test_middleware_short_circuit(self, gateway):
+        """Test middleware can short-circuit request"""
+        async def blocking_middleware(request, route):
+            return web.json_response({"blocked": True}, status=403)
+        
+        gateway.add_middleware(blocking_middleware)
+        
+        # In real test, would verify this blocks the request
+        assert len(gateway.middlewares) == 1
+
+
+class TestMetrics:
+    """Test metrics collection"""
+    
+    def test_initial_metrics(self, gateway):
+        """Test initial metrics state"""
+        metrics = gateway.get_metrics()
+        
+        assert metrics["requests_total"] == 0
+        assert metrics["requests_success"] == 0
+        assert metrics["requests_failed"] == 0
+        assert metrics["cache_hits"] == 0
+        assert metrics["cache_misses"] == 0
+    
+    @pytest.mark.asyncio
+    async def test_metrics_increment(self, gateway):
+        """Test metrics increment during request handling"""
+        gateway.metrics["requests_total"] += 1
+        gateway.metrics["requests_success"] += 1
+        
+        metrics = gateway.get_metrics()
+        assert metrics["requests_total"] == 1
+        assert metrics["requests_success"] == 1
+
+
+class TestCaching:
+    """Test response caching"""
+    
+    def test_cache_initialization(self, gateway):
+        """Test cache is properly initialized"""
+        assert gateway.cache is not None
+        assert len(gateway.cache) == 0
+    
+    def test_cache_storage(self, gateway):
+        """Test storing items in cache"""
+        gateway.cache["test_key"] = {"data": "test"}
+        assert "test_key" in gateway.cache
+        assert gateway.cache["test_key"]["data"] == "test"
+
+
+if __name__ == "__main__":
+    # Run basic validation
+    print("Running API Gateway unit tests...")
+    
+    # Test route matching
+    gateway = APIGateway()
+    gateway.register_route("/api/v1", "http://backend:8001")
+    gateway.register_route("/api/v1/users", "http://users:8002")
+    
+    # Test exact match
+    route = gateway._match_route("/api/v1/users")
+    assert route.backend_url == "http://users:8002"
+    
+    # Test prefix match
+    route = gateway._match_route("/api/v1/posts")
+    assert route.backend_url == "http://backend:8001"
+    
+    # Test API key manager
+    manager = APIKeyManager()
+    key = manager.create_api_key("Test App")
+    assert manager.validate_api_key(key) is not None
+    assert manager.validate_api_key("invalid") is None
+    
+    print("✅ API Gateway unit tests passed")

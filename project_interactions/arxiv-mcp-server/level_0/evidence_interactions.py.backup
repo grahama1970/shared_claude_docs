@@ -1,0 +1,268 @@
+"""
+Level 0 Evidence Mining Interactions for ArXiv MCP Server
+
+Tests the evidence finding and mining capabilities.
+
+External Dependencies:
+- typing: Built-in type annotations
+
+Example Usage:
+>>> interaction = FindSupportingEvidenceInteraction()
+>>> result = interaction.run(hypothesis="Attention mechanisms improve NLP models")
+>>> print(f"Found {len(result.output_data['result'])} supporting papers")
+"""
+
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from interaction_framework import Level0Interaction
+
+
+class FindSupportingEvidenceInteraction(Level0Interaction):
+    """Test finding supporting evidence for a hypothesis"""
+    
+    def __init__(self):
+        super().__init__(
+            "Find Supporting Evidence",
+            "Mine ArXiv for papers supporting a hypothesis"
+        )
+        
+    def initialize_module(self):
+        # Mock the MCP server's find-support tool
+        return {
+            "tool": "find-support",
+            "description": "Finds papers supporting a hypothesis"
+        }
+        
+    def execute(self, **kwargs):
+        hypothesis = kwargs.get("hypothesis", 
+            "Transformer models outperform RNNs in machine translation")
+        limit = kwargs.get("limit", 5)
+        
+        # Mock evidence mining results
+        return [
+            {
+                "paper_id": "2017.00001",
+                "title": "Attention Is All You Need",
+                "evidence_type": "strong_support",
+                "relevant_quotes": [
+                    "Transformers achieve state-of-the-art BLEU scores",
+                    "Outperforms previous RNN-based models by 2.0 BLEU"
+                ],
+                "confidence": 0.95
+            },
+            {
+                "paper_id": "2018.00002",
+                "title": "BERT: Pre-training of Deep Bidirectional Transformers",
+                "evidence_type": "indirect_support",
+                "relevant_quotes": [
+                    "Transformer-based models show superior performance"
+                ],
+                "confidence": 0.85
+            },
+            {
+                "paper_id": "2019.00003",
+                "title": "Comparative Study of Seq2Seq Models",
+                "evidence_type": "empirical_support",
+                "relevant_quotes": [
+                    "Table 3 shows Transformer consistently beats LSTM"
+                ],
+                "confidence": 0.90
+            }
+        ][:limit]
+        
+    def validate_output(self, output):
+        if not isinstance(output, list) or len(output) == 0:
+            return False
+            
+        # Check evidence structure
+        required_fields = ["paper_id", "evidence_type", "confidence"]
+        for evidence in output:
+            if not all(field in evidence for field in required_fields):
+                return False
+            if evidence["confidence"] < 0 or evidence["confidence"] > 1:
+                return False
+                
+        return True
+
+
+class FindContradictingEvidenceInteraction(Level0Interaction):
+    """Test finding contradicting evidence for a claim"""
+    
+    def __init__(self):
+        super().__init__(
+            "Find Contradicting Evidence",
+            "Mine ArXiv for papers that contradict a claim"
+        )
+        
+    def initialize_module(self):
+        return {
+            "tool": "find-contradictions",
+            "description": "Finds papers contradicting a claim"
+        }
+        
+    def execute(self, **kwargs):
+        claim = kwargs.get("claim", 
+            "Larger models always perform better")
+        
+        # Mock contradicting evidence
+        return [
+            {
+                "paper_id": "2023.00001",
+                "title": "Small Models Can Outperform Large Ones",
+                "contradiction_type": "direct",
+                "evidence": "We show 1B parameter models beating 10B models",
+                "context": "When properly distilled and fine-tuned",
+                "strength": 0.8
+            },
+            {
+                "paper_id": "2023.00002",
+                "title": "The Efficiency-Performance Tradeoff",
+                "contradiction_type": "conditional",
+                "evidence": "Larger models show diminishing returns",
+                "context": "For many downstream tasks",
+                "strength": 0.7
+            }
+        ]
+        
+    def validate_output(self, output):
+        if not isinstance(output, list):
+            return False
+            
+        for contradiction in output:
+            if "contradiction_type" not in contradiction:
+                return False
+            if "strength" not in contradiction:
+                return False
+                
+        return True
+
+
+class HypothesisTestingInteraction(Level0Interaction):
+    """Test hypothesis testing across multiple papers"""
+    
+    def __init__(self):
+        super().__init__(
+            "Hypothesis Testing",
+            "Test a hypothesis against the literature"
+        )
+        
+    def initialize_module(self):
+        return {"tool": "hypothesis-test"}
+        
+    def execute(self, **kwargs):
+        hypothesis = kwargs.get("hypothesis", 
+            "Self-attention improves long-range dependencies")
+        
+        return {
+            "hypothesis": hypothesis,
+            "total_papers_analyzed": 127,
+            "supporting_papers": 89,
+            "contradicting_papers": 12,
+            "neutral_papers": 26,
+            "confidence_score": 0.78,
+            "summary": "Strong support with some domain-specific exceptions",
+            "key_insights": [
+                "Well-supported in NLP tasks",
+                "Mixed results in time-series prediction",
+                "Computational cost is a limiting factor"
+            ],
+            "recommended_reading": [
+                {"id": "2017.00001", "reason": "Foundational paper"},
+                {"id": "2023.00005", "reason": "Recent comprehensive review"}
+            ]
+        }
+        
+    def validate_output(self, output):
+        if not isinstance(output, dict):
+            return False
+            
+        required = ["hypothesis", "supporting_papers", "contradicting_papers", 
+                   "confidence_score"]
+        
+        if not all(field in output for field in required):
+            return False
+            
+        # Sanity checks
+        if output["confidence_score"] < 0 or output["confidence_score"] > 1:
+            return False
+            
+        total = (output.get("supporting_papers", 0) + 
+                output.get("contradicting_papers", 0) + 
+                output.get("neutral_papers", 0))
+                
+        return total > 0
+
+
+class CitationMiningInteraction(Level0Interaction):
+    """Test mining citations and building citation graphs"""
+    
+    def __init__(self):
+        super().__init__(
+            "Citation Mining",
+            "Extract and analyze citation networks"
+        )
+        
+    def initialize_module(self):
+        return {"tool": "citation-mining"}
+        
+    def execute(self, **kwargs):
+        paper_id = kwargs.get("paper_id", "2017.00001")
+        depth = kwargs.get("depth", 1)
+        
+        return {
+            "root_paper": paper_id,
+            "citations": {
+                "direct_citations": 1523,
+                "papers_citing": [
+                    {"id": "2018.00001", "title": "BERT", "citations": 5000},
+                    {"id": "2019.00001", "title": "GPT-2", "citations": 3000}
+                ],
+                "papers_cited_by": [
+                    {"id": "2014.00001", "title": "Seq2Seq", "citations": 2000},
+                    {"id": "2015.00001", "title": "Attention Mechanism", "citations": 1500}
+                ]
+            },
+            "influence_metrics": {
+                "h_index_contribution": 45,
+                "field_impact": "transformative",
+                "citation_velocity": "increasing"
+            },
+            "related_works_cluster": [
+                {"id": "2017.00002", "similarity": 0.92},
+                {"id": "2017.00003", "similarity": 0.87}
+            ]
+        }
+        
+    def validate_output(self, output):
+        if not isinstance(output, dict):
+            return False
+            
+        if "citations" not in output:
+            return False
+            
+        citations = output["citations"]
+        if not isinstance(citations.get("direct_citations", 0), int):
+            return False
+            
+        return True
+
+
+if __name__ == "__main__":
+    from interaction_framework import InteractionRunner
+    
+    runner = InteractionRunner("ArXiv Evidence Mining")
+    
+    interactions = [
+        FindSupportingEvidenceInteraction(),
+        FindContradictingEvidenceInteraction(),
+        HypothesisTestingInteraction(),
+        CitationMiningInteraction()
+    ]
+    
+    for interaction in interactions:
+        runner.run_interaction(interaction)
+        
+    report = runner.generate_report()
+    print(f"\nEvidence mining success rate: {report['summary']['success_rate']:.1f}%")

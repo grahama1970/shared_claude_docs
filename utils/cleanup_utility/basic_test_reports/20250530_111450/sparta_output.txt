@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/sparta/.venv/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}
+rootdir: /home/graham/workspace/experiments/sparta
+configfile: pyproject.toml
+plugins: metadata-3.1.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0
+asyncio: mode=auto, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 2 items
+
+tests/test_basic.py::test_module_imports PASSED                          [ 50%]
+tests/test_basic.py::test_basic_functionality PASSED                     [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.10/site-packages/_pytest/config/__init__.py:1441
+  /home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/_pytest/config/__init__.py:1441: PytestConfigWarning: Unknown config option: asyncio_fixture_loop_scope
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+tests/test_basic.py::test_module_imports
+  /home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 2 passed, 2 warnings in 0.09s =========================
+
+Cannot read termcap database;
+using dumb terminal settings.
+/home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Debug why security implementation isn't working.
+"""
+
+import sys
+from pathlib import Path
+
+# Add paths
+sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, "/home/graham/workspace/experiments/granger_hub/src")
+
+def debug_modules():
+    """Debug module security implementation."""
+    modules = ["arangodb", "marker", "sparta"]
+    
+    for module_name in modules:
+        print(f"\n🔍 Debugging {module_name}:")
+        try:
+            # Import module
+            module = __import__(module_name)
+            print(f"  ✅ Module imported successfully")
+            
+            # Check for security features
+            has_handle_request = hasattr(module, 'handle_request')
+            has_handle_request_secure = hasattr(module, 'handle_request_secure')
+            has_security_available = hasattr(module, 'SECURITY_AVAILABLE')
+            
+            print(f"  - has handle_request: {has_handle_request}")
+            print(f"  - has handle_request_secure: {has_handle_request_secure}")
+            print(f"  - SECURITY_AVAILABLE: {getattr(module, 'SECURITY_AVAILABLE', 'Not found')}")
+            
+            # Test the actual response
+            if has_handle_request:
+                result = module.handle_request({
+                    "auth": "invalid_token",
+                    "command": "test"
+                })
+                print(f"  - Response: {result}")
+                
+                # Check error message
+                error = result.get("error", "")
+                if "Invalid authentication" in error:
+                    print(f"  ✅ Security is working! Error: {error}")
+                else:
+                    print(f"  ❌ Security not working. Response: {result}")
+                    
+        except Exception as e:
+            print(f"  ❌ Error: {e}")
+
+def test_token_generation():
+    """Test if we can generate valid tokens."""
+    print("\n🔑 Testing Token Generation:")
+    try:
+        from granger_hub.security import token_validator
+        
+        # Generate tokens
+        tokens = {}
+        for module in ["arangodb", "marker", "sparta"]:
+            token = token_validator.generate_token(module)
+            tokens[module] = token
+            print(f"  - Generated token for {module}: {token[:40]}...")
+            
+        # Test validation
+        print("\n🔐 Testing Token Validation:")
+        for module, token in tokens.items():
+            valid = token_validator.validate_token(token)
+            print(f"  - {module} token valid: {valid}")
+            
+        return tokens
+    except Exception as e:
+        print(f"  ❌ Error: {e}")
+        return {}
+
+def test_with_valid_tokens(tokens):
+    """Test modules with valid tokens."""
+    print("\n✅ Testing with Valid Tokens:")
+    
+    for module_name, token in tokens.items():
+        try:
+            module = __import__(module_name)
+            result = module.handle_request({
+                "auth": token,
+                "command": "test"
+            })
+            print(f"  - {module_name}: {result}")
+        except Exception as e:
+            print(f"  - {module_name} error: {e}")
+
+def main():
+    """Debug security implementation."""
+    print("🐛 Security Implementation Debugger")
+    print("=" * 50)
+    
+    # Debug modules
+    debug_modules()
+    
+    # Test token generation
+    tokens = test_token_generation()
+    
+    # Test with valid tokens
+    if tokens:
+        test_with_valid_tokens(tokens)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/claude-module-communicator/.venv/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'html': '4.1.1', 'cov': '6.1.1', 'mock': '3.14.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}
+rootdir: /home/graham/workspace/experiments/claude-module-communicator
+configfile: pyproject.toml
+plugins: metadata-3.1.1, html-4.1.1, cov-6.1.1, mock-3.14.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0
+asyncio: mode=auto, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 2 items
+
+tests/test_basic.py::test_module_imports PASSED                          [ 50%]
+tests/test_basic.py::test_basic_functionality PASSED                     [100%]
+
+============================== 2 passed in 0.09s ===============================
+
+Cannot read termcap database;
+using dumb terminal settings.

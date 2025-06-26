@@ -1,0 +1,7 @@
+[
+  {
+    "bug": "Poor error for reserved fields",
+    "error": "Database connection failed",
+    "severity": "LOW"
+  }
+]

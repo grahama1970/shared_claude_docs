@@ -1,0 +1,34 @@
+{
+  "project": "/home/graham/workspace/experiments/youtube_transcripts",
+  "name": "youtube_transcripts",
+  "type": "tool",
+  "timestamp": "20250529-115057",
+  "issues": [
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities, initialize"
+  ],
+  "warnings": [
+    "README.md missing sections: requirements",
+    "No slash commands documented for Claude project",
+    "High technical debt: 9727 TODO/FIXME comments",
+    "Expected imports not found: youtube_dl"
+  ],
+  "suggestions": [],
+  "validations": {
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    }
+  },
+  "status": "issues"
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "bug": "None values in paper data",
+    "fields": [
+      "journal_ref",
+      "doi"
+    ],
+    "impact": "JSON serialization fails",
+    "paper_id": "http://arxiv.org/abs/2309.08593v1",
+    "fix": "Replace None with empty string or omit field"
+  },
+  {
+    "bug": "None values in paper data",
+    "fields": [
+      "comment",
+      "journal_ref",
+      "doi"
+    ],
+    "impact": "JSON serialization fails",
+    "paper_id": "http://arxiv.org/abs/2207.13955v1",
+    "fix": "Replace None with empty string or omit field"
+  },
+  {
+    "bug": "None values in paper data",
+    "fields": [
+      "comment",
+      "journal_ref",
+      "doi"
+    ],
+    "impact": "JSON serialization fails",
+    "paper_id": "http://arxiv.org/abs/2103.15679v1",
+    "fix": "Replace None with empty string or omit field"
+  },
+  {
+    "bug": "Slow query processing",
+    "query_type": "Very long query",
+    "duration": "11.76s",
+    "impact": "Performance degradation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  },
+  {
+    "bug": "Invalid evidence type accepted",
+    "impact": "No input validation"
+  }
+]

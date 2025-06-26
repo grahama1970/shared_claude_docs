@@ -1,0 +1,82 @@
+{
+  "project_name": "claude-test-reporter",
+  "project_path": "/home/graham/workspace/experiments/claude-test-reporter",
+  "project_type": "Quality Assurance",
+  "status": "warnings",
+  "mode": "VerificationMode.FULL",
+  "duration": 0.20625090599060059,
+  "cleanup_result": "passed",
+  "compliance_result": "failed",
+  "test_result": "passed",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 0,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/claude-test-reporter/src/claude_test_reporter/analyzers/comprehensive_analyzer.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/claude-test-reporter/src/claude_test_reporter/core/test_result_verifier.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/claude-test-reporter/src/claude_test_reporter/core/test_result_verifier_clean.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_doc_header",
+      "description": "Missing documentation header",
+      "severity": "medium",
+      "evidence": [
+        "File has no docstring header"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/claude-test-reporter/src/claude_test_reporter/core/generators/enhanced_multi_project_dashboard.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    }
+  ],
+  "auto_fixes_applied": 0,
+  "fix_directive_generated": true
+}

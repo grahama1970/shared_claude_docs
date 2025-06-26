@@ -1,0 +1,1661 @@
+Hello community. So great that you are
+
+back. Yes. Today we going to have a
+
+look. You are building your multi- aent
+
+AI system. No. And you have an agent A.
+
+It's beautiful. You have an agent to
+
+agent protocol. You have other agents.
+
+Those agents have an MCP protocol. You
+
+can connect to all the different tools.
+
+You have all the external data coming
+
+in. But you know it's not really working
+
+because there is a bottleneck in your
+
+system. So let's talk about it. how you
+
+can optimize UI. And you know what are
+
+we going to talk about? We're going to
+
+talk about the world model because it
+
+turns out some of our LLMs in our
+
+agents, they do have a world model and
+
+some don't and some do have a real
+
+powerful world model and some are rather
+
+limited given their specific parameter
+
+and their learning. So what to watch out
+
+for? Let's start here.
+
+So a world model I mean yeah of course a
+
+world model everybody knows what a world
+
+model is no but we need to have a deep
+
+dive into the context here within our
+
+artificial intelligence configuration so
+
+yeah let's start maybe we should give a
+
+meaning to it and here it's a very
+
+simple one in robotics a world model is
+
+more or less an agent's internal
+
+representation of how the world
+
+works so this may include now a partial
+
+knowledge of physics, how objects
+
+interact, what is gravity, what are
+
+object properties, what are these
+
+things, no what are they made of? What
+
+are their expected behavior? If we think
+
+AI predictive behavior, what are their
+
+spatial relationship? Where things are
+
+relative to each other? What are then
+
+their causal relationship? If I do X,
+
+then Y will likely happen. What is
+
+specific domain knowledge that I have to
+
+integrate? This means knowledge about
+
+specific areas, topics and really
+
+important in multi-AI agent system the
+
+agent intention the behaviors how other
+
+agent might act in my environment and
+
+this can be other AI system people
+
+animals what is the expected behavior of
+
+objects this is what we say this is a
+
+world model but this is not precise
+
+enough no because think about it in
+
+essence a world model in an LLM in an
+
+agent at the core of an agent is a
+
+complex web of statistical relationship
+
+and patterns this system has learned
+
+from text and let's start with an LLM
+
+before we move on to visual language
+
+models and learn from text which allows
+
+it to simulate an understanding it
+
+simulates an understanding of all the
+
+concept of all the entities and what we
+
+human would call a common
+
+sense but all of this only describes
+
+described in that text in the
+
+pre-training data
+
+set and yeah for the first step we limit
+
+ourselves to a large language model and
+
+therefore we only have text semantics
+
+linguistics now this is something I told
+
+you this is a world model but you know
+
+this is just my human
+
+representation for to communicate to
+
+other humans but you know this is not a
+
+world model because this has a visual
+
+interpretation where I want to show you
+
+hey some world models have huge holes
+
+holes of knowledge where there's no
+
+pattern connecting topics or relations
+
+or domains maybe this is here the
+
+complete financial domain that is
+
+excluded here from the learning
+
+hyperface of this particular LLM or
+
+maybe here we are missing out I don't
+
+know on physics or mathematics or causal
+
+reasoning
+
+Maybe this blue here is just beautiful
+
+code experience but we are missing out
+
+on three other subtopics. So this
+
+learning hyper plane or if you want this
+
+world model visualization I have chosen
+
+for the particular reason that you see
+
+this is not a continuous coherent hyper
+
+plane in a multi-dimensional space. It
+
+has holes. It has disconnected areas and
+
+it has a different um structure in this
+
+multiple dimensional spaces. It can be a
+
+simple or complex one. So it is not easy
+
+what is a world model. Let me give you
+
+this. You say hey yeah that's simply a
+
+map of the earth. Yeah. What the textual
+
+description and we are here in a world
+
+model in text. We here in statistical
+
+relationship in patterns. But the
+
+simplest model might take ah what I see
+
+is a vast blue expanses dotted with
+
+varied land masses. So you see the
+
+textual context the linguistic
+
+difficulty a simple LLM might associate
+
+with this particular image if it's a
+
+vision language model is different to
+
+the next one where we already start to
+
+give names no interconnected blue oceans
+
+the Pacific the Atlantic the Indian the
+
+Arctic and the southern
+
+um ocean covering most of the surplus
+
+punctuated by distinct
+
+continents if you want here Lawrence
+
+here the name of the s first before it
+
+learns here the name of the
+
+continents. World models are really
+
+specific to LLMs. So an LLM world model
+
+is an implicit internal learned
+
+understanding of the relationship
+
+concepts entities and common sense
+
+knowledge embedded within that
+
+particular training data the LLM was
+
+trained
+
+on. And now comes the beauty. This is an
+
+emergent property that arises from the
+
+model's training objective. Predict the
+
+next word or the next token or the next
+
+sequence of token in a sequence in a
+
+linguistic sequence. And to do this well
+
+across trillions of world within our
+
+neural network, the model must now learn
+
+underlying patterns and maybe underlying
+
+symmetries. You know, vector spaces. We
+
+built close by semantic meaning patterns
+
+about how things relate in the real
+
+world and now we have to break it down
+
+into a two-dimensional text hyper plane.
+
+So we lose a lot of the complexity of
+
+understanding what is a world and
+
+therefore we call it a world
+
+model. So which LLM has now the best
+
+world model? Does every LLM has a world
+
+model? How are world models different?
+
+Well, here I show you three of my world
+
+models. And of course, you always have
+
+agent to agent communication protocols
+
+and you have always here the if you want
+
+agent MCP model context protocol to the
+
+tools. Great. But just at coming back to
+
+the question at the beginning of this
+
+video, what if I connect multiple
+
+agents?
+
+Is the complexity or the world model 1 2
+
+3 of those LLMs important for the
+
+complete multi- aent system? Is it that
+
+the weakest world model in an LLM is the
+
+weakest
+
+chain link if you want in a huge multi-
+
+aent chain does this determine the
+
+complete performance of the system and
+
+if so how and when and what about we
+
+have an MCP to specific tools here or we
+
+have here an MCP connections from this
+
+very simple world model what are the
+
+differences in the performance that we
+
+can expect and does it make sense that
+
+you pay for an LLM really expensive and
+
+then you connect it here
+
+for model context protocol data
+
+extraction from tools with those agent
+
+what you should be aware of so let's
+
+start and yes we have a brand new study
+
+and this is here from Google deep mind
+
+and here to answer the first question
+
+does every LLM have here a world model
+
+and the answer is well, it depends. And
+
+luckily, here you see the first three
+
+pages of an 11page mathematical proof
+
+that given particular boundary
+
+conditions and particular error
+
+fluctuations and particular start
+
+conditions, yeah, a complex LLM can have
+
+a world
+
+model. Anyway, this is exactly what I
+
+was looking for. Well, of course. So
+
+let's have a look at this in my last
+
+video and my last video I published only
+
+to be able now to tell you hey look what
+
+we achieved in the last video here was
+
+the following the LLM generated
+
+something out for us no and it generated
+
+here for the cases of an orbital data
+
+center different components solar energy
+
+collection system battery energy storage
+
+unit a thermal loop phase changing
+
+thermal reservoir and so on. So what it
+
+did it created here a causal chain in
+
+its own temporal logic of how it
+
+imagines the world. So if you want our
+
+03 model from open AI when I had this
+
+cascading
+
+complexity it created world models and I
+
+task now the system to create for each
+
+and every level a different world model
+
+very simple world model then we add
+
+complexity we add complexity and the
+
+complete causal interreation of our
+
+world models went up and up and up. So
+
+our world models became more and more
+
+complex and I told you if you make this
+
+an auto run you see exactly when 03 is
+
+not able anymore to hold this complexity
+
+into its own system and yeah I have here
+
+a particular prompt where I see exactly
+
+when 03 tells me hey sorry I give up
+
+this is too much I can't solve this
+
+anymore the complexity I created is now
+
+so high that I cannot build a world
+
+model anymore I terminate
+
+Now as an
+
+EI this is exactly the breaking point
+
+I'm examining now if I test LLMs. So the
+
+world model is something absolutely
+
+fascinating because it gives us here if
+
+you want a higher simplified
+
+representation of what an EI like let's
+
+say here our 03 is capable
+
+of with a more complex world model we
+
+can bring the LLM to its absolute limit.
+
+And this is what I'm interested in. And
+
+you might say but wait how does the LLM
+
+or the general agent here in our case
+
+understand here the causal behavior of
+
+those elements because those elements is
+
+what it learned know from its
+
+pre-training data and yes there's a
+
+solar energy collection system and yes
+
+there's a battery energy storage unit
+
+but hey what if I bring this to the low
+
+earth orbit I have complete different
+
+pressure complete different temperatures
+
+if I have here eclipse non-e eclipse
+
+situation it will have much more stress
+
+factors. What about uh vibration here in
+
+the systems? No. How will this now
+
+behave differently if I build a
+
+different world
+
+model? Welcome. Because this is exactly
+
+what Google deep mind examined and
+
+Google deep mind started here with June
+
+2nd 2025 publication on general agent
+
+need world models to function and they
+
+were the first providing here new
+
+algorithm for eliciting world models
+
+from agents. This is especially
+
+interesting for agent we have no access
+
+to nonopensource proprietary like 03 by
+
+openi and they tell us here any agent
+
+capable of generalizing here at least
+
+the multi-step goal directed tasks must
+
+have learned somehow a predictive model
+
+of its environment and now this is
+
+important and it's not just a model it's
+
+not a passive it is a predictive model
+
+so we can have a look into the future So
+
+we can apply an auto reggressive model
+
+and it is a prediction about the
+
+environment. So the eye does not only
+
+reflect on its own action on all
+
+possibilities but it also understands
+
+that the environment can have a dynamic
+
+evolutionary scenario and it is now the
+
+task to predict this
+
+model. So if you ask me how does the LLM
+
+understand this? You ask more than just
+
+hey how does it know that there's a
+
+solar energy collection system or a
+
+battery energy storage here in the
+
+orbital data center. You ask how is this
+
+interconnected on a real physical level.
+
+Now talking about a real physical level
+
+two days ago we have here a new
+
+publication by MIT UC Berkeley Caltech
+
+UCLA and they talk about exactly this
+
+principle-based physics reasoning
+
+benchmark for LLMs and in this study
+
+they have some beautiful insight and
+
+they say current LLMs often fail and I
+
+will show you seven LLMs in detail to
+
+emulate here the concise principlebased
+
+reasoning characteristic of human
+
+experts instead generating lengthy and
+
+opac solutions that might be absolutely
+
+incorrect. So if you sort that an LLM
+
+today here in June 2025 is really able
+
+to describe here an external environment
+
+to itself. I have to tell you well we
+
+have still to deal with some challenges.
+
+Let's have a look.
+
+their studies show and please have a
+
+look it's a beautiful study it reveals
+
+here a consistent failure to align with
+
+expert like reasoning paths now there is
+
+something special to this study and if
+
+you read it you understand immediately
+
+it is not just about physics and
+
+theoretical physics or theoretical
+
+chemistry about the reasoning process
+
+but they focus here on a very specific
+
+subset of an intelligent subset they
+
+call a principle-based physics reasoning
+
+and they develop a data set and whatever
+
+but they design this particular problems
+
+to be solved easily I mean easily now if
+
+you're a theoretical physicist or you
+
+have a PhD in mathematics using physics
+
+principle reasoning so more or less you
+
+have two options how to solve this no
+
+you can go to a computer and you have
+
+your numerical simulation programs for
+
+high energy particle collisions or
+
+whatever or you just can use your brain
+
+your your understanding of the physical
+
+law of the finement and diagrams and you
+
+say hey wait a minute here I know that
+
+there is an inherent symmetry to system
+
+and whenever I have a symmetry I have if
+
+you want some other mathematical
+
+um elements in the theory and you know
+
+exactly what I mean if you're a radical
+
+physicist so let's have a look at this
+
+how they built this you see half of is
+
+just about the symmetry the internal
+
+symmetry of theoretical ical physics and
+
+you know exactly what I mean god and so
+
+on. Then we have dimensional analysis.
+
+You can solve so many problems just by
+
+looking here at the dimensions unitary
+
+transformation. You have some symmetry
+
+here on a molecular level or an atomic
+
+level. You can look at the topology. You
+
+can have even simple equation of motion.
+
+And you remember we did a deduction just
+
+from some principles first order
+
+principles. So I just give you the
+
+result. So here you have the accuracy of
+
+LLMs given here three different degrees
+
+of
+
+difficulty. We do apply a zero shot
+
+test. This means no further information.
+
+We just say hey this is the problem.
+
+Give us your solution. Difficult you
+
+have uh color encoded E for easy, medium
+
+in orange and difficult here you see
+
+green.
+
+Interestingly, they have now Gemini 2.5
+
+Pro and you see this is here the best of
+
+their models. Then Google, then they go
+
+with openi4 mini high. Then they go here
+
+with claw 3.7 sinking the max sinking
+
+model here from entropic and with the
+
+unfortunately with the old R1 deepse
+
+that is almost half a yield and then
+
+they go with the claw 3.7 non-syncing
+
+the GPD 4.1 and the version three of
+
+deepse and you see there's quite a
+
+difference and you remember here in the
+
+video that I showed you the crazy LLM
+
+test and we looked to the ARC AGI
+
+leaderboard and I told you look this
+
+there are two very close by um
+
+performance data we have here claw 3.7
+
+with 16k syncing and we had the arc AGI
+
+one score of 28% and this was even
+
+better than the arc AGI1 score of us and
+
+thinking of 1k that's even less
+
+expensive so this was quite an
+
+intelligent choice here I think
+
+And also you see even in this ARC AJI1
+
+that the old Deep Seek R1 was not as
+
+performant as here the cloud 3.7 syncing
+
+16K. So this is absolutely here what I
+
+would expect looking at the other
+
+benchmark. This sounds good. Yeah, you
+
+could have maybe have the 03 model, but
+
+04 mini high is absolutely a beautiful
+
+contender from openi and the claw 3.7
+
+here the maximum syncing model is a good
+
+choice. Yeah, the other and whatever. So
+
+you see this is I would say at first
+
+glance I would say yes I understand
+
+this. This is also what I found also in
+
+the literature here from other
+
+performance benchmark test and other
+
+artists tell us hey we introduce now a
+
+physic sense a new novel human created
+
+imagine in June 2025 somebody is really
+
+creating something by
+
+human wow it's amazing no synthetic data
+
+set created here on principle-based
+
+physics reasoning benchmark on
+
+evaluation science scientific problem
+
+solving and they have here 380 carefully
+
+designed problems from all different
+
+ways symmetry reasoning dimensional
+
+analysis reormalization group analysis
+
+topology and quantum dynamics plus they
+
+have three prompt strategies like I
+
+showed you the serial shot then you give
+
+it a hint you say hey you know there
+
+might be look at this parameter because
+
+if you and no computation and no
+
+computation will become important and I
+
+want to give you feeling for this
+
+problem. So here the simplest problem
+
+you have here you have a uniformly
+
+charged plane in space. The plane is a
+
+square. The four corners are XY Z and
+
+which of the following locations in
+
+space have the X direction electric
+
+field strength equal to the Y direction
+
+electric field strength in both sign and
+
+magnitude.
+
+Now if you know total physics you say
+
+hey that's an easy thing because you
+
+know that this electric field has an
+
+internal symmetry especially if your
+
+plane is a square and everything is so
+
+easy to solve but you know yeah look at
+
+the answer from Gemini 2.5 pro with zero
+
+shot so you give no information at all
+
+you just say this is the problem solve
+
+it you don't have in context learning
+
+nothing at all and Gemini 2.5 pro will
+
+start electro field component and
+
+uniform chain square plane but the
+
+corners are given here by
+
+uh integration and then we just
+
+calculate this and looking for the
+
+points and yeah but yes yes and it gives
+
+you an answer A and B. Now you know that
+
+this is the wrong answer but you see it
+
+is not seeing the inherent symmetry of
+
+principlebased theoretical physics
+
+questions.
+
+It is trying to calculate this and it
+
+fails because it's a vision language or
+
+a large language
+
+model. If you ask a human, the human
+
+would tell you here it is the answer A,
+
+E, I, J, N, R, and V and whatever, you
+
+know, simply a symmetry based answer.
+
+And now the authors here MIT Burglar
+
+Cultia say hey overall especially now
+
+the non-reasoning model so the
+
+non-syncing models where you know that
+
+this is an active syncing model they
+
+even demonstrate a more shallow
+
+understanding of physical principles and
+
+often if they apply them they apply them
+
+inconsistently showing your tendency to
+
+latch on to terminology without a true
+
+comprehension. So this is if you want if
+
+you are into this particular domain
+
+knowledge maybe not the best way is to
+
+go with nonreasoning
+
+models another example let's have here
+
+an example on quantum dynamics a very
+
+easy one you have here a quantum spin
+
+chain prepared here on the Hamiltonian
+
+that is given you have a time evolution
+
+which is is the following uh elements
+
+here is true in the final state and if
+
+you look at this you immediately as a
+
+human you see the symmetry you have
+
+multiple symmetry layers but if you now
+
+look at an EI an EI might not have this
+
+inside and here we come now to the
+
+non-computation prompting the order tell
+
+us hey we observe that some LLMs
+
+particular the reasoning models or the
+
+strong reasoning models they may default
+
+to complex computational approaches you
+
+know MCP A2A whatever goes on yes
+
+beautiful C++ obscuring ing here the
+
+application of fundamental principle and
+
+leading to overly convoluted solution.
+
+In this setting models, we're explicitly
+
+instructed to avoid here the complex
+
+computation non-computing prompt we're
+
+given and instead focus here on a
+
+principlebased reasoning structure. You
+
+don't have to compute here the quantum
+
+spin because you easily see from the
+
+text that they are inherent symmetries
+
+in the
+
+system. if the AI is able to to find
+
+them and to notice them. And so they
+
+says this strategy aims to assess if the
+
+LLMs can prioritize simpler principled
+
+driven solution when they are not
+
+allowed to do numerical
+
+computation and I want to just give you
+
+here all the the beautiful different
+
+answers. So the 04 mini high with a hint
+
+prompt where I tell them hey buddy there
+
+were some symmetry in the system so
+
+please activate your symmetry
+
+analysis comes back and gives you this
+
+and says here a&z and for mini high with
+
+the non-computee prompt where you just
+
+say hey please do not try to compute
+
+anything just think logic about this
+
+from first
+
+principle as then this explanation and
+
+then we have GPD 4.1 with the int
+
+prompt. Yeah. Oh, it's really beautiful.
+
+Yeah. What what the EI tries to argue
+
+and here you see a reflection looking at
+
+the reasoning process if it is a real
+
+reflection of the reasoning process just
+
+how strange the system understands
+
+physics and maybe the eye system does
+
+not understand physics at all. Maybe
+
+it's just pinpointing some vector
+
+somewhere in the space and think that
+
+there might be a correlation because
+
+there was in the pre-training text a
+
+semantic correlation that is not at all
+
+a causal relation in the real world.
+
+So this is a beautiful test where you
+
+see now the internal reasoning
+
+process that just goes crazy and this
+
+maybe it finds one or maybe even two
+
+symmetries here as you see but it's
+
+missing out on the general structure and
+
+it's missing out on the general
+
+solution.
+
+So absolutely fascinating to see. But on
+
+the other hand, I have to tell you, if
+
+you would have told me two or three
+
+years ago, hey, imagine I would give
+
+this particular problem to an AI. Do you
+
+think it would be able to solve it, I
+
+don't know, to one/ird or half uh of the
+
+answers. I would have said never ever
+
+would any system be able to do this. Now
+
+we see that those models try. Sometimes
+
+they are lucky, sometimes they fail
+
+completely, but we are not there
+
+yet. And the others tell us, hey, we
+
+focus here on the predictive world
+
+models which can be used by agents to
+
+plan. And you know the planning exercise
+
+by any agent is the most important step.
+
+Here's where you put in on the strategy
+
+how you want to approach this, how you
+
+want to tackle this problem. And after
+
+the planning definition of the world
+
+model used in reinforcement learning and
+
+especially in reinforcement learning
+
+with all the methods I showed you in one
+
+of my last videos, this seems to be
+
+really the right way forward to
+
+understand the interaction with the
+
+environment
+
+states. And for a modelbased
+
+reinforcement learning agent, explicit
+
+world models are usually one-step
+
+predictors of the environment state,
+
+which in a mockup environment are
+
+sufficient to predict the evolution of
+
+the environment. and the dynamic of the
+
+environment under arbitrary policies and
+
+this is here one of the ports that here
+
+the authors here from MIT UCLA and
+
+Berkeley they really given us here they
+
+say it's a proof I would say it's a
+
+strong
+
+indicator that those models have to have
+
+an internal world
+
+model and here given the official
+
+wording and they tell us our main result
+
+is a proof by reduction we assume whom
+
+the agent is a bound goal condition
+
+agent. It has some lower bound
+
+competency at goal directed task of some
+
+finite depth n and we prove that an
+
+approximation of the environment
+
+transition function which is in the
+
+probabilistic view that we have on EI.
+
+nothing else than the internal world
+
+model of our AI of our vision language
+
+model of our large language model of our
+
+agent is determined by the agent policy
+
+alone with a bounded error.
+
+So this is now
+
+interesting because the environment
+
+transition function how the dynamic of
+
+the environment will develop step by
+
+step if we have a discrete environment
+
+uh developmental functor. This is our
+
+world model.
+
+Yeah. So absolutely fascinating that we
+
+are just at the basic levels at
+
+understanding here the reasoning and the
+
+decision making here of our AI system if
+
+they have to take into account an
+
+external
+
+environment. Now coming back now here to
+
+the examples you as my viewers had here
+
+with my last videos. You can ask hey
+
+what is the world model of appropriatory
+
+03 model by openi?
+
+Now we don't know because we have no
+
+insight if you want. No, we're just
+
+given here if you want the result only.
+
+But you could now theoretically I mean
+
+probe and let's say we have somewhere
+
+here the information that I don't know
+
+at a
+
+particular at a temperature the system
+
+will switch. So what we can do we can
+
+now manually appropriate a complete
+
+temperature range and see when it
+
+happens. So let's say at 40° the 03 now
+
+tells me that it switched now to let's
+
+say auxiliary
+
+power. So I have now achieved just by
+
+probing here the action which is the
+
+policy which is relevant and determines
+
+with an error bound the internal EI
+
+world model. I have no insight into the
+
+O3 world model. But of course think
+
+about the complexity of the world u
+
+subsection we even have to test here for
+
+an orbital data center this would be an
+
+extreme expensive undertaking but you
+
+see now we understand which is common
+
+sense I think if it just go through all
+
+the possible degrees of temperature all
+
+the possible degrees what can happen all
+
+the possible interaction patterns all
+
+the possible catastrophic failure
+
+patterns you If you go through them step
+
+by step, you will see the reaction by
+
+the eye system and therefore you are
+
+able to logically deduct the world model
+
+of those three. Also it might take you
+
+to quite some time and at the end of the
+
+video you know I will show you the
+
+official conclusion the screenshot here
+
+of the orders and they say we have shown
+
+that any agent capable of generalizing
+
+to a sufficient wide range of simple
+
+goal directed task must have learned an
+
+accurate model of its environment
+
+otherwise it would not be able to
+
+predict it. So essentially all the
+
+information required to ac accurately
+
+simulate the environment is contained in
+
+the agent
+
+policy and this implies that learning a
+
+world model is not only beneficial but
+
+necessary for general
+
+agents. So if this is true and I'm not
+
+absolutely sure between you and me that
+
+this is really a proof. I think this is
+
+a strong indicator but okay let's say
+
+this is
+
+it. This means if you have a very
+
+powerful huge model an LLM agent then
+
+this agent LLM has in Toronto found a
+
+representation of a world model and this
+
+representation now kind of dictates here
+
+the probability distribution for
+
+particular action in particular states
+
+of the environment and of the AI system
+
+itself.
+
+I was asked to give here a very short
+
+summary at the end. Okay, if you want
+
+this is it. A world model now in this
+
+new view is nothing else than a
+
+probabilistic approximation of the
+
+environment's dynamics seen through the
+
+lens of the internal representation of
+
+an
+
+agent. This has a beautiful idea. I
+
+would call it a consequence. It's just a
+
+sword. No, if you have this huge
+
+foundation models, no this I don't know
+
+03 or go with O1 the new one and they
+
+auto styles here this work supports now
+
+the hypothesis that implicit world
+
+models
+
+emerge during the pre-training during
+
+all the training phases here of the AI
+
+therefore enabling here the
+
+generalization of the AI system to
+
+unseen
+
+objective that means we have if you want
+
+this kind of emergence of intelligence
+
+quotation mark especially in the
+
+reasoning and the planning phase that we
+
+have that are so important that define
+
+here the action of our
+
+agent. Now I would say from a physical
+
+point of view this would make sense
+
+because if you have a
+
+dislocated patch of little islands of
+
+reasoning and little actions sequence
+
+planning segments somewhere floating in
+
+space but you do not have a coherent
+
+closed reasoning system a world
+
+model then you cannot generalize to
+
+unseen mean functions. But if you have
+
+an implicit world model and it might be
+
+an even tiny little stupid incorrect but
+
+you have a view of the world as an
+
+AI then this would enable you to have
+
+here kind of
+
+emergence of some new level of
+
+intelligence to unseen objectives
+
+because you understand the logical
+
+interconnect between all the different
+
+elements of your world model. And if now
+
+a new interaction pattern is detected,
+
+you would be theoretically logical able
+
+to deduct here the causal interference
+
+patterns.
+
+So if you see the learning process of an
+
+EI or an agent from this particular
+
+perspective that it has to develop its
+
+own world model an implicit world model
+
+this would explain for me a
+
+simple-minded person why you could say
+
+okay if I have then unseen
+
+objects this is not the emergence of
+
+intelligence and suddenly this the hyper
+
+intelligence emerges no it just has a
+
+coher
+
+world model and it makes sense that now
+
+given all the other objects a
+
+place. Now if we add a new connection a
+
+new edge into this let's say a graph
+
+structure it makes sense that it
+
+integrates in a coherent way and
+
+therefore we have some quotation mark
+
+new
+
+intelligence. But of course and you know
+
+this the complexity level of these world
+
+models all defined by the capabilities
+
+of the
+
+LLM. So just because you have a world
+
+model as an 8b 8 billion free trainable
+
+parameter model does not mean you have
+
+the correct world model. It just means
+
+that you have some crazy
+
+polarized non-coherent whatever world
+
+model kind of
+
+no and it needs the complexity of the
+
+internal structure here of the
+
+architecture that we can really then say
+
+okay these world models become more and
+
+more coherent in their planning in the
+
+reasoning process. So we can increase
+
+the complexity now of our task given we
+
+have a higher complexity of the world
+
+models but this also means and now
+
+coming back to me here in my what I
+
+called it I don't know hyper manly
+
+intellectual pose here that when I
+
+operate now with 03 from open eye I have
+
+no idea at all about the internal world
+
+model of 03 I don't know since it's a
+
+proper term model how 03 was pre-trained
+
+on what complex it is in the real world.
+
+I just interact blindly with it and I'm
+
+just hoping for a correct solution for a
+
+machine that has never seen the real
+
+world. I think this is currently for me
+
+personally the state of AI. This is our
+
+theoretical understanding of if you call
+
+it intelligence of an artificial
+
+intelligence system. It is here the
+
+coherence building of an internal world
+
+representation.
+
+I like this idea. So therefore, here you
+
+have me stepping into a brand new world
+
+where the world outside is an internal
+
+representation by an AI optimized given
+
+its pre-training data and its training
+
+procedures. But it might be absolutely
+
+different to my world, to my
+
+understanding, to my experience, to my
+
+beliefs, to my values.
+
+because the coherence in my world model
+
+might be completely different to the EI
+
+coherence. And you might say, but wait a
+
+minute, wait a minute. This was just
+
+about logic. This was just about causal
+
+reasoning. This was just about planning.
+
+This was just about mathematics. This
+
+was just about logic. This was just
+
+about physics. But we have something
+
+that is so much better.
+
+Yeah, we have vibe coding. And yes, of
+
+course, you are right. We have VIP
+
+coding. Yes. And I have here a video on
+
+VIP coding done professional to create
+
+your own apps in 15 minutes. Yes, of
+
+course. But let me ask you something. Do
+
+you really think honestly if we do here
+
+an SV and benchmark analysis? So we
+
+check how good is AI in developing high
+
+performance
+
+softmark. What do you think the
+
+benchmark results will be? Well, let me
+
+ask it in a different way. What could
+
+possibly go wrong if I look now at the
+
+latest software age on benchmark
+
+analysis? If you want to find out, hey,
+
+why not subscribe and I see you in one
+
+of my next videos.

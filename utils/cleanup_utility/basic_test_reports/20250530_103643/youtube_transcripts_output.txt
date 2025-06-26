@@ -1,0 +1,18 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.12.3, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/youtube_transcripts/.venv/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.3', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}
+rootdir: /home/graham/workspace/experiments/youtube_transcripts
+configfile: pytest.ini
+plugins: metadata-3.1.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+[1mcollecting ... [0mcollected 0 items
+
+[33m============================ [33mno tests ran[0m[33m in 0.00s[0m[33m =============================[0m
+
+/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+ERROR: file or directory not found: tests/test_basic.py
+

@@ -1,0 +1,26 @@
+{
+  "project": "/home/graham/workspace/experiments/unsloth_wip",
+  "name": "unsloth_wip",
+  "type": "experimental",
+  "timestamp": "20250529-115057",
+  "issues": [],
+  "warnings": [
+    "README.md missing sections: installation, usage",
+    "No slash commands documented for Claude project",
+    "High technical debt: 7109 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": false,
+    "slash_commands": {
+      "implemented": true
+    }
+  },
+  "status": "success"
+}

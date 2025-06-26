@@ -1,0 +1,17 @@
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: production-telemetry
+  namespace: production
+spec:
+  accessLogging:
+  - providers:
+    - name: otel
+  metrics:
+  - dimensions: {}
+    providers:
+    - name: prometheus
+  tracing:
+  - providers:
+    - name: jaeger
+    randomSamplingPercentage: 10.0

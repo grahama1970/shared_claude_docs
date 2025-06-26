@@ -1,0 +1,12 @@
+STDOUT:
+
+
+STDERR:
+Cannot read termcap database;
+using dumb terminal settings.
+ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]
+__main__.py: error: unrecognized arguments: --json-report --json-report-file=/home/graham/workspace/shared_claude_docs/utils/cleanup_utility/universal_test_reports/20250530_111634/mcp-screenshot_test_report.json
+  inifile: /home/graham/workspace/experiments/mcp-screenshot/pyproject.toml
+  rootdir: /home/graham/workspace/experiments/mcp-screenshot
+
+

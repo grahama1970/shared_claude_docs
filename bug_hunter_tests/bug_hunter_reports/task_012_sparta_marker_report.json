@@ -1,0 +1,105 @@
+{
+  "task": "Task #012: SPARTA-Marker Integration",
+  "module": "sparta-marker-integration",
+  "duration": "0.00s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 9,
+  "bug_details": [
+    {
+      "type": "metadata_loss",
+      "severity": "medium",
+      "description": "CVE metadata not passed to Marker",
+      "expected": "Full metadata including CVE IDs",
+      "actual": "Only filename passed"
+    },
+    {
+      "type": "error_swallowed",
+      "severity": "high",
+      "description": "CVE_NOT_FOUND error not propagated",
+      "expected": "Error passed to hub with context",
+      "actual": "Error logged locally and swallowed"
+    },
+    {
+      "type": "no_batch_limit",
+      "severity": "medium",
+      "description": "No batch size limit for 1000 docs",
+      "expected": "Process in chunks of 50-100",
+      "actual": "Attempts to process all at once"
+    },
+    {
+      "type": "mixed_batch_inefficient",
+      "severity": "low",
+      "description": "Mixed document types processed inefficiently",
+      "expected": "Group by type for optimization",
+      "actual": "Random processing order"
+    },
+    {
+      "type": "missing_metric",
+      "severity": "low",
+      "description": "Metric 'pages_per_second' not tracked",
+      "expected": "Track for performance monitoring",
+      "actual": "No metric available"
+    },
+    {
+      "type": "missing_metric",
+      "severity": "low",
+      "description": "Metric 'queue_depth' not tracked",
+      "expected": "Track for performance monitoring",
+      "actual": "No metric available"
+    },
+    {
+      "type": "potential_deadlock",
+      "severity": "high",
+      "description": "Risk of deadlock with high concurrency",
+      "expected": "Timeout and recovery mechanisms",
+      "actual": "Can hang indefinitely"
+    },
+    {
+      "type": "path_traversal_risk",
+      "severity": "critical",
+      "description": "Path traversal not prevented",
+      "expected": "Reject paths with ../",
+      "actual": "Path accepted without validation"
+    },
+    {
+      "type": "invalid_enum_accepted",
+      "severity": "medium",
+      "description": "Invalid severity value accepted",
+      "expected": "Validate against allowed values",
+      "actual": "Any string accepted"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "PDF Handoff",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Error Propagation",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Batch Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Performance Metrics",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Concurrent Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Data Validation",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

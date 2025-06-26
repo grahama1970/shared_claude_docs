@@ -1,0 +1,668 @@
+"""
+Module: data_fusion_interaction.py
+Purpose: Multi-modal data fusion pipeline for combining text, images, and structured data
+
+External Dependencies:
+- numpy: https://numpy.org/doc/stable/
+- torch: https://pytorch.org/docs/stable/
+- transformers: https://huggingface.co/docs/transformers/
+- Pillow: https://pillow.readthedocs.io/
+- pandas: https://pandas.pydata.org/docs/
+
+Example Usage:
+>>> from data_fusion_interaction import MultiModalFusionPipeline
+>>> pipeline = MultiModalFusionPipeline()
+>>> result = pipeline.fuse_modalities({
+...     "text": "Space debris monitoring system",
+...     "image": "satellite_image.jpg",
+...     "structured": {"altitude": 400, "velocity": 7.8}
+... })
+>>> print(f"Unified embedding shape: {result['unified_embedding'].shape}")
+Unified embedding shape: (768,)
+"""
+
+import json
+import time
+from pathlib import Path
+from typing import Dict, List, Optional, Union, Any, Tuple
+from dataclasses import dataclass
+from datetime import datetime
+import base64
+from io import BytesIO
+
+import numpy as np
+import torch
+import torch.nn as nn
+from transformers import AutoModel, AutoTokenizer, ViTModel, ViTImageProcessor
+from PIL import Image
+import pandas as pd
+
+
+@dataclass
+class ModalityData:
+    """Container for multi-modal data"""
+    text: Optional[str] = None
+    image: Optional[Union[str, Image.Image]] = None
+    structured: Optional[Dict[str, Any]] = None
+    tabular: Optional[pd.DataFrame] = None
+    embeddings: Optional[Dict[str, np.ndarray]] = None
+
+
+class TextEncoder:
+    """Text feature extraction using transformer models"""
+    
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name)
+        self.model.eval()
+        
+    def encode(self, text: str) -> np.ndarray:
+        """Extract features from text"""
+        inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+            # Use mean pooling
+            embeddings = outputs.last_hidden_state.mean(dim=1)
+            
+        return embeddings.numpy().flatten()
+
+
+class ImageEncoder:
+    """Image feature extraction using Vision Transformer"""
+    
+    def __init__(self, model_name: str = "google/vit-base-patch16-224"):
+        self.feature_extractor = ViTImageProcessor.from_pretrained(model_name)
+        self.model = ViTModel.from_pretrained(model_name)
+        self.model.eval()
+        
+    def encode(self, image: Union[str, Image.Image]) -> np.ndarray:
+        """Extract features from image"""
+        if isinstance(image, str):
+            if Path(image).exists():
+                image = Image.open(image).convert("RGB")
+            else:
+                # Handle base64 encoded images
+                image_data = base64.b64decode(image)
+                image = Image.open(BytesIO(image_data)).convert("RGB")
+        
+        inputs = self.feature_extractor(images=image, return_tensors="pt")
+        
+        with torch.no_grad():
+            outputs = self.model(**inputs)
+            # Use CLS token embedding
+            embeddings = outputs.last_hidden_state[:, 0]
+            
+        return embeddings.numpy().flatten()
+
+
+class StructuredDataEncoder:
+    """Encode structured data (JSON, tables) into embeddings"""
+    
+    def __init__(self, embedding_dim: int = 128):
+        self.embedding_dim = embedding_dim
+        self.encoders = {}
+        
+    def encode_json(self, data: Dict[str, Any]) -> np.ndarray:
+        """Encode JSON/dictionary data"""
+        features = []
+        
+        def flatten_dict(d: Dict, prefix: str = "") -> List[Tuple[str, Any]]:
+            items = []
+            for k, v in d.items():
+                new_key = f"{prefix}.{k}" if prefix else k
+                if isinstance(v, dict):
+                    items.extend(flatten_dict(v, new_key))
+                else:
+                    items.append((new_key, v))
+            return items
+        
+        flat_items = flatten_dict(data)
+        
+        for key, value in flat_items:
+            # Encode key
+            key_hash = hash(key) % 1000
+            features.append(key_hash / 1000.0)
+            
+            # Encode value based on type
+            if isinstance(value, (int, float)):
+                features.append(float(value) / 1000.0)  # Normalize
+            elif isinstance(value, str):
+                str_hash = hash(value) % 1000
+                features.append(str_hash / 1000.0)
+            elif isinstance(value, bool):
+                features.append(1.0 if value else 0.0)
+            else:
+                features.append(0.5)  # Default for unknown types
+                
+        # Pad or truncate to fixed size
+        if len(features) < self.embedding_dim:
+            features.extend([0.0] * (self.embedding_dim - len(features)))
+        else:
+            features = features[:self.embedding_dim]
+            
+        return np.array(features, dtype=np.float32)
+    
+    def encode_tabular(self, df: pd.DataFrame) -> np.ndarray:
+        """Encode tabular data"""
+        features = []
+        
+        # Statistical features for numeric columns
+        for col in df.select_dtypes(include=[np.number]).columns:
+            features.extend([
+                df[col].mean(),
+                df[col].std(),
+                df[col].min(),
+                df[col].max()
+            ])
+            
+        # Categorical column features
+        for col in df.select_dtypes(include=['object']).columns:
+            unique_count = df[col].nunique()
+            features.append(unique_count)
+            
+        # Shape features
+        features.extend([df.shape[0], df.shape[1]])
+        
+        # Pad or truncate
+        if len(features) < self.embedding_dim:
+            features.extend([0.0] * (self.embedding_dim - len(features)))
+        else:
+            features = features[:self.embedding_dim]
+            
+        return np.array(features, dtype=np.float32)
+
+
+class AttentionFusion(nn.Module):
+    """Attention-based fusion mechanism for multi-modal embeddings"""
+    
+    def __init__(self, input_dims: List[int], output_dim: int = 768):
+        super().__init__()
+        self.input_dims = input_dims
+        self.output_dim = output_dim
+        
+        # Project each modality to common dimension
+        self.projections = nn.ModuleList([
+            nn.Linear(dim, output_dim) for dim in input_dims
+        ])
+        
+        # Attention mechanism
+        self.attention = nn.MultiheadAttention(output_dim, num_heads=8)
+        
+        # Final fusion layer
+        self.fusion = nn.Sequential(
+            nn.Linear(output_dim * len(input_dims), output_dim),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(output_dim, output_dim)
+        )
+        
+    def forward(self, embeddings: List[torch.Tensor]) -> torch.Tensor:
+        """Fuse multi-modal embeddings using attention"""
+        # Project to common dimension
+        projected = []
+        proj_idx = 0
+        for emb in embeddings:
+            if emb is not None:
+                proj = self.projections[proj_idx](emb.unsqueeze(0))
+                projected.append(proj)
+                proj_idx += 1
+                
+        if not projected:
+            return torch.zeros(1, self.output_dim)
+            
+        # Stack for attention
+        stacked = torch.stack(projected, dim=0)  # [num_modalities, 1, output_dim]
+        
+        # Self-attention
+        attended, _ = self.attention(stacked, stacked, stacked)
+        
+        # Concatenate and fuse
+        concatenated = attended.transpose(0, 1).flatten(1)  # [1, num_modalities * output_dim]
+        fused = self.fusion(concatenated)
+        
+        return fused.squeeze(0)
+
+
+class MultiModalFusionPipeline:
+    """Main pipeline for multi-modal data fusion"""
+    
+    def __init__(self):
+        print("Initializing multi-modal fusion pipeline...")
+        self.text_encoder = TextEncoder()
+        self.image_encoder = ImageEncoder()
+        self.structured_encoder = StructuredDataEncoder()
+        
+        # Initialize fusion model
+        self.fusion_model = AttentionFusion(
+            input_dims=[384, 768, 128],  # Text, Image, Structured
+            output_dim=768
+        )
+        self.fusion_model.eval()
+        
+    def extract_features(self, data: ModalityData) -> Dict[str, Optional[np.ndarray]]:
+        """Extract features from each modality"""
+        features = {}
+        
+        # Text features
+        if data.text:
+            print(f"Extracting text features from: {data.text[:50]}...")
+            features['text'] = self.text_encoder.encode(data.text)
+            
+        # Image features
+        if data.image:
+            print("Extracting image features...")
+            features['image'] = self.image_encoder.encode(data.image)
+            
+        # Structured data features
+        if data.structured:
+            print("Extracting structured data features...")
+            features['structured'] = self.structured_encoder.encode_json(data.structured)
+            
+        # Tabular data features
+        if data.tabular is not None:
+            print("Extracting tabular data features...")
+            features['tabular'] = self.structured_encoder.encode_tabular(data.tabular)
+            
+        return features
+    
+    def align_embeddings(self, features: Dict[str, np.ndarray]) -> List[Optional[torch.Tensor]]:
+        """Align embeddings for fusion"""
+        aligned = []
+        
+        # Expected order: text, image, structured/tabular
+        text_emb = features.get('text')
+        image_emb = features.get('image')
+        
+        # Handle structured/tabular - check if either exists
+        struct_emb = features.get('structured')
+        if struct_emb is None:
+            struct_emb = features.get('tabular')
+        
+        for emb in [text_emb, image_emb, struct_emb]:
+            if emb is not None:
+                aligned.append(torch.from_numpy(emb).float())
+            else:
+                aligned.append(None)
+                
+        return aligned
+    
+    def fuse_modalities(self, data: Union[Dict[str, Any], ModalityData]) -> Dict[str, Any]:
+        """Main fusion method"""
+        start_time = time.time()
+        
+        # Convert dict to ModalityData if needed
+        if isinstance(data, dict):
+            modality_data = ModalityData(
+                text=data.get('text'),
+                image=data.get('image'),
+                structured=data.get('structured'),
+                tabular=data.get('tabular')
+            )
+        else:
+            modality_data = data
+            
+        # Extract features
+        features = self.extract_features(modality_data)
+        
+        # Handle missing modalities
+        available_modalities = [k for k, v in features.items() if v is not None]
+        print(f"Available modalities: {available_modalities}")
+        
+        if not available_modalities:
+            print("Warning: No modalities available for fusion")
+            return {
+                'unified_embedding': np.zeros(768),
+                'modalities_used': [],
+                'fusion_time': time.time() - start_time
+            }
+            
+        # Align embeddings
+        aligned_embeddings = self.align_embeddings(features)
+        
+        # Filter out None values for fusion
+        valid_embeddings = [emb for emb in aligned_embeddings if emb is not None]
+        
+        # Fuse with attention mechanism
+        with torch.no_grad():
+            # Adjust fusion model input dimensions dynamically
+            actual_dims = [emb.shape[0] for emb in valid_embeddings]
+            if len(actual_dims) < 3 or actual_dims != [384, 768, 128]:
+                # Simple averaging fusion for mismatched dimensions
+                unified = torch.stack([
+                    torch.nn.functional.pad(emb, (0, 768 - emb.shape[0]))[:768]
+                    for emb in valid_embeddings
+                ]).mean(dim=0)
+            else:
+                unified = self.fusion_model(valid_embeddings)
+                
+        fusion_time = time.time() - start_time
+        
+        return {
+            'unified_embedding': unified.numpy(),
+            'modalities_used': available_modalities,
+            'feature_dimensions': {k: v.shape for k, v in features.items()},
+            'fusion_time': fusion_time
+        }
+    
+    def generate_similarity_matrix(self, embeddings: List[np.ndarray]) -> np.ndarray:
+        """Generate similarity matrix for multiple fused embeddings"""
+        n = len(embeddings)
+        similarity_matrix = np.zeros((n, n))
+        
+        for i in range(n):
+            for j in range(i, n):
+                # Cosine similarity
+                sim = np.dot(embeddings[i], embeddings[j]) / (
+                    np.linalg.norm(embeddings[i]) * np.linalg.norm(embeddings[j])
+                )
+                similarity_matrix[i, j] = sim
+                similarity_matrix[j, i] = sim
+                
+        return similarity_matrix
+
+
+# Test methods
+def test_text_only_fusion():
+    """Test fusion with text modality only"""
+    pipeline = MultiModalFusionPipeline()
+    
+    data = ModalityData(
+        text="Advanced satellite communication systems require precise orbital mechanics calculations"
+    )
+    
+    result = pipeline.fuse_modalities(data)
+    
+    assert result['unified_embedding'].shape == (768,), f"Expected shape (768,), got {result['unified_embedding'].shape}"
+    assert 'text' in result['modalities_used'], "Text modality not detected"
+    assert result['fusion_time'] < 2.0, f"Fusion took too long: {result['fusion_time']}s"
+    
+    return result
+
+
+def test_multi_modal_fusion():
+    """Test fusion with multiple modalities"""
+    pipeline = MultiModalFusionPipeline()
+    
+    # Create sample image
+    img = Image.new('RGB', (224, 224), color='blue')
+    
+    data = ModalityData(
+        text="Quantum encryption for secure satellite communications",
+        image=img,
+        structured={
+            "satellite": {
+                "altitude_km": 550,
+                "inclination_deg": 53.2,
+                "period_minutes": 95.6
+            },
+            "encryption": {
+                "algorithm": "QKD",
+                "key_length": 256,
+                "protocol": "BB84"
+            }
+        }
+    )
+    
+    result = pipeline.fuse_modalities(data)
+    
+    assert result['unified_embedding'].shape == (768,), f"Expected shape (768,), got {result['unified_embedding'].shape}"
+    assert len(result['modalities_used']) == 3, f"Expected 3 modalities, got {len(result['modalities_used'])}"
+    assert result['fusion_time'] < 5.0, f"Fusion took too long: {result['fusion_time']}s"
+    
+    return result
+
+
+def test_missing_modality_handling():
+    """Test graceful handling of missing modalities"""
+    pipeline = MultiModalFusionPipeline()
+    
+    # Test with only structured data
+    data = ModalityData(
+        structured={"mission": "Mars2024", "launch_date": "2024-07-15", "duration_days": 687}
+    )
+    
+    result = pipeline.fuse_modalities(data)
+    
+    assert result['unified_embedding'].shape == (768,), f"Expected shape (768,), got {result['unified_embedding'].shape}"
+    assert 'structured' in result['modalities_used'], "Structured modality not detected"
+    assert len(result['modalities_used']) == 1, f"Expected 1 modality, got {len(result['modalities_used'])}"
+    
+    return result
+
+
+def test_tabular_data_fusion():
+    """Test fusion with tabular data"""
+    pipeline = MultiModalFusionPipeline()
+    
+    # Create sample dataframe
+    df = pd.DataFrame({
+        'timestamp': pd.date_range('2024-01-01', periods=5, freq='h'),
+        'temperature': [20.5, 21.0, 19.8, 22.1, 20.3],
+        'pressure': [1013.2, 1013.5, 1012.8, 1014.0, 1013.1],
+        'status': ['nominal', 'nominal', 'warning', 'nominal', 'nominal']
+    })
+    
+    data = ModalityData(
+        text="Environmental monitoring data from ISS",
+        tabular=df
+    )
+    
+    result = pipeline.fuse_modalities(data)
+    
+    assert result['unified_embedding'].shape == (768,), f"Expected shape (768,), got {result['unified_embedding'].shape}"
+    assert 'tabular' in result['modalities_used'] or 'text' in result['modalities_used'], "Expected modalities not found"
+    
+    return result
+
+
+def test_embedding_similarity():
+    """Test similarity computation between fused embeddings"""
+    pipeline = MultiModalFusionPipeline()
+    
+    # Create multiple data samples
+    samples = [
+        ModalityData(text="Space debris tracking and collision avoidance"),
+        ModalityData(text="Orbital mechanics and trajectory optimization"),
+        ModalityData(text="Deep learning for natural language processing")
+    ]
+    
+    embeddings = []
+    for sample in samples:
+        result = pipeline.fuse_modalities(sample)
+        embeddings.append(result['unified_embedding'])
+        
+    # Compute similarity matrix
+    similarity_matrix = pipeline.generate_similarity_matrix(embeddings)
+    
+    # Space-related texts should be more similar to each other
+    assert similarity_matrix[0, 1] > similarity_matrix[0, 2], "Expected space texts to be more similar"
+    assert similarity_matrix.shape == (3, 3), f"Expected shape (3, 3), got {similarity_matrix.shape}"
+    
+    return similarity_matrix
+
+
+def generate_test_report(test_results: List[Dict[str, Any]]):
+    """Generate markdown test report"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_path = Path(f"test_report_fusion_{timestamp}.md")
+    
+    content = f"""# Multi-Modal Data Fusion Test Report
+Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+
+## Test Results
+
+| Test Name | Description | Result | Status | Duration | Error |
+|-----------|-------------|---------|---------|-----------|--------|
+"""
+    
+    for result in test_results:
+        status = "✅ Pass" if result["passed"] else "❌ Fail"
+        error = result.get("error", "")
+        content += f"| {result['name']} | {result['description']} | {result['result']} | {status} | {result['duration']:.2f}s | {error} |\n"
+    
+    content += f"\n## Summary\n"
+    content += f"- Total Tests: {len(test_results)}\n"
+    content += f"- Passed: {sum(1 for r in test_results if r['passed'])}\n"
+    content += f"- Failed: {sum(1 for r in test_results if not r['passed'])}\n"
+    
+    with open(report_path, 'w') as f:
+        f.write(content)
+        
+    return report_path
+
+
+if __name__ == "__main__":
+    # Validation with real data
+    print("=" * 80)
+    print("MULTI-MODAL DATA FUSION PIPELINE VALIDATION")
+    print("=" * 80)
+    
+    test_results = []
+    failed_count = 0
+    
+    # Test 1: Text-only fusion
+    print("\n1. Testing text-only fusion...")
+    start = time.time()
+    try:
+        result = test_text_only_fusion()
+        test_results.append({
+            "name": "test_text_only_fusion",
+            "description": "Fusion with text modality only",
+            "result": f"Embedding shape: {result['unified_embedding'].shape}",
+            "passed": True,
+            "duration": time.time() - start
+        })
+        print(f"✅ Text-only fusion successful. Shape: {result['unified_embedding'].shape}")
+    except Exception as e:
+        failed_count += 1
+        test_results.append({
+            "name": "test_text_only_fusion",
+            "description": "Fusion with text modality only",
+            "result": "Failed",
+            "passed": False,
+            "duration": time.time() - start,
+            "error": str(e)
+        })
+        print(f"❌ Text-only fusion failed: {e}")
+    
+    # Test 2: Multi-modal fusion
+    print("\n2. Testing multi-modal fusion...")
+    start = time.time()
+    try:
+        result = test_multi_modal_fusion()
+        test_results.append({
+            "name": "test_multi_modal_fusion",
+            "description": "Fusion with text, image, and structured data",
+            "result": f"{len(result['modalities_used'])} modalities fused",
+            "passed": True,
+            "duration": time.time() - start
+        })
+        print(f"✅ Multi-modal fusion successful. Modalities: {result['modalities_used']}")
+    except Exception as e:
+        failed_count += 1
+        test_results.append({
+            "name": "test_multi_modal_fusion",
+            "description": "Fusion with text, image, and structured data",
+            "result": "Failed",
+            "passed": False,
+            "duration": time.time() - start,
+            "error": str(e)
+        })
+        print(f"❌ Multi-modal fusion failed: {e}")
+    
+    # Test 3: Missing modality handling
+    print("\n3. Testing missing modality handling...")
+    start = time.time()
+    try:
+        result = test_missing_modality_handling()
+        test_results.append({
+            "name": "test_missing_modality_handling",
+            "description": "Graceful handling of missing modalities",
+            "result": f"Handled with {len(result['modalities_used'])} modality",
+            "passed": True,
+            "duration": time.time() - start
+        })
+        print(f"✅ Missing modality handling successful")
+    except Exception as e:
+        failed_count += 1
+        test_results.append({
+            "name": "test_missing_modality_handling",
+            "description": "Graceful handling of missing modalities",
+            "result": "Failed",
+            "passed": False,
+            "duration": time.time() - start,
+            "error": str(e)
+        })
+        print(f"❌ Missing modality handling failed: {e}")
+    
+    # Test 4: Tabular data fusion
+    print("\n4. Testing tabular data fusion...")
+    start = time.time()
+    try:
+        result = test_tabular_data_fusion()
+        test_results.append({
+            "name": "test_tabular_data_fusion",
+            "description": "Fusion with tabular/dataframe data",
+            "result": f"Fused {len(result['modalities_used'])} modalities",
+            "passed": True,
+            "duration": time.time() - start
+        })
+        print(f"✅ Tabular data fusion successful")
+    except Exception as e:
+        failed_count += 1
+        test_results.append({
+            "name": "test_tabular_data_fusion",
+            "description": "Fusion with tabular/dataframe data",
+            "result": "Failed",
+            "passed": False,
+            "duration": time.time() - start,
+            "error": str(e)
+        })
+        print(f"❌ Tabular data fusion failed: {e}")
+    
+    # Test 5: Embedding similarity
+    print("\n5. Testing embedding similarity computation...")
+    start = time.time()
+    try:
+        similarity_matrix = test_embedding_similarity()
+        test_results.append({
+            "name": "test_embedding_similarity",
+            "description": "Similarity computation between embeddings",
+            "result": f"Matrix shape: {similarity_matrix.shape}",
+            "passed": True,
+            "duration": time.time() - start
+        })
+        print(f"✅ Embedding similarity successful")
+        print(f"   Similarity matrix:\n{similarity_matrix}")
+    except Exception as e:
+        failed_count += 1
+        test_results.append({
+            "name": "test_embedding_similarity",
+            "description": "Similarity computation between embeddings",
+            "result": "Failed",
+            "passed": False,
+            "duration": time.time() - start,
+            "error": str(e)
+        })
+        print(f"❌ Embedding similarity failed: {e}")
+    
+    # Generate test report
+    report_path = generate_test_report(test_results)
+    
+    # Summary
+    print("\n" + "=" * 80)
+    print("VALIDATION SUMMARY")
+    print("=" * 80)
+    print(f"Total tests: {len(test_results)}")
+    print(f"Passed: {len(test_results) - failed_count}")
+    print(f"Failed: {failed_count}")
+    print(f"Test report saved to: {report_path}")
+    
+    # Exit with appropriate code
+    if failed_count > 0:
+        print(f"\n❌ Validation failed with {failed_count} errors")
+        exit(1)
+    else:
+        print("\n✅ All validations passed successfully!")
+        exit(0)

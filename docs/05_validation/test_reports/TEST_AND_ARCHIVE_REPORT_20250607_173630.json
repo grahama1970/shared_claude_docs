@@ -1,0 +1,3771 @@
+[
+  {
+    "project": "granger_hub",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "scripts/validate_discovery_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "archive/debug_scripts/skeptical_test_verification.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration_scenarios/categories/security/test_satellite_firmware.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/rl/test_reinforcement_learning.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration_scenarios/categories/research_integration/test_paper_validation.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/conversation/test_conversation_message.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_conversation_protocol.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/research_integration/test_testparallelarxivv1.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_schema_negotiation.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/modules/test_modules.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/conversation/test_conversation_manager.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "src/granger_hub/rl/validate_rl_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/core/adapters/test_hardware_adapters.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration_scenarios/categories/document_processing/test_pdf_extraction.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/test_service_discovery.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration_scenarios/generated/ml_workflows/test_testtestpatternllm_callv1.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/rl_integration/test_rl_module_selection.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_arango_conversations.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_conversation_context.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_arango_conversations_mock.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/storage/test_storage_backends.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "scripts/run_task105_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/test_discovery_system.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/ml_workflows/test_testmessagequeuellm_callv3.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_communicator_conversations.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_conversation_integration_simple.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/conversation/test_conversation_protocol.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/core/adapters/test_binary_handling.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_claude_communication.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/rl/metrics/test_rl_metrics.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/ml_workflows/test_testapigatewayllm_callv4.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/adapters/test_rest_adapter.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/adapters/test_cli_adapter.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/adapters/test_mcp_adapter.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/test_event_system.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "scripts/validate_integration_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_conversation_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/llm/test_llm_integration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/modules/test_schema_negotiation.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/conversation/test_conversation_context.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/cli/test_communication_commands.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/rl/metrics/test_learning_curves.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/modules/test_browser_automation_module.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/document_processing/test_testcachearangodbv2_evolved.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "archive/debug_scripts/validate_granger_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration_scenarios/generated/integration/test_testhybridcacheparallel.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/ml_workflows/test_rl_module_learning.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/forecast/test_forecast_real_data.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/mcp/test_mcp_server.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration/test_task105_final.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_integration_validation.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_conversation_integration_mock.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/modules/test_analyzer.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/ml_workflows/test_testmessagequeuellm_callv3_evolved.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/test_progress_utils.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/validate_hardware_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_conversation_message.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/core/adapters/test_adapter_framework.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/forecast/validate_forecast_fixtures.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_conversation_manager.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/research_integration/test_testparallelarxivv1_evolved.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/validate_conversation_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_granger_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/adapters/test_adapter_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration_scenarios/generated/document_processing/test_testcachearangodbv2.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scenarios/run_youtube_research_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      }
+    ],
+    "summary": {
+      "total": 67,
+      "passed": 20,
+      "failed": 28,
+      "broken": 0,
+      "archived": 19
+    }
+  },
+  {
+    "project": "rl_commons",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/algorithms/ppo/test_ppo.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integrations/test_module_communicator_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/monitoring/test_entropy_tracker.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/algorithms/ppo/test_entropy_aware_ppo.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/core/test_base.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/algorithms/a3c/test_a3c_simple.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/algorithms/a3c/test_a3c.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/algorithms/gnn/test_gnn_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/algorithms/ppo/test_kl_cov_ppo.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/run_comprehensive_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/algorithms/meta/test_maml.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integrations/test_arangodb_optimizer.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/test_covariance_analyzer.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/core/test_entropy_aware_selector.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/algorithms/morl/test_entropy_aware_morl.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      }
+    ],
+    "summary": {
+      "total": 16,
+      "passed": 0,
+      "failed": 1,
+      "broken": 0,
+      "archived": 15
+    }
+  },
+  {
+    "project": "world_model",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_module_creation.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/run_task_001_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      }
+    ],
+    "summary": {
+      "total": 3,
+      "passed": 0,
+      "failed": 2,
+      "broken": 0,
+      "archived": 1
+    }
+  },
+  {
+    "project": "claude-test-reporter",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_basic.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/cli/test_main.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/analyzers/test_llm_test_analyzer.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/monitoring/test_hallucination_monitor.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_analyzers.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/test_test_result_verifier.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      }
+    ],
+    "summary": {
+      "total": 7,
+      "passed": 2,
+      "failed": 2,
+      "broken": 0,
+      "archived": 3
+    }
+  },
+  {
+    "project": "sparta",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/level_0/test_sparta.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/sparta/integration/archive/test_module_integration_simple.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "archive/test_runners/run_sparta_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/skeptical_test_verify.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/test_runners/run_tests_with_reporter.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_0/test_sparta_standardized.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/sparta/mcp/test_server.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "archive/test_runners/run_tests_simple.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_module_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "archive/tests/run_level_0_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/sparta/integration/test_graph_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/sparta/integration/test_marker_communication.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/sparta/core/test_mitre_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_real_api.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/sparta/integration/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/sparta/core/test_downloader.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_nasa_direct.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/sparta/integration/test_actual_module_functionality.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/sparta/mcp/test_mcp_validation.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/sparta/integration/archive/test_verify_html_output.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/sparta/integration/archive/test_readme_claims.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "archive/test_runners/run_all_tests_with_reporter.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/sparta/integration/test_graph_collaboration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      }
+    ],
+    "summary": {
+      "total": 25,
+      "passed": 0,
+      "failed": 5,
+      "broken": 0,
+      "archived": 20
+    }
+  },
+  {
+    "project": "marker",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/integration/test_integration.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/renderers/test_markdown_renderer.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_document_toc_processor.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_basic_extraction.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_claude_features.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/comms/tests/validate_imports.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/processors/code_processors/test_tree_sitter_extraction.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/providers/test_xml_native.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_blank_page.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/llm_call/validators/test_direct_validation.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/cli/test_mcp_functionality.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/services/test_service_init.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_overriding.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_strip_existing_ocr.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_litellm.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/cli/test_cli.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/schema/test_unified_schema.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/core/renderers/test_extract_images.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_integration_suite.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/processors/test_table_metadata_debug.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/providers/test_document_providers.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_fixes.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_layout_replace.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/providers/test_pdf_provider.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/providers/test_html_native.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/cli/test_cli_demo.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/providers/test_docx_native.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_inline_math_lines.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_pdf_links.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/providers/pdf/test_small_pdf.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/code_processors/test_ts_language_detection.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_cli_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/providers/pdf/test_pdf_simple.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_enhanced_features.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/renderers/test_json_renderer.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/level_0/test_marker_standardized.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/core/providers/test_image_provider.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/arangodb/test_arangodb_cli.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/code_processors/test_corpus_and_tree_sitter.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_structure.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/llm_call/validators/test_citation_validators.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_final_verification.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_mcp_server_standalone.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/code_processors/test_comprehensive_language_detection.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/providers/pdf/test_python_type_checking_pdf.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/renderers/test_json_output.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_comprehensive_verification.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_search_sections.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/arangodb/test_direct_arangodb.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/code_processors/test_enhanced_code_processor.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/core/config/test_config.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/renderers/test_section_breadcrumbs.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_backwards_compatibility.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_table_extraction_only.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_imports.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/arangodb/test_arangodb_conversion.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/arangodb/database/test_arangodb_import.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_rotated_bboxes.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/converters/test_pdf_converter.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/schema/groups/test_list_grouping.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_enhanced_camelot_processor.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_regression_marker.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/test_basic.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_e2e_workflow.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_document_builder.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_simple_metadata.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_garbled_pdf.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/llm_call/validators/test_corpus_validation.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_hierarchical_document.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_footnote_processor.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/config/test_table_config.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/features/test_enhanced_camelot_conversion.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_unified_extraction.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "scripts/validate_claude_implementation.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/processors/test_table_processor.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/arangodb/test_simple_arangodb.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_table_metadata_json.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_equation_processor.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "scripts/validation/validate_cli.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/services/test_litellm_pdf_conversion.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/providers/test_pptx_native.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_pdf_pipeline_real.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/converters/test_table_converter.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/processors/test_ignoretext.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_simple_table_extraction.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/arangodb/test_arangodb_integration.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/arangodb/test_qa_validation.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/processors/test_table_merge_analyzer.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_pdf_pipeline.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/builders/test_ocr_pipeline.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/features/test_breadcrumb_functionality.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/verification/test_e2e_workflows.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/cli/test_real_cli.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/core/llm_call/test_llm_call_module.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/package/test_package_build.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      }
+    ],
+    "summary": {
+      "total": 97,
+      "passed": 0,
+      "failed": 0,
+      "broken": 0,
+      "archived": 97
+    }
+  },
+  {
+    "project": "arangodb",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/arangodb/core/memory/test_memory_agent_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/test_view_manager.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_crud_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_qa_generation_basic.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/arangodb/qa_generation/validate_qa_export.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/smoke/test_basic_smoke.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/visualization/test_tree_layout.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_d3_visualizations_style_compliance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/core/memory/test_memory_agent_community_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_graph_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/memory/test_temporal_operations.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "scripts/utilities/validate_visualization_system.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/cli/test_graph_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/validation/test_table_visualization.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_validate_memory_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/graph/test_community_detection.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_arangodb_standardization.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_db_connection.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "examples/screenshot/tests/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_basic.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration/test_vector_search.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/visualization/server/test_server.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/validate/validate_main_cli.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/visualization/test_d3_with_memory_data.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_arango_setup.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_pizza_cli.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_community_detection_unit.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_marker_relationship_extraction.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/visualization/test_performance_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/validation/test_all_modules.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_crud_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/visualization/test_visualization_suite.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/visualization/test_pizza_d3.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/core/test_final_validation.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_graphiti_memory_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arangodb/cli/test_crud_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_review_cli.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_visualization_interactions.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_db_connection.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_qa_cli_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/core/search/test_integrated_semantic_search.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/cli/test_episode_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "archive/validate_structure.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_unsloth_export.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_mcp_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/memory/test_memory_vector_search.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_advanced_features.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_bm25_search.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_entity_extraction_debug.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/.obsolete/test_marker_integration.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/arangodb/core/search/test_search_basic.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/visualization/test_visualization_setup.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/search/test_search_config.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_entity_deduplication.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arangodb/core/search/test_field_flexibility.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_bm25_search.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_search_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/dashboard/test_framework.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_qa_edge_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_enrichment.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/e2e/test_cli_final.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/core/memory/test_temporal_memory.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/cli/test_community_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_constants.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_vector_search.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_contradiction_detection_full.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_constants.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/visualization/sparta/test_sparta_module.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_exporter.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_memory_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_cli_final.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_edge_generator.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_visualization_validation.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/core/test_error_logging.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_qa_generation_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_0/test_arangodb_standardized.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validate/validate_all_commands.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/core/test_vertex_client.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "examples/screenshot/tests/run_cli_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/arangodb/core/graph/test_graph_core.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/visualization/test_force_layout.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/memory/test_episode_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/validate_constants.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/qa_generation/test_utils.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_arango_setup.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_memory_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/e2e/test_main_cli.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/arangodb/cli/validate_memory_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_table_visualization.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/validate/validate_all_modules_fixed.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_view_optimization.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/cli/test_memory_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/e2e/test_all_commands.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arangodb/core/test_generic_crud.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_search_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/smoke/test_quick_validation.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/testing/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arangodb/core/test_db_operations.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_qa_generation_flow.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/cli/test_all_cli_commands.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/arangodb/cli/test_search_commands.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/visualization/test_d3_real_data.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arangodb/test_utils.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/validate/validate_graph_commands.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/arangodb/cli/validate_commands.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      }
+    ],
+    "summary": {
+      "total": 108,
+      "passed": 1,
+      "failed": 12,
+      "broken": 0,
+      "archived": 95
+    }
+  },
+  {
+    "project": "llm_call",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/llm_call/core/test_all_validators.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/root_cleanup/scripts/run_all_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/llm_call/core/test_claude_capabilities_verification.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "repos/ADVANCED-inference/nested-kv-lookup/run_tests.py",
+        "status": "archived",
+        "reason": "Contains run_tests.py"
+      },
+      {
+        "file": "tests/llm_call/proof_of_concept/test_first_prompt.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/core/validation/test_json_validators.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/llm_call/core/validation/test_ai_validator_real_llm.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/scripts_v2/run_v4_tests_essential.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/cli/test_mcp_features.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/scripts_v2/run_v4_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "archive/root_cleanup/scripts/run_all_essential_tests_final.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/run_tests_with_report.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/test_router.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/proof_of_concept/test_v4_implementation.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/core/test_capabilities_final_verification.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/llm_call/rl_integration/test_rl_integration.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "archive/root_cleanup/scripts/validate_cli.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_basic.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/core/test_claude_proxy_polling.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/core/test_validation_integration.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/llm_call/cli/test_unified_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/test_comprehensive_validation.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/llm_call/cli/run_all_cli_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/test_retry_exponential.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/cli/test_llm_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/v4_claude_validator/run_final_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/llm_call/proof_of_concept/test_working_models.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/test_image_encoding_enhancements.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/scripts_v2/run_v4_tests_with_table.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/run_module_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/test_core_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/cli/test_cli_comprehensive.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/scripts_v2/run_v4_tests_filtered.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/root_cleanup/scripts/run_v4_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/llm_call/core/test_runpod_routing.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "archive/root_cleanup/scripts/run_all_v4_tests_direct.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/llm_call/core/validation/test_ai_validator_with_llm.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "src/llm_call/proof_of_concept/archive/root_cleanup/v4_claude_validator/validate_all_test_prompts.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      }
+    ],
+    "summary": {
+      "total": 39,
+      "passed": 0,
+      "failed": 0,
+      "broken": 0,
+      "archived": 39
+    }
+  },
+  {
+    "project": "unsloth_wip",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/integration/test_suite.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/test_student_teacher.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_dashboard.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_dapo_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_entropy_utils.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_msmarco_loader.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/test_runpod_ops.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/integration/test_full_pipeline.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_tensorboard_verifier.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_reporting_setup.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_runpod_import.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/test_entropy_aware_trainer.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_verification_engine.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/unit/test_entropy_aware_thinking_enhancer.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/test_basic.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/unit/test_entropy_aware_thinking.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_dashboard_simple.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      }
+    ],
+    "summary": {
+      "total": 19,
+      "passed": 2,
+      "failed": 6,
+      "broken": 0,
+      "archived": 11
+    }
+  },
+  {
+    "project": "youtube_transcripts",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "archive/run_all_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_0/test_youtube_transcripts_standardized.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/core/test_youtube.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/agents/test_agents.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_with_reporter.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_partial_data_handler.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/integration/test_research_pipeline_edge_cases.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/level_2/test_links_to_storage_flow.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/level_0/test_sanitization_unit.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/level_0/test_video_id_unit.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/scripts/test_download_transcript.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_partial_data_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/scenarios/test_level0_scenarios.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_performance_monitoring.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration/test_arangodb_features.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/scenarios/run_level0_tests.py",
+        "status": "archived",
+        "reason": "Old test runner script"
+      },
+      {
+        "file": "tests/test_youtube_with_reporter.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_2/test_error_recovery_flows.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/archive/deprecated_2025_06_06/test_rate_limit_honeypot.py",
+        "status": "timeout",
+        "error": "Test timed out"
+      },
+      {
+        "file": "tests/test_all_integrations.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/archive/test_integration_complete.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_2/test_youtube_to_knowledge_flow.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/archive/test_relationship_extraction.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "archive/repos/ADVANCED-inference/nested-kv-lookup/run_tests.py",
+        "status": "archived",
+        "reason": "Contains run_tests.py"
+      },
+      {
+        "file": "tests/archive/deprecated_2025_06_06/test_arxiv_youtube_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/run_full_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_search_widening.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/level_0/test_link_extraction_unit.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/level_1/test_youtube_api_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_reporter_verification.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_minimal.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_arangodb_connection.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_database_adapter.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/level_1/test_arangodb_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/archive/test_hybrid_search.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_youtube_manually.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_3/test_multi_module_orchestration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/archive/test_entity_extraction.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_concurrent_processing.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/archive/deprecated_2025_06_06/test_youtube_error_handling.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "archive/run_tests_with_reporter.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_1/test_extraction_pipeline.py",
+        "status": "timeout",
+        "error": "Test timed out"
+      },
+      {
+        "file": "tests/test_mcp_prompts.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/core/utils/test_scientific_extractors.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_integration_summary.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      }
+    ],
+    "summary": {
+      "total": 48,
+      "passed": 15,
+      "failed": 14,
+      "broken": 2,
+      "archived": 17
+    }
+  },
+  {
+    "project": "darpa_crawl",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/darpa_crawl/core/database/test_db_backends.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/analysis/test_capability_analyzer_real.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_darpa_crawl_simulation.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_simple.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/darpa_crawl/core/database/test_database_real.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_darpa_catalog_real.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/database/test_database_adapter.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_basic_functionality.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_sam_gov_real.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_darpa_catalog.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_real_functionality.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_arangodb_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_darpa_rss.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/darpa_crawl/core/database/test_simple_db.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_integration_real.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_full_system.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/test_enhanced_modules.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_minimal.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_final_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_darpa_correct_url.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/database/test_db_direct.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_darpa_specific_search.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_direct_darpa_scrape.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_reporter_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/mcp/test_mcp_imports.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/darpa_crawl/core/scrapers/test_sam_gov_api.py",
+        "status": "passed",
+        "error": null
+      }
+    ],
+    "summary": {
+      "total": 31,
+      "passed": 4,
+      "failed": 5,
+      "broken": 0,
+      "archived": 22
+    }
+  },
+  {
+    "project": "gitget",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/e2e/test_gitingest_config.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_module_interface.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/gitget/test_api_real.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/test_processing_real.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/performance/test_memory.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_ast_search.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/e2e/test_workflows.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_minified_js_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/performance/test_parallel.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/test_arangodb_renderer.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/test_error_handling.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/utils/test_helpers.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/utils/test_workflow_tracking.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/unit/test_ai_output.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/unit/test_config_loader.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/test_summarization_real.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_mcp_server.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/gitget/utils/test_directory_manager.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/performance/test_streaming.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_minified_js.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/gitget/test_workflow_real.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_workflow_simple.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/cli/test_commands_real.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/gitget/utils/test_tree_sitter_utils.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/integration/test_integration_api_simple.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_slash_commands.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/security/test_security.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/test_gitingest_integration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/unit/test_unified_schema.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/gitget/utils/test_enhanced_logger.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/unit/test_cache.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      }
+    ],
+    "summary": {
+      "total": 34,
+      "passed": 10,
+      "failed": 15,
+      "broken": 0,
+      "archived": 9
+    }
+  },
+  {
+    "project": "arxiv-mcp-server",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/integration/test_integration_new_features.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_new_features.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/performance/test_concurrent_operations.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/scenarios/test_quantum_research_workflow.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_full_workflows.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/scenarios/test_data.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "scripts/testing/run_tests_and_report.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_reading_list.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_all_tools.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/scenarios/test_research_workflows.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/scenarios/test_library_management.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_comprehensive_features.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/level_0/test_arxiv_standardized.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "archive/test_iterations/validate_real_functionality.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_export_references.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_basic.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "scripts/run_tests_with_report.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/framework/scenario_test.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_citation_tracking.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/examples/test_example_compliant.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/resilience/test_error_recovery.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_claude_workflow.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arxiv_mcp_server/storage/test_search_engine.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_search_widening.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_real_functionality.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/testing/validate_real_functionality.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/testing/run_tests_with_report.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/run_scenario_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/run_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_daily_digest.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/run_tests_and_report.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/scenarios/test_advanced_features.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/arxiv_mcp_server/tools/test_tools.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      }
+    ],
+    "summary": {
+      "total": 35,
+      "passed": 1,
+      "failed": 4,
+      "broken": 0,
+      "archived": 30
+    }
+  },
+  {
+    "project": "mcp-screenshot",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_image_similarity.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_zoom_visual.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_history.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_mcp_screenshot.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_script.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_zoom.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_litellm_cache.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_cli_improvements.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_annotation.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_history_file.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_sqlite.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      }
+    ],
+    "summary": {
+      "total": 13,
+      "passed": 0,
+      "failed": 3,
+      "broken": 0,
+      "archived": 10
+    }
+  },
+  {
+    "project": "chat",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_dashboard_manual.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/test_dashboard_fixtures.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/backend/test_caching.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/backend/d3/test_d3_integration.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/test_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/integration/test_dashboard_ui.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/test_console_errors.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/backend/test_pipeline_timeline.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/backend/test_plugin_system.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/backend/test_main_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_dashboard_command.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/test_chat_flow_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_dashboard_integration_playwright.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/backend/test_learning_curves.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/validate_style_guide.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/backend/test_dashboard_api.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/test_dashboard_implementation.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_dashboard_standalone.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/validate_task_108.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      }
+    ],
+    "summary": {
+      "total": 20,
+      "passed": 0,
+      "failed": 1,
+      "broken": 0,
+      "archived": 19
+    }
+  },
+  {
+    "project": "annotator",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/active_annotator/test_marker_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/test_controller.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/active_annotator/frontend/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/test_streams.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/active_annotator/test_server.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "examples/validate_marker_extraction.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/test_active_learning.py",
+        "status": "archived",
+        "reason": "Broken: Import error"
+      },
+      {
+        "file": "tests/active_annotator/ux/test_screenshots.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "scripts/run_task_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_recipes.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/validation/validate_2025_compliance.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/active_annotator/frontend/test_project_setup.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_responsive_ui.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_collaboration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/active_learning/test_active_learning.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/test_active_learning_final.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      }
+    ],
+    "summary": {
+      "total": 17,
+      "passed": 1,
+      "failed": 2,
+      "broken": 0,
+      "archived": 14
+    }
+  },
+  {
+    "project": "aider-daemon",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/integration/test_hybrid_functionality.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_rl_manager.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/performance/test_uvloop_performance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_find_or_blocks.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_exceptions.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/e2e/test_security_scenarios.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/test_pattern_extraction.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/mcp/test_prompts.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/performance/test_rl_manager_enhanced_performance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_websocket_batching.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/e2e/test_production_workflows.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/performance/test_performance_benchmarks.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_enhanced_session_manager.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_code_generator.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/cli/test_app.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_arangodb_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_run_cmd.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/unit/core/test_monitoring.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/performance/test_json_performance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/mcp/test_integration.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/core/test_websocket_batching.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_session_persistence.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/performance/test_session_cache_performance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_gemini_auth.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/unit/core/test_llm_providers_validation.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_repomap.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/test_claude_code_parity.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/smoke/test_honeypot.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_special.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/test_event_system.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_daemon.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/cli/test_session_management.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_event_bus_caching.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_event_bus.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_bounded_collections.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "scripts/run_loop2_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/unit/core/test_error_handling.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_module_explorer.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/smoke/test_setup.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/integration/test_daemon_features.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/modules/test_oss_agent_schema.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "venv/lib/python3.12/site-packages/pydantic/validate_call_decorator.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/modules/test_oss_agent_thinking_mock.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/cli/test_resume_flag.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_subprocess_entry.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/unit/cli/test_continue_flag.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_session_cache.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/integration/test_event_bus_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_progress_tracking_validation.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/storage/test_storage_simple.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_circuit_breaker.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/modules/test_oss_agent_thinking.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/cli/test_print_mode.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/integration/test_stream_json_protocol.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/integration/test_monitoring_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/storage/test_storage_backends.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/cli/test_output_formats.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/test_event_system.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/smoke/test_regression_check.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_udiff.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/unit/cli/test_session_listing.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_urls.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_watch.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/unit/modules/test_open_source_agent_module.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_session_cache_integration.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_validation_pipeline.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_aws_credentials.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/test_module_system.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/integration/test_oss_agent_integration.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/unit/core/test_progress_tracking.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/modules/test_schema_helpers.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/ui/test_tui_components.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/test_code_generator.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "tests/legacy/basic/basic/test_commands.py",
+        "status": "archived",
+        "reason": "Broken: Module not found"
+      },
+      {
+        "file": "tests/unit/core/test_pattern_docs.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/performance/test_bounded_collections_performance.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      },
+      {
+        "file": "tests/unit/core/test_llm_providers.py",
+        "status": "archived",
+        "reason": "Broken: Syntax error"
+      }
+    ],
+    "summary": {
+      "total": 78,
+      "passed": 1,
+      "failed": 5,
+      "broken": 0,
+      "archived": 72
+    }
+  },
+  {
+    "project": "runpod_ops",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "tests/test_honeypot.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_core/test_inference_server.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/runpod_ops/integration/test_auto_termination.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_core/test_auto_terminator.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/test_real_api/test_api_coverage.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_real_api/test_instance_lifecycle.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_real_api/test_ssh_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/runpod_ops/integration/test_ssh_connection.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_real_api/test_runpod_api_integration.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_core/test_instance_monitor_finetuning.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/test_core/test_training_orchestrator.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/runpod_ops/integration/test_error_handling.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_instance_monitor.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/runpod_ops/integration/test_unsloth_integration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_core/test_runpod_manager.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/runpod_ops/core/test_inference_server.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/runpod_ops/core/test_instance_optimizer.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_cli.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_core/test_error_handler.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/test_api_keys.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_ssh_manager.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/runpod_ops/core/test_training_orchestrator.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/runpod_ops/core/test_runpod_connection.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_real_api/test_inference_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/test_core/test_ssh_manager_enhanced.py",
+        "status": "failed",
+        "error": "Test assertions failed"
+      },
+      {
+        "file": "tests/test_real_api/test_training_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/runpod_ops/core/test_cost_calculator.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_real_api/test_monitoring_real.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "tests/runpod_ops/integration/test_distributed_training.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/runpod_ops/core/test_runpod_manager.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_granger_integration.py",
+        "status": "passed",
+        "error": null
+      },
+      {
+        "file": "tests/test_core/test_ssh_manager_enhanced_standalone.py",
+        "status": "archived",
+        "reason": "Broken: Mock usage without import"
+      },
+      {
+        "file": "tests/runpod_ops/core/test_instance_monitor.py",
+        "status": "passed",
+        "error": null
+      }
+    ],
+    "summary": {
+      "total": 33,
+      "passed": 13,
+      "failed": 8,
+      "broken": 0,
+      "archived": 12
+    }
+  },
+  {
+    "project": "granger-ui",
+    "status": "tested",
+    "tests": [],
+    "summary": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "broken": 0,
+      "archived": 0
+    }
+  },
+  {
+    "project": "shared_claude_docs",
+    "status": "tested",
+    "tests": [
+      {
+        "file": "project_interactions/claude-module-communicator/validate_setup.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/arxiv-mcp-server/run_task_002_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/rl-commons/run_task_004_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/arangodb_tests/level_0/run_all_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/arxiv-mcp-server/level_0_tests/run_all_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/arxiv-mcp-server/level_0_tests/validate_pipeline_setup.py",
+        "status": "archived",
+        "reason": "Contains validate_"
+      },
+      {
+        "file": "project_interactions/youtube-transcripts/run_task_003_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/claude-module-communicator/run_task_001_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "scripts/run_all_granger_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "utils/cleanup_utility/run_all_tests_with_reporter.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/run_all_task_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      },
+      {
+        "file": "project_interactions/marker/run_task_006_tests.py",
+        "status": "archived",
+        "reason": "Contains sys.exit("
+      }
+    ],
+    "summary": {
+      "total": 12,
+      "passed": 0,
+      "failed": 0,
+      "broken": 0,
+      "archived": 12
+    }
+  }
+]

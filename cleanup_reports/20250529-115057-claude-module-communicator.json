@@ -1,0 +1,40 @@
+{
+  "project": "/home/graham/workspace/experiments/claude-module-communicator",
+  "name": "claude-module-communicator",
+  "type": "communicator",
+  "timestamp": "20250529-115057",
+  "issues": [
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities"
+  ],
+  "warnings": [
+    "README.md missing sections: requirements",
+    "Tests directory exists but contains no test files",
+    "No slash commands documented for Claude project",
+    "High technical debt: 3615 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    },
+    "inter_project": [
+      "sparta",
+      "marker",
+      "arangodb",
+      "claude_max_proxy"
+    ]
+  },
+  "status": "issues"
+}

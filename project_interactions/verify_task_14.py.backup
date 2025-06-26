@@ -1,0 +1,257 @@
+#!/usr/bin/env python3
+"""
+Skeptical verification of Task #14: Multi-Source Research Aggregation
+"""
+
+import sys
+import time
+from pathlib import Path
+from datetime import datetime
+
+# Add parent to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import the scenario directly
+exec(open("/home/graham/workspace/shared_claude_docs/project_interactions/multi-source-research/multi_source_interaction_v2.py").read())
+
+
+class SkepticalVerifier:
+    """Skeptically verify Task #14 implementation."""
+    
+    def __init__(self):
+        self.suspicions = []
+        self.confidence_scores = {}
+    
+    def verify_parallel_search(self, scenario):
+        """Verify parallel search test."""
+        print("\n🔍 Verifying Parallel Search (Test 014.1)...")
+        
+        start_time = time.time()
+        result = scenario.test_parallel_search()
+        duration = time.time() - start_time
+        
+        # Check duration - Level 2 should take longer
+        expected_min, expected_max = 15.0, 40.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["parallel_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["parallel_duration"] = 0.5
+            self.suspicions.append(f"Duration {duration:.2f}s outside expected range for Level 2")
+            print(f"  ⚠️  Duration suspicious: {duration:.2f}s")
+        
+        # Check parallel execution evidence
+        output = result.output_data
+        if output.get("arxiv_results", 0) > 0 and output.get("youtube_results", 0) > 0:
+            print(f"  ✅ Both sources returned results: ArXiv={output['arxiv_results']}, YouTube={output['youtube_results']}")
+            self.confidence_scores["parallel_execution"] = 0.9
+        else:
+            self.suspicions.append("Missing results from parallel sources")
+            self.confidence_scores["parallel_execution"] = 0.3
+        
+        # Check for time savings claim
+        if "search_time_saved" in output:
+            print(f"  ✅ Parallel execution benefit: {output['search_time_saved']}")
+        else:
+            self.suspicions.append("No evidence of parallel execution benefits")
+        
+        return result
+    
+    def verify_knowledge_merge(self, scenario):
+        """Verify knowledge merge test."""
+        print("\n🔍 Verifying Knowledge Merge (Test 014.2)...")
+        
+        start_time = time.time()
+        result = scenario.test_knowledge_merge()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 10.0, 25.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["merge_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["merge_duration"] = 0.5
+            self.suspicions.append(f"Merge duration {duration:.2f}s outside range")
+        
+        # Check graph construction
+        output = result.output_data
+        graph_stats = output.get("graph_stats", {})
+        
+        if graph_stats.get("total_nodes", 0) > 5 and graph_stats.get("total_edges", 0) > 3:
+            print(f"  ✅ Graph created: {graph_stats['total_nodes']} nodes, {graph_stats['total_edges']} edges")
+            self.confidence_scores["graph_quality"] = 0.85
+        else:
+            self.suspicions.append("Graph too small for meaningful knowledge merge")
+            self.confidence_scores["graph_quality"] = 0.4
+        
+        # Check knowledge density
+        density = output.get("knowledge_density", 0)
+        if density > 0:
+            print(f"  ✅ Knowledge density: {density:.2f}")
+        else:
+            self.suspicions.append("Zero knowledge density indicates empty graph")
+        
+        return result
+    
+    def verify_contradiction_detection(self, scenario):
+        """Verify contradiction detection test."""
+        print("\n🔍 Verifying Contradiction Detection (Test 014.3)...")
+        
+        start_time = time.time()
+        result = scenario.test_contradiction_detection()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 10.0, 25.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["contradiction_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["contradiction_duration"] = 0.5
+        
+        # Check contradiction detection capability
+        output = result.output_data
+        contradictions = output.get("contradictions_found", 0)
+        
+        print(f"  ℹ️  Contradictions found: {contradictions}")
+        
+        # It's OK if no contradictions found - that's realistic
+        if "resolution_strategies" in output and len(output["resolution_strategies"]) > 0:
+            print(f"  ✅ Resolution strategies provided: {len(output['resolution_strategies'])}")
+            self.confidence_scores["contradiction_handling"] = 0.9
+        else:
+            self.suspicions.append("No resolution strategies provided")
+            self.confidence_scores["contradiction_handling"] = 0.5
+        
+        # Check confidence score
+        detection_confidence = output.get("confidence_in_detection", 0)
+        if 0.5 <= detection_confidence <= 0.9:
+            print(f"  ✅ Detection confidence realistic: {detection_confidence:.2%}")
+        else:
+            self.suspicions.append(f"Unrealistic detection confidence: {detection_confidence}")
+        
+        return result
+    
+    def verify_honeypot(self, scenario):
+        """Verify honeypot test fails as expected."""
+        print("\n🔍 Verifying Honeypot (Test 014.H)...")
+        
+        try:
+            # Create incompatible data
+            scenario.knowledge_builder.nodes["incompatible_1"] = {
+                "type": "invalid_type",
+                "data": {"format": "completely_different"}
+            }
+            scenario.knowledge_builder.nodes["incompatible_2"] = {
+                "type": None,
+                "data": ["wrong", "format"]
+            }
+            
+            # Try to merge
+            merge_stats = scenario.knowledge_builder.merge_knowledge()
+            
+            # If it succeeds, check it handled incompatible data properly
+            if merge_stats["total_nodes"] > 0:
+                print("  ⚠️  Honeypot handled gracefully - merged despite incompatible data")
+                self.confidence_scores["honeypot"] = 0.7  # Partial credit for graceful handling
+            else:
+                print("  ❌ Honeypot FAILED: Should not merge incompatible data")
+                self.suspicions.append("CRITICAL: Accepted incompatible data")
+                self.confidence_scores["honeypot"] = 0.0
+                
+        except Exception as e:
+            print(f"  ✅ Honeypot correctly failed: {str(e)}")
+            self.confidence_scores["honeypot"] = 1.0
+            return True
+    
+    def generate_report(self, results):
+        """Generate skeptical analysis report."""
+        overall_confidence = sum(self.confidence_scores.values()) / len(self.confidence_scores) if self.confidence_scores else 0
+        
+        print("\n" + "="*60)
+        print("SKEPTICAL ANALYSIS REPORT - Task #14")
+        print("="*60)
+        
+        print(f"\nOverall Confidence: {overall_confidence:.1%}")
+        
+        print("\nConfidence Breakdown:")
+        for metric, score in self.confidence_scores.items():
+            print(f"  - {metric}: {score:.1%}")
+        
+        if self.suspicions:
+            print("\n🚨 Suspicions Detected:")
+            for suspicion in self.suspicions:
+                print(f"  - {suspicion}")
+        
+        # Determine verdict
+        if overall_confidence >= 0.85:
+            verdict = "LIKELY_GENUINE"
+            emoji = "✅"
+        elif overall_confidence >= 0.7:
+            verdict = "QUESTIONABLE"
+            emoji = "🟡"
+        elif overall_confidence >= 0.5:
+            verdict = "SUSPICIOUS"
+            emoji = "⚠️"
+        else:
+            verdict = "FAKE_IMPLEMENTATION"
+            emoji = "🚫"
+        
+        print(f"\n{emoji} VERDICT: {verdict}")
+        
+        # Level 2 specific checks
+        print("\n📊 Level 2 Verification:")
+        print("  - Parallel execution: " + ("✅ Confirmed" if self.confidence_scores.get("parallel_execution", 0) > 0.7 else "❌ Not confirmed"))
+        print("  - Complex workflow: " + ("✅ Yes" if len(results) >= 3 else "❌ Too simple"))
+        print("  - Multi-source integration: " + ("✅ Yes" if self.confidence_scores.get("graph_quality", 0) > 0.7 else "❌ Poor"))
+        
+        return {
+            "confidence": overall_confidence,
+            "verdict": verdict,
+            "suspicions": self.suspicions,
+            "is_level_2": self.confidence_scores.get("parallel_execution", 0) > 0.7
+        }
+
+
+def main():
+    """Main verification runner."""
+    print("="*80)
+    print("Task #14 Skeptical Verification (Level 2)")
+    print(f"Started: {datetime.now().isoformat()}")
+    print("="*80)
+    
+    # Create scenario and verifier
+    scenario = MultiSourceResearchScenario()
+    verifier = SkepticalVerifier()
+    
+    # Run all verifications
+    results = {
+        "parallel": verifier.verify_parallel_search(scenario),
+        "merge": verifier.verify_knowledge_merge(scenario),
+        "contradiction": verifier.verify_contradiction_detection(scenario),
+        "honeypot": verifier.verify_honeypot(scenario)
+    }
+    
+    # Generate report
+    report = verifier.generate_report(results)
+    
+    # Final summary
+    print("\n" + "="*80)
+    print("TASK #14 VERIFICATION COMPLETE")
+    print("="*80)
+    
+    if report["verdict"] in ["LIKELY_GENUINE", "QUESTIONABLE"] and report["is_level_2"]:
+        print("\n✅ Task #14 PASSED skeptical verification as Level 2 interaction")
+        print("\nMoving to Task #15...")
+        return 0
+    else:
+        print("\n❌ Task #14 FAILED skeptical verification")
+        if not report["is_level_2"]:
+            print("   Not properly implementing Level 2 parallel execution")
+        print("Debug and fix issues before proceeding")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

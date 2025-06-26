@@ -1,0 +1,43 @@
+{
+  "project": "/home/graham/workspace/experiments/marker",
+  "name": "marker",
+  "type": "tool",
+  "timestamp": "20250530-073127",
+  "issues": [
+    "Found 1 hardcoded PYTHONPATH entries",
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities, initialize"
+  ],
+  "warnings": [
+    "TOML syntax error in pyproject.toml: Unbalanced quotes (line 5 column 71 char 236)",
+    "Tests directory exists but contains no test files",
+    "No slash commands documented for Claude project",
+    "MCP dependencies not declared in pyproject.toml",
+    "High technical debt: 15580 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "imports": true,
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    },
+    "cli": true
+  },
+  "fixes_applied": [
+    "Removed 1 hardcoded PYTHONPATH entries"
+  ],
+  "status": "issues",
+  "git_status": "merged",
+  "git_tag": "pre-cleanup-20250530-073130"
+}

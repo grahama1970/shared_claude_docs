@@ -1,0 +1,96 @@
+{
+  "project_name": "unsloth_wip",
+  "project_path": "/home/graham/workspace/experiments/unsloth_wip",
+  "project_type": "AI Services",
+  "status": "warnings",
+  "mode": "VerificationMode.FULL",
+  "duration": 5.17860746383667,
+  "cleanup_result": "passed",
+  "compliance_result": "failed",
+  "test_result": "passed",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 0,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/unsloth_wip/src/unsloth/visualization/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/unsloth_wip/src/unsloth/upload/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/unsloth_wip/src/unsloth/utils/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/unsloth_wip/src/unsloth/runpod/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/unsloth_wip/src/unsloth/training/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    }
+  ],
+  "auto_fixes_applied": 0,
+  "fix_directive_generated": true
+}

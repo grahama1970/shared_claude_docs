@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: web-frontend-fault-injection
+  namespace: production
+spec:
+  hosts:
+  - web-frontend
+  http:
+  - fault:
+      abort: null
+      delay:
+        fixedDelay: 3s
+        percentage:
+          value: 10
+    match:
+    - headers:
+        x-test-fault:
+          exact: 'true'
+    route:
+    - destination:
+        host: web-frontend

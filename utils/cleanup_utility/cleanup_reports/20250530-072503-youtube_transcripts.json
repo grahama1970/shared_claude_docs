@@ -1,0 +1,39 @@
+{
+  "project": "/home/graham/workspace/experiments/youtube_transcripts",
+  "name": "youtube_transcripts",
+  "type": "tool",
+  "timestamp": "20250530-072503",
+  "issues": [
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities, initialize"
+  ],
+  "warnings": [
+    "TOML syntax error in pyproject.toml: Unbalanced quotes (line 5 column 11 char 85)",
+    "README.md missing sections: requirements",
+    "No slash commands documented for Claude project",
+    "High technical debt: 10130 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "imports": true,
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "tests_pass": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    }
+  },
+  "fixes_applied": [],
+  "status": "issues",
+  "test_count": 30,
+  "git_tag": "pre-cleanup-20250530-072521"
+}

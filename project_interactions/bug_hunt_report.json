@@ -1,0 +1,301 @@
+{
+  "timestamp": "2025-06-08T14:47:07.480436",
+  "bugs_found": 49,
+  "modules_tested": 4,
+  "bugs": [
+    {
+      "module": "sparta",
+      "file": "/home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/pydantic_core/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "sparta",
+      "file": "/home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/iniconfig/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "arangodb",
+      "file": "/home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/pydantic_core/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "arangodb",
+      "file": "/home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/iniconfig/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "arangodb",
+      "file": "/home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/torch/backends/cuda/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "arangodb",
+      "file": "/home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/torch/onnx/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "arangodb",
+      "file": "/home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/torch/jit/mobile/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pydantic_core/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/bs4/builder/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/websockets/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/websockets/legacy/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/isoduration/operations/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/isoduration/formatter/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/comm/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pywt/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/anthropic/types/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/anthropic/types/beta/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/anthropic/types/beta/messages/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/anthropic/types/messages/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/blinker/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/ftfy/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/docx/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/docx/drawing/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/docx/styles/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/docx/oxml/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/PIL/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/iniconfig/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pptx/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pptx/shapes/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pptx/oxml/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/pptx/oxml/shapes/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/constraint/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/uvicorn/supervisors/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/markupsafe/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/watchdog/utils/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/watchdog/observers/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/watchdog/tricks/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/scipy/_lib/array_api_extra/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/defusedxml/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/torch/backends/cuda/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/torch/onnx/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "marker",
+      "file": "/home/graham/workspace/experiments/marker/.venv/lib/python3.10/site-packages/torch/jit/mobile/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/pyparsing/diagram/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/torch/backends/cuda/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/torch/onnx/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/torch/jit/mobile/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/markdown/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/markdown/extensions/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    },
+    {
+      "module": "youtube_transcripts",
+      "file": "/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.10/site-packages/platformdirs/__init__.py",
+      "bug": "Module docstring not at start of file",
+      "severity": "HIGH"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Quick benchmark test to verify functionality
+"""
+
+import asyncio
+import time
+from distributed_training_interaction import (
+    DistributedTrainingOrchestrator,
+    AggregationStrategy
+)
+
+
+async def quick_benchmark():
+    """Quick benchmark with smaller parameters"""
+    print("🚀 Quick Benchmark Test")
+    print("=" * 40)
+    
+    # Test 1: Worker scaling (small)
+    print("\n📊 Testing worker scaling...")
+    worker_counts = [2, 4]
+    
+    for num_workers in worker_counts:
+        orchestrator = DistributedTrainingOrchestrator(num_workers=num_workers)
+        await orchestrator.initialize_workers()
+        
+        model_config = {
+            "size": 1000,
+            "batch_size": 32,
+            "learning_rate": 0.01,
+            "epochs": 2
+        }
+        
+        data_config = {"total_samples": 1000}
+        
+        start_time = time.time()
+        result = await orchestrator.train_distributed(model_config, data_config)
+        duration = time.time() - start_time
+        
+        print(f"  {num_workers} workers: {duration:.2f}s (loss: {result['final_loss']:.4f})")
+        
+        await orchestrator.cleanup()
+    
+    # Test 2: Aggregation strategies
+    print("\n📊 Testing aggregation strategies...")
+    strategies = [AggregationStrategy.ALL_REDUCE, AggregationStrategy.RING_ALL_REDUCE]
+    
+    for strategy in strategies:
+        orchestrator = DistributedTrainingOrchestrator(num_workers=3)
+        await orchestrator.initialize_workers()
+        
+        model_config = {
+            "size": 1000,
+            "batch_size": 32,
+            "learning_rate": 0.01,
+            "epochs": 2,
+            "aggregation_strategy": strategy
+        }
+        
+        data_config = {"total_samples": 1000}
+        
+        start_time = time.time()
+        result = await orchestrator.train_distributed(model_config, data_config)
+        duration = time.time() - start_time
+        
+        print(f"  {strategy.value}: {duration:.2f}s (loss: {result['final_loss']:.4f})")
+        
+        await orchestrator.cleanup()
+    
+    print("\n✅ Quick benchmark completed!")
+
+
+if __name__ == "__main__":
+    asyncio.run(quick_benchmark())

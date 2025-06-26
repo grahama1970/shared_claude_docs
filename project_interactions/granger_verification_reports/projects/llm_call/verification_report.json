@@ -1,0 +1,40 @@
+{
+  "project_name": "llm_call",
+  "project_path": "/home/graham/workspace/experiments/llm_call",
+  "project_type": "AI Services",
+  "status": "warnings",
+  "mode": "VerificationMode.FULL",
+  "duration": 3.9418299198150635,
+  "cleanup_result": "passed",
+  "compliance_result": "passed",
+  "test_result": "warnings",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 1,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "mock_usage_detected",
+      "description": "Found mocks in 1 test files",
+      "severity": "high",
+      "evidence": [
+        "tests/llm_call/core/test_runpod_routing.py"
+      ],
+      "files": [
+        "tests/llm_call/core/test_runpod_routing.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": true,
+      "fix_result": "success"
+    }
+  ],
+  "auto_fixes_applied": 1,
+  "fix_directive_generated": true
+}

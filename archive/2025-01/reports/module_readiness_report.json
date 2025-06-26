@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-06-09 14:56:01.100697",
+  "modules": [
+    {
+      "module": "SPARTA",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "has_tests": true,
+      "test_count": 54,
+      "skeleton_count": 6,
+      "has_pytest": true,
+      "has_src": true,
+      "real_implementation": true
+    },
+    {
+      "module": "Marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "has_tests": true,
+      "test_count": 254,
+      "skeleton_count": 51,
+      "has_pytest": true,
+      "has_src": true,
+      "real_implementation": false
+    },
+    {
+      "module": "ArangoDB",
+      "path": "/home/graham/workspace/experiments/arangodb",
+      "has_tests": true,
+      "test_count": 197,
+      "skeleton_count": 52,
+      "has_pytest": true,
+      "has_src": true,
+      "real_implementation": false
+    },
+    {
+      "module": "YouTube Transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "has_tests": true,
+      "test_count": 139,
+      "skeleton_count": 17,
+      "has_pytest": true,
+      "has_src": true,
+      "real_implementation": true
+    },
+    {
+      "module": "Claude Test Reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "has_tests": true,
+      "test_count": 18,
+      "skeleton_count": 15,
+      "has_pytest": true,
+      "has_src": true,
+      "real_implementation": true
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "ready": 3,
+    "not_ready": 2
+  }
+}

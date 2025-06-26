@@ -1,0 +1,396 @@
+{
+  "summary": {
+    "date": "2025-06-08T11:04:40.040434",
+    "total_tests": 3,
+    "pass_rate": 33.33333333333333,
+    "bugs_found": 2
+  },
+  "results": [
+    {
+      "name": "Security Validation",
+      "status": "PASS",
+      "duration": 0.5016365051269531,
+      "error": null,
+      "work_performed": [
+        "Verified authentication in arangodb",
+        "Tested token validation in arangodb",
+        "Verified authentication in marker",
+        "Tested token validation in marker",
+        "Verified authentication in sparta",
+        "Tested token validation in sparta",
+        "Security boundary testing"
+      ],
+      "metrics": {
+        "duration": 0.5016365051269531,
+        "validations": {
+          "arangodb_auth": true,
+          "arangodb_token_validation": false,
+          "marker_auth": true,
+          "marker_token_validation": false,
+          "sparta_auth": true,
+          "sparta_token_validation": false
+        },
+        "work_performed": [
+          {
+            "action": "Verified authentication in arangodb",
+            "duration": 0.0002856254577636719,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.442820"
+          },
+          {
+            "action": "Tested token validation in arangodb",
+            "duration": 0.0002949237823486328,
+            "result": false,
+            "timestamp": "2025-06-08T11:04:39.442828"
+          },
+          {
+            "action": "Verified authentication in marker",
+            "duration": 0.00046634674072265625,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.443000"
+          },
+          {
+            "action": "Tested token validation in marker",
+            "duration": 0.00047087669372558594,
+            "result": false,
+            "timestamp": "2025-06-08T11:04:39.443004"
+          },
+          {
+            "action": "Verified authentication in sparta",
+            "duration": 0.0006582736968994141,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.443192"
+          },
+          {
+            "action": "Tested token validation in sparta",
+            "duration": 0.0006630420684814453,
+            "result": false,
+            "timestamp": "2025-06-08T11:04:39.443196"
+          },
+          {
+            "action": "Security boundary testing",
+            "duration": 0.5009498596191406,
+            "result": {
+              "tests_performed": 10
+            },
+            "timestamp": "2025-06-08T11:04:39.944154"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pipeline Data Isolation",
+      "status": "INVALID",
+      "duration": 0.09573817253112793,
+      "error": "Test completed too quickly (0.096s) - insufficient work performed",
+      "work_performed": [
+        "Created pipeline instance pipeline_0",
+        "Created pipeline instance pipeline_1",
+        "Created pipeline instance pipeline_2",
+        "Verified isolation between 0 and 1",
+        "Verified isolation between 0 and 2",
+        "Verified isolation between 1 and 0",
+        "Verified isolation between 1 and 2",
+        "Verified isolation between 2 and 0",
+        "Verified isolation between 2 and 1",
+        "Tested concurrent pipeline access"
+      ],
+      "metrics": {
+        "duration": 0.09573817253112793,
+        "isolation_tests": {
+          "isolation_0_1": true,
+          "isolation_0_2": true,
+          "isolation_1_0": true,
+          "isolation_1_2": true,
+          "isolation_2_0": true,
+          "isolation_2_1": true,
+          "memory_isolation": true
+        },
+        "work_performed": [
+          {
+            "action": "Created pipeline instance pipeline_0",
+            "duration": 7.62939453125e-06,
+            "result": "pipeline_0",
+            "timestamp": "2025-06-08T11:04:39.944220"
+          },
+          {
+            "action": "Created pipeline instance pipeline_1",
+            "duration": 1.3589859008789062e-05,
+            "result": "pipeline_1",
+            "timestamp": "2025-06-08T11:04:39.944225"
+          },
+          {
+            "action": "Created pipeline instance pipeline_2",
+            "duration": 1.7404556274414062e-05,
+            "result": "pipeline_2",
+            "timestamp": "2025-06-08T11:04:39.944229"
+          },
+          {
+            "action": "Verified isolation between 0 and 1",
+            "duration": 2.574920654296875e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944238"
+          },
+          {
+            "action": "Verified isolation between 0 and 2",
+            "duration": 4.00543212890625e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944252"
+          },
+          {
+            "action": "Verified isolation between 1 and 0",
+            "duration": 4.506111145019531e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944257"
+          },
+          {
+            "action": "Verified isolation between 1 and 2",
+            "duration": 4.887580871582031e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944261"
+          },
+          {
+            "action": "Verified isolation between 2 and 0",
+            "duration": 5.269050598144531e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944264"
+          },
+          {
+            "action": "Verified isolation between 2 and 1",
+            "duration": 5.650520324707031e-05,
+            "result": true,
+            "timestamp": "2025-06-08T11:04:39.944268"
+          },
+          {
+            "action": "Tested concurrent pipeline access",
+            "duration": 0.0924673080444336,
+            "result": {
+              "concurrent_tests": 9
+            },
+            "timestamp": "2025-06-08T11:04:40.036687"
+          }
+        ],
+        "instances_tested": 3
+      }
+    },
+    {
+      "name": "Error Handling Quality",
+      "status": "INVALID",
+      "duration": 7.510185241699219e-05,
+      "error": "Test completed too quickly (0.000s) - insufficient work performed",
+      "work_performed": [
+        "Analyzed error handling in arangodb",
+        "Analyzed error handling in sparta",
+        "Analyzed error handling in marker"
+      ],
+      "metrics": {
+        "duration": 7.510185241699219e-05,
+        "error_analysis": {
+          "arangodb": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              }
+            ],
+            "average_quality": 2.0,
+            "recommendation": "Good"
+          },
+          "sparta": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              }
+            ],
+            "average_quality": 2.0,
+            "recommendation": "Good"
+          },
+          "marker": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 2
+              }
+            ],
+            "average_quality": 2.0,
+            "recommendation": "Good"
+          }
+        },
+        "work_performed": [
+          {
+            "action": "Analyzed error handling in arangodb",
+            "duration": 3.0994415283203125e-05,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                }
+              ],
+              "average_quality": 2.0,
+              "recommendation": "Good"
+            },
+            "timestamp": "2025-06-08T11:04:40.040062"
+          },
+          {
+            "action": "Analyzed error handling in sparta",
+            "duration": 5.53131103515625e-05,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                }
+              ],
+              "average_quality": 2.0,
+              "recommendation": "Good"
+            },
+            "timestamp": "2025-06-08T11:04:40.040085"
+          },
+          {
+            "action": "Analyzed error handling in marker",
+            "duration": 7.224082946777344e-05,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 2
+                }
+              ],
+              "average_quality": 2.0,
+              "recommendation": "Good"
+            },
+            "timestamp": "2025-06-08T11:04:40.040102"
+          }
+        ]
+      }
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG_001",
+      "title": "Pipeline Data Isolation Failed - Test completed too quickly (0.096s) - insufficient work performed",
+      "severity": "MEDIUM",
+      "modules": [
+        "granger_hub",
+        "arangodb"
+      ],
+      "root_cause": "Insufficient test implementation",
+      "fix_recommendation": "Implement actual validation logic instead of placeholder code"
+    },
+    {
+      "id": "BUG_002",
+      "title": "Error Handling Quality Failed - Test completed too quickly (0.000s) - insufficient work performed",
+      "severity": "MEDIUM",
+      "modules": [
+        "arangodb",
+        "sparta",
+        "marker"
+      ],
+      "root_cause": "Insufficient test implementation",
+      "fix_recommendation": "Implement actual validation logic instead of placeholder code"
+    }
+  ],
+  "performance_metrics": {
+    "arangodb_import_time": 0.0002827644348144531,
+    "marker_import_time": 0.00016760826110839844,
+    "sparta_import_time": 0.00018405914306640625
+  }
+}

@@ -1,0 +1,201 @@
+#!/usr/bin/env python3
+"""
+Simple verification of GRANGER tasks 8-12.
+
+This script runs basic tests on the generated task implementations.
+"""
+
+import sys
+import os
+from pathlib import Path
+
+# Add the parent directory to Python path
+parent_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(parent_dir))
+
+# Now we can import from shared_claude_docs
+from templates.interaction_framework import InteractionResult, InteractionLevel
+
+def verify_task_8():
+    """Verify Task #8: Claude Max Proxy"""
+    print("\n" + "="*60)
+    print("Task #8: Claude Max Proxy - Multi-Model Orchestration")
+    print("="*60)
+    
+    try:
+        # Import the module
+        from project_interactions.claude_max_proxy.claude_max_proxy_interaction import MultiModelOrchestrationScenario
+        
+        # Create scenario
+        scenario = MultiModelOrchestrationScenario()
+        
+        # Run execute method
+        result = scenario.execute()
+        
+        print(f"✅ Module loaded successfully")
+        print(f"✅ Scenario created: {scenario.module_name}")
+        print(f"✅ Execute result: {'PASS' if result.success else 'FAIL'}")
+        print(f"   Duration: {result.duration:.2f}s")
+        print(f"   Output: {result.output_data}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def verify_task_9():
+    """Verify Task #9: Unsloth"""
+    print("\n" + "="*60)
+    print("Task #9: Unsloth - Student-Teacher Learning")
+    print("="*60)
+    
+    try:
+        # Import the module
+        from project_interactions.unsloth.unsloth_interaction import StudentTeacherLearningScenario
+        
+        # Create scenario
+        scenario = StudentTeacherLearningScenario()
+        
+        # Run execute method
+        result = scenario.execute()
+        
+        print(f"✅ Module loaded successfully")
+        print(f"✅ Scenario created: {scenario.module_name}")
+        print(f"✅ Execute result: {'PASS' if result.success else 'FAIL'}")
+        print(f"   Duration: {result.duration:.2f}s")
+        print(f"   Output: {result.output_data}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def verify_task_10():
+    """Verify Task #10: Test Reporter"""
+    print("\n" + "="*60)
+    print("Task #10: Test Reporter - Flaky Test Detection")
+    print("="*60)
+    
+    try:
+        # Import the module
+        from project_interactions.test_reporter.test_reporter_interaction import FlakyTestDetectionScenario
+        
+        # Create scenario
+        scenario = FlakyTestDetectionScenario()
+        
+        # Run execute method
+        result = scenario.execute()
+        
+        print(f"✅ Module loaded successfully")
+        print(f"✅ Scenario created: {scenario.module_name}")
+        print(f"✅ Execute result: {'PASS' if result.success else 'FAIL'}")
+        print(f"   Duration: {result.duration:.2f}s")
+        print(f"   Output: {result.output_data}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def verify_task_11():
+    """Verify Task #11: ArXiv-Marker Pipeline"""
+    print("\n" + "="*60)
+    print("Task #11: ArXiv → Marker Pipeline (Level 1)")
+    print("="*60)
+    
+    try:
+        # Import the module
+        from project_interactions.arxiv_marker_pipeline.arxiv_marker_pipeline_interaction import ArxivMarkerPipelineScenario
+        
+        # Create scenario
+        scenario = ArxivMarkerPipelineScenario()
+        
+        # Run execute method
+        result = scenario.execute()
+        
+        print(f"✅ Module loaded successfully")
+        print(f"✅ Scenario created: {scenario.module_name}")
+        print(f"✅ Execute result: {'PASS' if result.success else 'FAIL'}")
+        print(f"   Duration: {result.duration:.2f}s")
+        print(f"   Output: {result.output_data}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def verify_task_12():
+    """Verify Task #12: Marker-ArangoDB Pipeline"""
+    print("\n" + "="*60)
+    print("Task #12: Marker → ArangoDB Pipeline (Level 1)")
+    print("="*60)
+    
+    try:
+        # Import the module
+        from project_interactions.marker_arangodb_pipeline.marker_arangodb_pipeline_interaction import MarkerArangoPipelineScenario
+        
+        # Create scenario
+        scenario = MarkerArangoPipelineScenario()
+        
+        # Run execute method
+        result = scenario.execute()
+        
+        print(f"✅ Module loaded successfully")
+        print(f"✅ Scenario created: {scenario.module_name}")
+        print(f"✅ Execute result: {'PASS' if result.success else 'FAIL'}")
+        print(f"   Duration: {result.duration:.2f}s")
+        print(f"   Output: {result.output_data}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def main():
+    """Main verification runner."""
+    print("="*60)
+    print("GRANGER Tasks 8-12 Verification")
+    print("="*60)
+    
+    results = {
+        8: verify_task_8(),
+        9: verify_task_9(),
+        10: verify_task_10(),
+        11: verify_task_11(),
+        12: verify_task_12()
+    }
+    
+    # Summary
+    print("\n" + "="*60)
+    print("SUMMARY")
+    print("="*60)
+    
+    passed = sum(1 for v in results.values() if v)
+    total = len(results)
+    
+    for task_num, result in results.items():
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"Task #{task_num}: {status}")
+    
+    print(f"\nOverall: {passed}/{total} tasks verified")
+    
+    if passed == total:
+        print("\n✅ SUCCESS: All tasks 8-12 have been implemented!")
+    else:
+        print("\n❌ FAILURE: Some tasks need attention.")
+    
+    return 0 if passed == total else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

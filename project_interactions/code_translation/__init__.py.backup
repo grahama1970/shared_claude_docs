@@ -1,0 +1,23 @@
+"""
+Code Translation Pipeline Module
+
+Provides AST-based code translation between Python, JavaScript, and Go.
+"""
+
+from .code_translation_interaction import (
+    CodeTranslationPipeline,
+    TranslationResult,
+    PythonToJavaScriptTransformer,
+    JavaScriptToPythonTransformer,
+    GoTransformer,
+)
+
+__all__ = [
+    "CodeTranslationPipeline",
+    "TranslationResult", 
+    "PythonToJavaScriptTransformer",
+    "JavaScriptToPythonTransformer",
+    "GoTransformer",
+]
+
+__version__ = "1.0.0"

@@ -1,0 +1,198 @@
+{
+  "test_name": "GitGet Repository Analysis",
+  "level": 0,
+  "modules": [
+    "GitGet",
+    "Test Reporter"
+  ],
+  "timestamp": "20250608_174354",
+  "duration": 0.0004124641418457031,
+  "verification": {
+    "verified": false,
+    "reason": "Test Reporter not available",
+    "confidence_score": 0.5,
+    "total_tests": 12,
+    "passed_tests": 10,
+    "failed_tests": 2,
+    "bugs_found": 2,
+    "suspicious_patterns": []
+  },
+  "bugs": [
+    {
+      "bug": "Primary language not detected",
+      "severity": "MEDIUM",
+      "timestamp": 1749419034.375836,
+      "test_level": 0,
+      "modules": [
+        "GitGet",
+        "Test Reporter"
+      ],
+      "repo": "JavaScript project",
+      "expected": "JavaScript",
+      "found": "Python"
+    },
+    {
+      "bug": "Missing expected languages",
+      "severity": "MEDIUM",
+      "timestamp": 1749419034.3758435,
+      "test_level": 0,
+      "modules": [
+        "GitGet",
+        "Test Reporter"
+      ],
+      "repo": "Multi-language project",
+      "missing": [
+        "C++"
+      ]
+    }
+  ],
+  "test_results": [
+    {
+      "test": "gitget_import",
+      "passed": true,
+      "timestamp": 1749419034.3758173,
+      "duration": 0.0002961158752441406,
+      "details": {}
+    },
+    {
+      "test": "analyze_Small Python project",
+      "passed": true,
+      "timestamp": 1749419034.3758295,
+      "duration": 0.0003085136413574219,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "analyze_JavaScript project",
+      "passed": true,
+      "timestamp": 1749419034.3758337,
+      "duration": 0.00031304359436035156,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "bug_check_1",
+      "passed": false,
+      "timestamp": 1749419034.3758378,
+      "duration": 0.0003170967102050781,
+      "details": {
+        "bug": "Primary language not detected",
+        "severity": "MEDIUM",
+        "repo": "JavaScript project",
+        "expected": "JavaScript",
+        "found": "Python"
+      }
+    },
+    {
+      "test": "analyze_Multi-language project",
+      "passed": true,
+      "timestamp": 1749419034.3758416,
+      "duration": 0.0003209114074707031,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "bug_check_2",
+      "passed": false,
+      "timestamp": 1749419034.3758447,
+      "duration": 0.00032401084899902344,
+      "details": {
+        "bug": "Missing expected languages",
+        "severity": "MEDIUM",
+        "repo": "Multi-language project",
+        "missing": [
+          "C++"
+        ]
+      }
+    },
+    {
+      "test": "analyze_Invalid repository URL",
+      "passed": true,
+      "timestamp": 1749419034.3758512,
+      "duration": 0.00033020973205566406,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "analyze_Private repository",
+      "passed": true,
+      "timestamp": 1749419034.3758538,
+      "duration": 0.0003330707550048828,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "analyze_Empty URL",
+      "passed": true,
+      "timestamp": 1749419034.3758569,
+      "duration": 0.00033593177795410156,
+      "details": {
+        "files": 100,
+        "size_mb": 10.5,
+        "languages": [
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "metadata_extraction",
+      "passed": true,
+      "timestamp": 1749419034.375865,
+      "duration": 0.0003440380096435547,
+      "details": {
+        "name": "cpython",
+        "stars": 100,
+        "forks": 20,
+        "language": "Python",
+        "created_at": "2020-01-01",
+        "updated_at": "2025-01-01",
+        "description": "Repository"
+      }
+    },
+    {
+      "test": "quality_High quality code",
+      "passed": true,
+      "timestamp": 1749419034.3758707,
+      "duration": 0.0003497600555419922,
+      "details": {
+        "score": 75,
+        "issue_count": 0
+      }
+    },
+    {
+      "test": "quality_Legacy codebase",
+      "passed": true,
+      "timestamp": 1749419034.3758733,
+      "duration": 0.0003523826599121094,
+      "details": {
+        "score": 75,
+        "issue_count": 0
+      }
+    }
+  ]
+}

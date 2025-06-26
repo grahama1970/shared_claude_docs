@@ -1,0 +1,39 @@
+{
+  "test_run": {
+    "timestamp": "2025-06-03T21:31:26.587004",
+    "sparta_available": true,
+    "total_duration": 4.291534423828125e-05,
+    "summary": {
+      "total": 5,
+      "successful": 0,
+      "failed": 5
+    }
+  },
+  "results": [
+    {
+      "handler": "test_download_handler",
+      "success": false,
+      "error": "Can't instantiate abstract class SPARTADownloadHandler with abstract methods initialize_module, validate_output"
+    },
+    {
+      "handler": "test_mission_search_handler",
+      "success": false,
+      "error": "Can't instantiate abstract class SPARTAMissionSearchHandler with abstract methods initialize_module, validate_output"
+    },
+    {
+      "handler": "test_cve_search_handler",
+      "success": false,
+      "error": "Can't instantiate abstract class SPARTACVESearchHandler with abstract methods initialize_module, validate_output"
+    },
+    {
+      "handler": "test_mitre_handler",
+      "success": false,
+      "error": "Can't instantiate abstract class SPARTAMITREHandler with abstract methods initialize_module, validate_output"
+    },
+    {
+      "handler": "test_module_handler",
+      "success": false,
+      "error": "Can't instantiate abstract class SPARTAModuleHandler with abstract methods initialize_module, validate_output"
+    }
+  ]
+}

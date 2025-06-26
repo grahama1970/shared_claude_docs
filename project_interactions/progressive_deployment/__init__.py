@@ -1,0 +1,36 @@
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""Progressive Deployment and Rollback System
+
+GRANGER Task #20 - Level 3 complexity task for safe deployment with monitoring
+and automatic rollback capabilities.
+"""
+
+from .progressive_deployment_interaction import (
+    ProgressiveDeploymentSystem,
+    DeploymentConfig,
+    DeploymentState,
+    DeploymentStrategy,
+    DeploymentStatus,
+    HealthStatus,
+    HealthMetrics,
+    ServiceSimulator
+)
+
+__all__ = [
+    "ProgressiveDeploymentSystem",
+    "DeploymentConfig",
+    "DeploymentState",
+    "DeploymentStrategy",
+    "DeploymentStatus",
+    "HealthStatus",
+    "HealthMetrics",
+    "ServiceSimulator"
+]
+
+__version__ = "1.0.0"

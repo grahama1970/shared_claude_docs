@@ -1,0 +1,493 @@
+"""
+Module: test_rate_limiting.py
+Purpose: Comprehensive tests for rate limiting algorithms
+
+External Dependencies:
+- pytest: https://docs.pytest.org/
+- pytest-asyncio: https://github.com/pytest-dev/pytest-asyncio
+- freezegun: https://github.com/spulec/freezegun
+
+Example Usage:
+>>> pytest test_rate_limiting.py -v
+"""
+
+import asyncio
+import time
+# REMOVED: from unittest.mock import Mock, patch, AsyncMock
+
+import pytest
+import pytest_asyncio
+from freezegun import freeze_time
+
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from api_gateway_interaction import (
+    RateLimiter, RateLimitConfig, RateLimitAlgorithm
+)
+
+
+@pytest.fixture
+async def rate_limiter():
+    """Create rate limiter instance"""
+    return RateLimiter()
+
+
+@pytest.fixture
+async def redis_rate_limiter():
+    """Create rate limiter with mocked Redis"""
+    redis_mock = AsyncMock()
+    redis_mock.pipeline.return_value = redis_mock
+    redis_mock.execute = AsyncMock(return_value=[0, 0, 1, 1])
+    return RateLimiter(redis_mock)
+
+
+class TestSlidingWindowRateLimiting:
+    """Test sliding window rate limiting algorithm"""
+    
+    @pytest.mark.asyncio
+    async def test_sliding_window_allows_requests(self, rate_limiter):
+        """Test sliding window allows requests within limit"""
+        config = RateLimitConfig(
+            requests_per_minute=5,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        # Make 5 requests (should all pass)
+        for i in range(5):
+            allowed, metadata = await rate_limiter.check_rate_limit(
+                "test_key", config, time.time() + i
+            )
+            assert allowed is True
+            assert metadata["remaining"] == 4 - i
+            assert metadata["limit"] == 5
+    
+    @pytest.mark.asyncio
+    async def test_sliding_window_blocks_excess(self, rate_limiter):
+        """Test sliding window blocks requests over limit"""
+        config = RateLimitConfig(
+            requests_per_minute=3,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        current_time = time.time()
+        
+        # Make 3 requests (should pass)
+        for i in range(3):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "test_key", config, current_time + i
+            )
+            assert allowed is True
+        
+        # 4th request should fail
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time + 3
+        )
+        assert allowed is False
+        assert metadata["remaining"] == 0
+    
+    @pytest.mark.asyncio
+    async def test_sliding_window_resets(self, rate_limiter):
+        """Test sliding window resets after time passes"""
+        config = RateLimitConfig(
+            requests_per_minute=2,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        current_time = time.time()
+        
+        # Make 2 requests
+        for i in range(2):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "test_key", config, current_time + i
+            )
+            assert allowed is True
+        
+        # 3rd request fails
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time + 2
+        )
+        assert allowed is False
+        
+        # After 60 seconds, should allow again
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time + 61
+        )
+        assert allowed is True
+    
+    @pytest.mark.asyncio
+    async def test_sliding_window_multiple_keys(self, rate_limiter):
+        """Test sliding window tracks different keys separately"""
+        config = RateLimitConfig(
+            requests_per_minute=2,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        current_time = time.time()
+        
+        # Use up limit for key1
+        for i in range(2):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "key1", config, current_time + i
+            )
+            assert allowed is True
+        
+        # key1 should be blocked
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "key1", config, current_time + 2
+        )
+        assert allowed is False
+        
+        # key2 should still work
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "key2", config, current_time + 2
+        )
+        assert allowed is True
+
+
+class TestTokenBucketRateLimiting:
+    """Test token bucket rate limiting algorithm"""
+    
+    @pytest.mark.asyncio
+    async def test_token_bucket_burst(self, rate_limiter):
+        """Test token bucket allows burst requests"""
+        config = RateLimitConfig(
+            requests_per_minute=60,
+            burst_size=10,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        current_time = time.time()
+        
+        # Should allow 10 burst requests immediately
+        for i in range(10):
+            allowed, metadata = await rate_limiter.check_rate_limit(
+                "test_key", config, current_time
+            )
+            assert allowed is True
+            assert metadata["remaining"] == 9 - i
+        
+        # 11th request should fail
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time
+        )
+        assert allowed is False
+        assert metadata["remaining"] == 0
+    
+    @pytest.mark.asyncio
+    async def test_token_bucket_refill(self, rate_limiter):
+        """Test token bucket refills over time"""
+        config = RateLimitConfig(
+            requests_per_minute=60,  # 1 per second
+            burst_size=5,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        current_time = time.time()
+        
+        # Use all tokens
+        for i in range(5):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "test_key", config, current_time
+            )
+            assert allowed is True
+        
+        # No tokens left
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time
+        )
+        assert allowed is False
+        
+        # After 1 second, should have 1 token
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time + 1
+        )
+        assert allowed is True
+        assert 0 <= metadata["remaining"] < 1
+    
+    @pytest.mark.asyncio
+    async def test_token_bucket_max_capacity(self, rate_limiter):
+        """Test token bucket doesn't exceed max capacity"""
+        config = RateLimitConfig(
+            requests_per_minute=600,  # 10 per second
+            burst_size=5,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        current_time = time.time()
+        
+        # Initial request
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time
+        )
+        assert allowed is True
+        
+        # Wait 10 seconds (would generate 100 tokens)
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time + 10
+        )
+        assert allowed is True
+        # Should be capped at burst_size - 1
+        assert metadata["remaining"] <= config.burst_size - 1
+
+
+class TestFixedWindowRateLimiting:
+    """Test fixed window rate limiting algorithm"""
+    
+    @pytest.mark.asyncio
+    async def test_fixed_window_basic(self, rate_limiter):
+        """Test basic fixed window rate limiting"""
+        config = RateLimitConfig(
+            requests_per_minute=5,
+            algorithm=RateLimitAlgorithm.FIXED_WINDOW
+        )
+        
+        # Use a fixed timestamp for predictable windows
+        base_time = int(time.time() // 60) * 60
+        
+        # Make 5 requests in same window
+        for i in range(5):
+            allowed, metadata = await rate_limiter.check_rate_limit(
+                "test_key", config, base_time + i
+            )
+            assert allowed is True
+            assert metadata["remaining"] == 4 - i
+        
+        # 6th request should fail
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, base_time + 5
+        )
+        assert allowed is False
+        assert metadata["remaining"] == 0
+    
+    @pytest.mark.asyncio
+    async def test_fixed_window_reset(self, rate_limiter):
+        """Test fixed window resets at window boundary"""
+        config = RateLimitConfig(
+            requests_per_minute=3,
+            algorithm=RateLimitAlgorithm.FIXED_WINDOW
+        )
+        
+        # Current window
+        base_time = int(time.time() // 60) * 60
+        
+        # Use up the limit
+        for i in range(3):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "test_key", config, base_time + i
+            )
+            assert allowed is True
+        
+        # Should be blocked in same window
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, base_time + 30
+        )
+        assert allowed is False
+        
+        # Next window should allow requests
+        allowed, _ = await rate_limiter.check_rate_limit(
+            "test_key", config, base_time + 60
+        )
+        assert allowed is True
+
+
+class TestRedisRateLimiting:
+    """Test Redis-based rate limiting"""
+    
+    @pytest.mark.asyncio
+    async def test_redis_sliding_window(self, redis_rate_limiter):
+        """Test Redis-based sliding window implementation"""
+        config = RateLimitConfig(
+            requests_per_minute=10,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        # Mock Redis responses
+        redis_rate_limiter.redis_client.pipeline.return_value.execute = AsyncMock(
+            return_value=[0, 5, 1, 1]  # removed, count, added, expire
+        )
+        
+        allowed, metadata = await redis_rate_limiter.check_rate_limit(
+            "test_key", config
+        )
+        
+        assert allowed is True
+        assert metadata["remaining"] == 4
+        assert metadata["limit"] == 10
+    
+    @pytest.mark.asyncio
+    async def test_redis_token_bucket(self, redis_rate_limiter):
+        """Test Redis-based token bucket with Lua script"""
+        config = RateLimitConfig(
+            requests_per_minute=60,
+            burst_size=10,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        # Mock Lua script execution
+        redis_rate_limiter.redis_client.eval = AsyncMock(
+            return_value=[1, 9]  # allowed, remaining tokens
+        )
+        
+        allowed, metadata = await redis_rate_limiter.check_rate_limit(
+            "test_key", config
+        )
+        
+        assert allowed is True
+        assert metadata["remaining"] == 9
+        assert metadata["burst_size"] == 10
+
+
+class TestRateLimitEdgeCases:
+    """Test edge cases and error conditions"""
+    
+    @pytest.mark.asyncio
+    async def test_zero_limit(self, rate_limiter):
+        """Test behavior with zero rate limit"""
+        config = RateLimitConfig(
+            requests_per_minute=0,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config
+        )
+        assert allowed is False
+        assert metadata["remaining"] == 0
+    
+    @pytest.mark.asyncio
+    async def test_very_high_rate(self, rate_limiter):
+        """Test with very high rate limit"""
+        config = RateLimitConfig(
+            requests_per_minute=1000000,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        # Should always allow
+        for i in range(100):
+            allowed, _ = await rate_limiter.check_rate_limit(
+                "test_key", config, time.time() + i * 0.001
+            )
+            assert allowed is True
+    
+    @pytest.mark.asyncio
+    async def test_concurrent_requests(self, rate_limiter):
+        """Test rate limiting with concurrent requests"""
+        config = RateLimitConfig(
+            requests_per_minute=10,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        current_time = time.time()
+        
+        async def make_request(i):
+            return await rate_limiter.check_rate_limit(
+                "test_key", config, current_time + i * 0.1
+            )
+        
+        # Make 15 concurrent requests
+        results = await asyncio.gather(
+            *[make_request(i) for i in range(15)]
+        )
+        
+        # First 10 should succeed, last 5 should fail
+        allowed_count = sum(1 for allowed, _ in results if allowed)
+        assert allowed_count == 10
+
+
+class TestRateLimitMetadata:
+    """Test rate limit response metadata"""
+    
+    @pytest.mark.asyncio
+    async def test_sliding_window_metadata(self, rate_limiter):
+        """Test metadata returned by sliding window"""
+        config = RateLimitConfig(
+            requests_per_minute=10,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        current_time = time.time()
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config, current_time
+        )
+        
+        assert "remaining" in metadata
+        assert "reset" in metadata
+        assert "limit" in metadata
+        assert metadata["limit"] == 10
+        assert metadata["remaining"] == 9
+        assert metadata["reset"] > current_time
+    
+    @pytest.mark.asyncio
+    async def test_token_bucket_metadata(self, rate_limiter):
+        """Test metadata returned by token bucket"""
+        config = RateLimitConfig(
+            requests_per_minute=60,
+            burst_size=5,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        allowed, metadata = await rate_limiter.check_rate_limit(
+            "test_key", config
+        )
+        
+        assert "remaining" in metadata
+        assert "burst_size" in metadata
+        assert "refill_rate" in metadata
+        assert metadata["burst_size"] == 5
+        assert metadata["refill_rate"] == 1.0  # 60 per minute = 1 per second
+
+
+if __name__ == "__main__":
+    # Run basic validation
+    print("Running rate limiting tests...")
+    
+    async def validate():
+        limiter = RateLimiter()
+        
+        # Test sliding window
+        config = RateLimitConfig(
+            requests_per_minute=3,
+            algorithm=RateLimitAlgorithm.SLIDING_WINDOW
+        )
+        
+        results = []
+        current_time = time.time()
+        
+        for i in range(5):
+            allowed, metadata = await limiter.check_rate_limit(
+                "test", config, current_time + i
+            )
+            results.append((allowed, metadata["remaining"]))
+        
+        # First 3 should pass, last 2 should fail
+        assert results[0][0] is True
+        assert results[1][0] is True
+        assert results[2][0] is True
+        assert results[3][0] is False
+        assert results[4][0] is False
+        
+        # Test token bucket
+        config = RateLimitConfig(
+            requests_per_minute=60,
+            burst_size=5,
+            algorithm=RateLimitAlgorithm.TOKEN_BUCKET
+        )
+        
+        # Should allow burst
+        for i in range(5):
+            allowed, _ = await limiter.check_rate_limit(
+                "burst_test", config, current_time
+            )
+            assert allowed is True
+        
+        # 6th should fail
+        allowed, _ = await limiter.check_rate_limit(
+            "burst_test", config, current_time
+        )
+        assert allowed is False
+        
+        print("✅ Rate limiting tests passed")
+    
+    asyncio.run(validate())

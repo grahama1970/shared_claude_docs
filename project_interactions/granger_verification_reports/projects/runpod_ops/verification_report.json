@@ -1,0 +1,82 @@
+{
+  "project_name": "runpod_ops",
+  "project_path": "/home/graham/workspace/experiments/runpod_ops",
+  "project_type": "Infrastructure Service",
+  "status": "warnings",
+  "mode": "VerificationMode.FULL",
+  "duration": 0.7826268672943115,
+  "cleanup_result": "passed",
+  "compliance_result": "failed",
+  "test_result": "warnings",
+  "documentation_result": null,
+  "total_tests": 0,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "mock_tests": 1,
+  "duration_failures": 0,
+  "honeypot_status": "present",
+  "readme_exists": false,
+  "documentation_claims": 0,
+  "verified_claims": 0,
+  "undocumented_features": 0,
+  "issues": [
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/runpod_ops/src/runpod_ops/verify_api.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/runpod_ops/src/runpod_ops/generate_commands.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "missing_description",
+      "description": "Documentation header missing description",
+      "severity": "low",
+      "evidence": [
+        "No Description or Purpose field found"
+      ],
+      "files": [
+        "/home/graham/workspace/experiments/runpod_ops/src/runpod_ops/handlers/__init__.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": false,
+      "fix_result": ""
+    },
+    {
+      "type": "mock_usage_detected",
+      "description": "Found mocks in 1 test files",
+      "severity": "high",
+      "evidence": [
+        "tests/test_core/test_ssh_manager_enhanced_standalone.py"
+      ],
+      "files": [
+        "tests/test_core/test_ssh_manager_enhanced_standalone.py"
+      ],
+      "auto_fixable": true,
+      "fix_attempted": true,
+      "fix_result": "success"
+    }
+  ],
+  "auto_fixes_applied": 1,
+  "fix_directive_generated": true
+}

@@ -1,0 +1,19 @@
+{
+  "module": "youtube_transcripts",
+  "timestamp": "2025-06-09T15:14:00.447971",
+  "checks": {
+    "real_implementation_score": "4/5",
+    "mock_count": 51,
+    "api_keys": {
+      "youtube": true,
+      "database": true
+    },
+    "network_patterns": {
+      "rate_limit": true,
+      "error_handling": true,
+      "real_urls": true
+    }
+  },
+  "verdict": "PARTIALLY REAL - Mixed implementation",
+  "confidence_score": 70
+}

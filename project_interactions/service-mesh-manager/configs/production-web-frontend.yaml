@@ -1,0 +1,26 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: web-frontend-destination-rule
+  namespace: production
+spec:
+  host: web-frontend
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 10
+        http2MaxRequests: 100
+      tcp:
+        maxConnections: 100
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      baseEjectionTime: 30s
+      consecutiveErrors: 5
+      interval: 30s
+      maxEjectionPercent: 50
+    retryPolicy:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure
+      retryRemoteLocalities: true

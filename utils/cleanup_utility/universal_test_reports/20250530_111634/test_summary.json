@@ -1,0 +1,103 @@
+{
+  "timestamp": "20250530_111634",
+  "total_projects": 11,
+  "status_counts": {
+    "passed": 6,
+    "failed": 5
+  },
+  "results": [
+    {
+      "project": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "timestamp": "2025-05-30T11:16:34.636308",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "timestamp": "2025-05-30T11:16:35.004821",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "arangodb",
+      "path": "/home/graham/workspace/experiments/arangodb",
+      "timestamp": "2025-05-30T11:16:45.961696",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "timestamp": "2025-05-30T11:16:48.591853",
+      "status": "failed",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0
+    },
+    {
+      "project": "claude_max_proxy",
+      "path": "/home/graham/workspace/experiments/claude_max_proxy",
+      "timestamp": "2025-05-30T11:16:50.739030",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "arxiv-mcp-server",
+      "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server",
+      "timestamp": "2025-05-30T11:16:55.183612",
+      "status": "failed",
+      "tests_run": 1,
+      "tests_passed": 1,
+      "tests_failed": 0
+    },
+    {
+      "project": "claude-module-communicator",
+      "path": "/home/graham/workspace/experiments/claude-module-communicator",
+      "timestamp": "2025-05-30T11:17:00.872450",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "timestamp": "2025-05-30T11:17:02.514210",
+      "status": "failed"
+    },
+    {
+      "project": "unsloth_wip",
+      "path": "/home/graham/workspace/experiments/unsloth_wip",
+      "timestamp": "2025-05-30T11:17:02.545186",
+      "status": "passed",
+      "tests_run": 2,
+      "tests_passed": 2,
+      "tests_failed": 0
+    },
+    {
+      "project": "marker-ground-truth",
+      "path": "/home/graham/workspace/experiments/marker-ground-truth",
+      "timestamp": "2025-05-30T11:17:04.094599",
+      "status": "failed",
+      "tests_run": 0,
+      "tests_passed": 0,
+      "tests_failed": 0
+    },
+    {
+      "project": "mcp-screenshot",
+      "path": "/home/graham/workspace/experiments/mcp-screenshot",
+      "timestamp": "2025-05-30T11:17:05.334909",
+      "status": "failed"
+    }
+  ]
+}

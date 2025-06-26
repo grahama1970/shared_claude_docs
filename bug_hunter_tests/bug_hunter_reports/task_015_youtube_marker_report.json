@@ -1,0 +1,153 @@
+{
+  "task": "Task #015: YouTube-Marker Flow",
+  "module": "youtube-marker-integration",
+  "duration": "0.00s",
+  "tests_run": 6,
+  "tests_passed": 5,
+  "bugs_found": 16,
+  "bug_details": [
+    {
+      "type": "rtl_formatting_lost",
+      "severity": "medium",
+      "description": "RTL text direction lost for ar",
+      "expected": "Preserve RTL formatting in document",
+      "actual": "All text rendered LTR"
+    },
+    {
+      "type": "timestamp_precision_loss",
+      "severity": "low",
+      "description": "Timestamp precision reduced for long videos",
+      "expected": "Millisecond precision throughout",
+      "actual": "Rounded to nearest second after 2 hours"
+    },
+    {
+      "type": "test_failure",
+      "severity": "critical",
+      "description": "Test 'Transcript to Document' crashed",
+      "error": "'language'"
+    },
+    {
+      "type": "no_speaker_separation",
+      "severity": "high",
+      "description": "No speaker diarization for 2 speakers",
+      "expected": "Separate text by speaker",
+      "actual": "All text merged together"
+    },
+    {
+      "type": "youtube_chapters_ignored",
+      "severity": "medium",
+      "description": "YouTube chapter markers not imported",
+      "expected": "Use YouTube chapters as document sections",
+      "actual": "Chapters ignored, flat document created"
+    },
+    {
+      "type": "no_auto_chapters",
+      "severity": "low",
+      "description": "No automatic chapter detection",
+      "expected": "Detect topic changes for sectioning",
+      "actual": "Single continuous document"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "YouTube description not preserved",
+      "expected": "Include description in document metadata",
+      "actual": "Metadata discarded"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "YouTube view_count not preserved",
+      "expected": "Include view_count in document metadata",
+      "actual": "Metadata discarded"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "YouTube channel_info not preserved",
+      "expected": "Include channel_info in document metadata",
+      "actual": "Metadata discarded"
+    },
+    {
+      "type": "code_switching_ignored",
+      "severity": "medium",
+      "description": "Language mixing (code-switch) not detected",
+      "expected": "Detect and tag language switches",
+      "actual": "All text marked as primary language"
+    },
+    {
+      "type": "slow_processing",
+      "severity": "medium",
+      "description": "short video processing takes 2500.0ms",
+      "expected": "< 1000ms",
+      "actual": "2500.0ms (2.5x slower)"
+    },
+    {
+      "type": "slow_processing",
+      "severity": "medium",
+      "description": "medium video processing takes 12500.0ms",
+      "expected": "< 5000ms",
+      "actual": "12500.0ms (2.5x slower)"
+    },
+    {
+      "type": "slow_processing",
+      "severity": "medium",
+      "description": "long video processing takes 37500.0ms",
+      "expected": "< 15000ms",
+      "actual": "37500.0ms (2.5x slower)"
+    },
+    {
+      "type": "slow_processing",
+      "severity": "medium",
+      "description": "very_long video processing takes 75000.0ms",
+      "expected": "< 30000ms",
+      "actual": "75000.0ms (2.5x slower)"
+    },
+    {
+      "type": "slow_processing",
+      "severity": "medium",
+      "description": "livestream video processing takes 150000.0ms",
+      "expected": "< 60000ms",
+      "actual": "150000.0ms (2.5x slower)"
+    },
+    {
+      "type": "no_streaming_support",
+      "severity": "high",
+      "description": "Cannot process ongoing livestreams",
+      "expected": "Support real-time transcript streaming",
+      "actual": "Must wait for stream to end"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Transcript to Document",
+      "passed": false,
+      "error": "'language'"
+    },
+    {
+      "test": "Speaker Diarization",
+      "passed": true,
+      "bugs": 1
+    },
+    {
+      "test": "Chapter Detection",
+      "passed": true,
+      "bugs": 1
+    },
+    {
+      "test": "Metadata Preservation",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Multilingual Handling",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Performance Optimization",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

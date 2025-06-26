@@ -1,0 +1,261 @@
+# Granger Ecosystem Test Configuration
+# This file defines test phases, dependencies, and execution order
+
+test_configuration:
+  parallel_workers: 4
+  timeout_minutes: 30
+  report_format: "html"
+  work_directory: "/tmp/granger_test"
+  
+  # Service health check endpoints
+  service_checks:
+    granger_hub:
+      url: "http://localhost:8000/health"
+      required: true
+    arangodb:
+      url: "http://localhost:8529/_api/version"
+      required: true
+    test_reporter:
+      url: "http://localhost:8002/status"
+      required: false
+      
+test_phases:
+  - name: "Core Infrastructure"
+    parallel: false
+    critical: true
+    description: "Core services that all other projects depend on"
+    projects:
+      - name: "granger_hub"
+        path: "/home/graham/workspace/experiments/granger_hub"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/unit/ -v --tb=short"
+            timeout: 300
+          - type: "integration"
+            command: "pytest tests/integration/ -v --tb=short"
+            timeout: 600
+        dependencies: []
+        environment:
+          GRANGER_HUB_TEST_MODE: "true"
+          PYTHONPATH: "./src"
+        
+      - name: "claude-test-reporter"
+        path: "/home/graham/workspace/experiments/claude-test-reporter"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: []
+        
+      - name: "rl_commons"
+        path: "/home/graham/workspace/experiments/rl_commons"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: []
+
+  - name: "Processing Spokes"
+    parallel: true
+    critical: true
+    description: "Main processing modules that can run in parallel"
+    projects:
+      - name: "sparta"
+        path: "/home/graham/workspace/experiments/sparta"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/unit/ -v --tb=short"
+            timeout: 300
+          - type: "integration"
+            command: "pytest tests/integration/ -v --tb=short --hub-url=http://localhost:8000"
+            timeout: 600
+        dependencies: ["granger_hub"]
+        setup_commands:
+          - "echo 'Setting up SPARTA test environment'"
+        
+      - name: "marker"
+        path: "/home/graham/workspace/experiments/marker"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+          - type: "performance"
+            command: "pytest tests/performance/ -v --benchmark-only"
+            timeout: 900
+        dependencies: ["granger_hub"]
+        
+      - name: "arangodb"
+        path: "/home/graham/workspace/experiments/arangodb"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/unit/ -v --tb=short"
+            timeout: 300
+          - type: "integration"
+            command: "pytest tests/integration/ -v --tb=short --db-url=http://localhost:8529"
+            timeout: 600
+        dependencies: ["granger_hub"]
+        environment:
+          ARANGO_TEST_DB: "test_granger"
+        
+      - name: "youtube_transcripts"
+        path: "/home/graham/workspace/experiments/youtube_transcripts"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: ["granger_hub"]
+        
+      - name: "llm_call"
+        path: "/home/graham/workspace/experiments/llm_call"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+          - type: "mocked"
+            command: "pytest tests/mocked/ -v --tb=short"
+            timeout: 300
+        dependencies: ["granger_hub", "rl_commons"]
+
+  - name: "User Interfaces"
+    parallel: true
+    critical: false
+    description: "Frontend and user-facing modules"
+    projects:
+      - name: "annotator"
+        path: "/home/graham/workspace/experiments/annotator"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+          - type: "ui"
+            command: "playwright test --reporter=list"
+            timeout: 600
+        dependencies: ["marker"]
+        
+      - name: "chat"
+        path: "/home/graham/workspace/experiments/chat"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: ["granger_hub", "llm_call"]
+        
+      - name: "aider-daemon"
+        path: "/home/graham/workspace/experiments/aider-daemon"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: ["granger_hub"]
+
+  - name: "MCP Services"
+    parallel: true
+    critical: false
+    description: "MCP server implementations"
+    projects:
+      - name: "arxiv-mcp-server"
+        path: "/home/graham/workspace/mcp-servers/arxiv-mcp-server"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+          - type: "mcp"
+            command: "pytest tests/mcp/ -v --tb=short"
+            timeout: 300
+        dependencies: ["granger_hub"]
+        
+      - name: "mcp-screenshot"
+        path: "/home/graham/workspace/experiments/mcp-screenshot"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 300
+        dependencies: []
+
+  - name: "Advanced Processing"
+    parallel: false
+    critical: false
+    description: "Complex processing that depends on multiple spokes"
+    projects:
+      - name: "unsloth_wip"
+        path: "/home/graham/workspace/experiments/unsloth_wip"
+        branch: "main"
+        tests:
+          - type: "unit"
+            command: "pytest tests/ -v --tb=short"
+            timeout: 600
+        dependencies: ["arangodb", "marker"]
+
+  - name: "Integration Tests"
+    parallel: false
+    critical: true
+    description: "End-to-end tests for the complete ecosystem"
+    projects:
+      - name: "granger_e2e"
+        path: "/home/graham/workspace/shared_claude_docs"
+        branch: "main"
+        tests:
+          - type: "e2e"
+            command: "pytest project_interactions/level_3_tests/ -v --tb=short"
+            timeout: 1800
+          - type: "pipeline"
+            command: "pytest project_interactions/pipeline_tests/ -v --tb=short"
+            timeout: 1200
+        dependencies: ["all"]
+        setup_commands:
+          - "echo 'Verifying all services are running'"
+          - "curl -s http://localhost:8000/health || exit 1"
+          - "curl -s http://localhost:8529/_api/version || exit 1"
+
+# Test execution strategies
+execution_strategies:
+  fast:
+    description: "Quick smoke tests only"
+    include_types: ["unit"]
+    timeout_multiplier: 0.5
+    
+  comprehensive:
+    description: "All tests including slow ones"
+    include_types: ["unit", "integration", "e2e", "performance"]
+    timeout_multiplier: 2.0
+    
+  ci:
+    description: "Continuous integration suite"
+    include_types: ["unit", "integration"]
+    skip_projects: ["mcp-screenshot"]  # Skip projects that need display
+    
+# Reporting configuration
+reporting:
+  formats:
+    - type: "json"
+      path: "test_results_{timestamp}.json"
+    - type: "html"
+      path: "test_report_{timestamp}.html"
+      open_on_completion: true
+    - type: "junit"
+      path: "junit_{timestamp}.xml"
+      
+  notifications:
+    slack:
+      enabled: false
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      on_failure: true
+      on_success: false
+      
+  archive:
+    enabled: true
+    path: "/home/graham/workspace/shared_claude_docs/test_archives"
+    retention_days: 30

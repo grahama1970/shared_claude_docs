@@ -1,0 +1,84 @@
+{
+  "task": "Task #008: YouTube Transcript Reliability",
+  "module": "youtube_transcripts",
+  "duration": "0.10s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 6,
+  "bug_details": [
+    {
+      "type": "timeout_risk",
+      "severity": "high",
+      "description": "Risk of timeout for 3+ hour videos",
+      "expected": "Chunked processing for long videos",
+      "actual": "Single request that may timeout"
+    },
+    {
+      "type": "timeout_risk",
+      "severity": "high",
+      "description": "Risk of timeout for 8+ hour videos",
+      "expected": "Chunked processing for long videos",
+      "actual": "Single request that may timeout"
+    },
+    {
+      "type": "poor_error_handling",
+      "severity": "medium",
+      "description": "No clear indication when video lacks captions",
+      "expected": "Clear message: 'No captions available'",
+      "actual": "Generic error or empty result"
+    },
+    {
+      "type": "auto_caption_quality",
+      "severity": "low",
+      "description": "Auto-generated captions often have errors",
+      "expected": "Quality indicator for auto vs manual captions",
+      "actual": "No distinction made"
+    },
+    {
+      "type": "missing_rate_limiter",
+      "severity": "medium",
+      "description": "No rate limiting for YouTube API",
+      "expected": "Rate limiter with 10 req/sec limit",
+      "actual": "Unlimited requests until quota hit"
+    },
+    {
+      "type": "timestamp_drift",
+      "severity": "low",
+      "description": "Timestamps can drift in long videos",
+      "expected": "Accurate timestamps throughout",
+      "actual": "Up to 2-3 second drift after 1 hour"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Long Video Handling",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Unavailable Videos",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Language Support",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Rate Limiting",
+      "passed": true,
+      "bugs": 1
+    },
+    {
+      "test": "Concurrent Extraction",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Transcript Formatting",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

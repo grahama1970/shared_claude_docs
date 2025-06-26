@@ -1,0 +1,129 @@
+{
+  "video": {
+    "id": "NU_1StN5Tkk",
+    "title": "10 Python Anti-Patterns That Are Breaking Your Code",
+    "channel": "ArjanCodes",
+    "channel_id": "UCVhQ2NnY5Rskt6UjCUkJ_DA",
+    "published_at": "2023-08-15T14:00:00Z",
+    "duration": "PT18M32S",
+    "view_count": 245000,
+    "like_count": 8900,
+    "comment_count": 342,
+    "description": "In this video, I'll show you 10 Python anti-patterns that you should avoid...",
+    "has_transcript": true,
+    "transcript_quality": 0.95
+  },
+  "patterns": [
+    {
+      "pattern": "Using Mutable Default Arguments",
+      "description": "Using mutable objects like lists or dictionaries as default function arguments",
+      "example": "def add_item(item, items=[]): items.append(item); return items",
+      "fix": "def add_item(item, items=None): if items is None: items = []; items.append(item); return items",
+      "severity": "high",
+      "category": "function_design"
+    },
+    {
+      "pattern": "Using Bare Except Clauses",
+      "description": "Catching all exceptions without specifying the type",
+      "example": "try: risky_operation() except: pass",
+      "fix": "try: risky_operation() except SpecificException as e: handle_error(e)",
+      "severity": "high",
+      "category": "error_handling"
+    },
+    {
+      "pattern": "Not Using Context Managers for Files",
+      "description": "Opening files without using 'with' statement",
+      "example": "f = open('file.txt'); data = f.read(); f.close()",
+      "fix": "with open('file.txt') as f: data = f.read()",
+      "severity": "medium",
+      "category": "resource_management"
+    },
+    {
+      "pattern": "Using Global Variables",
+      "description": "Modifying global state inside functions",
+      "example": "counter = 0; def increment(): global counter; counter += 1",
+      "fix": "class Counter: def __init__(self): self.value = 0; def increment(self): self.value += 1",
+      "severity": "high",
+      "category": "state_management"
+    },
+    {
+      "pattern": "Not Using List Comprehensions",
+      "description": "Using verbose loops when list comprehensions would be clearer",
+      "example": "result = []; for x in range(10): if x % 2 == 0: result.append(x * 2)",
+      "fix": "result = [x * 2 for x in range(10) if x % 2 == 0]",
+      "severity": "low",
+      "category": "code_style"
+    },
+    {
+      "pattern": "String Concatenation in Loops",
+      "description": "Building strings with + operator in loops",
+      "example": "result = ''; for item in items: result += str(item) + ', '",
+      "fix": "result = ', '.join(str(item) for item in items)",
+      "severity": "medium",
+      "category": "performance"
+    },
+    {
+      "pattern": "Not Using Enumerate",
+      "description": "Using range(len()) to iterate with indices",
+      "example": "for i in range(len(items)): print(i, items[i])",
+      "fix": "for i, item in enumerate(items): print(i, item)",
+      "severity": "low",
+      "category": "code_style"
+    },
+    {
+      "pattern": "Using Type Checking with ==",
+      "description": "Checking types with == instead of isinstance",
+      "example": "if type(obj) == list: process_list(obj)",
+      "fix": "if isinstance(obj, list): process_list(obj)",
+      "severity": "medium",
+      "category": "type_checking"
+    },
+    {
+      "pattern": "Not Using Pathlib",
+      "description": "Using os.path for path operations instead of pathlib",
+      "example": "import os; path = os.path.join(os.path.dirname(__file__), 'data', 'file.txt')",
+      "fix": "from pathlib import Path; path = Path(__file__).parent / 'data' / 'file.txt'",
+      "severity": "low",
+      "category": "modern_python"
+    },
+    {
+      "pattern": "Overusing Classes",
+      "description": "Creating classes when simple functions or dataclasses would suffice",
+      "example": "class Calculator: def add(self, a, b): return a + b",
+      "fix": "def add(a, b): return a + b  # Or use dataclass for data containers",
+      "severity": "medium",
+      "category": "design"
+    }
+  ],
+  "code_snippets": [
+    {
+      "code": "def process_data(data=[]):\n    data.append('processed')\n    return data",
+      "issue": "Mutable default argument",
+      "timestamp": "2:15"
+    },
+    {
+      "code": "try:\n    result = dangerous_operation()\nexcept:\n    result = None",
+      "issue": "Bare except clause",
+      "timestamp": "4:30"
+    },
+    {
+      "code": "with open('config.json') as f:\n    config = json.load(f)",
+      "issue": "Good practice example",
+      "timestamp": "6:45"
+    }
+  ],
+  "concepts": [
+    "Function default arguments evaluation",
+    "Exception hierarchy in Python",
+    "Context managers and resource cleanup",
+    "Global state and side effects",
+    "List comprehension performance",
+    "String immutability and concatenation",
+    "Iterator protocol and enumerate",
+    "Duck typing vs explicit type checking",
+    "Modern Python features (pathlib, dataclasses)",
+    "SOLID principles and class design"
+  ],
+  "transcript_length": 15420,
+  "extraction_timestamp": "2025-06-08T07:00:12.087794"
+}

@@ -1,0 +1,245 @@
+{
+  "timestamp": "2025-06-05T16:01:10.027874",
+  "total_commands": 7,
+  "passed": 0,
+  "failed": 7,
+  "success_rate": 0.0,
+  "average_confidence": 22.857142857142858,
+  "total_duration": 0.8336801528930664,
+  "results": [
+    {
+      "command": "llm-ask",
+      "timestamp": "2025-06-05T16:01:09.274212",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.04218173027038574,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.042s < 0.5s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.0377199649810791,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "arxiv-search",
+      "timestamp": "2025-06-05T16:01:09.362609",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.04574871063232422,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.046s < 1.0s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.042482614517211914,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "arangodb-search",
+      "timestamp": "2025-06-05T16:01:09.442385",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03927898406982422,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.039s < 0.1s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.040293216705322266,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "marker-extract",
+      "timestamp": "2025-06-05T16:01:09.517461",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03737449645996094,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.037s < 0.05s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03751659393310547,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "yt-search",
+      "timestamp": "2025-06-05T16:01:09.595122",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.037019968032836914,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.037s < 1.0s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.040465593338012695,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    },
+    {
+      "command": "darpa-search",
+      "timestamp": "2025-06-05T16:01:09.952869",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": "Searching DARPA opportunities...\nSearching DARPA opportunities... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'AI'\"\n}\n",
+          "error": null,
+          "duration": 0.1871352195739746,
+          "exit_code": 0,
+          "issues": [
+            "Duration too fast: 0.187s < 0.5s (possible mock)",
+            "Output is not JSON dict"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": "Searching DARPA opportunities...\nSearching DARPA opportunities... \u2713\n{\n  \"results\": [],\n  \"count\": 0,\n  \"query\": \"'underwater basketweaving'\"\n}\n",
+          "error": null,
+          "duration": 0.1703500747680664,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 40
+    },
+    {
+      "command": "test-report",
+      "timestamp": "2025-06-05T16:01:10.027837",
+      "tests": {
+        "basic": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03778791427612305,
+          "exit_code": 1,
+          "issues": [
+            "Duration too fast: 0.038s < 0.5s (possible mock)"
+          ],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.03699517250061035,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "FAIL",
+      "confidence": 20
+    }
+  ],
+  "common_issues": [
+    [
+      "Duration too fast: 0.042s < 0.5s (possible mock)",
+      1
+    ],
+    [
+      "Duration too fast: 0.046s < 1.0s (possible mock)",
+      1
+    ],
+    [
+      "Duration too fast: 0.039s < 0.1s (possible mock)",
+      1
+    ],
+    [
+      "Duration too fast: 0.037s < 0.05s (possible mock)",
+      1
+    ],
+    [
+      "Duration too fast: 0.037s < 1.0s (possible mock)",
+      1
+    ],
+    [
+      "Duration too fast: 0.187s < 0.5s (possible mock)",
+      1
+    ],
+    [
+      "Output is not JSON dict",
+      1
+    ],
+    [
+      "Duration too fast: 0.038s < 0.5s (possible mock)",
+      1
+    ]
+  ],
+  "recommendations": [
+    "Priority fixes needed for: llm-ask, arxiv-search, arangodb-search, marker-extract, yt-search, darpa-search, test-report"
+  ]
+}

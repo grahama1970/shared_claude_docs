@@ -1,0 +1,433 @@
+{
+  "timestamp": "2025-06-05T16:08:04.444560",
+  "total_commands": 7,
+  "passed": 7,
+  "failed": 0,
+  "success_rate": 100.0,
+  "average_confidence": 94.28571428571429,
+  "total_duration": 9.236150741577148,
+  "results": [
+    {
+      "command": "llm-ask",
+      "timestamp": "2025-06-05T16:07:56.481754",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "response": "The answer to 2+2 is 4.",
+            "model": "mock-model",
+            "tokens": 50,
+            "cost": 0.001
+          },
+          "error": null,
+          "duration": 0.6365048885345459,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "response": "I cannot help with creating malicious software.",
+            "model": "mock-model",
+            "tokens": 50,
+            "cost": 0.001
+          },
+          "error": null,
+          "duration": 0.6366381645202637,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 80
+    },
+    {
+      "command": "arxiv-search",
+      "timestamp": "2025-06-05T16:07:58.774933",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "results": [
+              {
+                "title": "Paper about 'machine learning' #1",
+                "authors": [
+                  "Author A",
+                  "Author B"
+                ],
+                "abstract": "This paper discusses 'machine learning' in detail...",
+                "url": "https://arxiv.org/abs/2024.1000",
+                "pdf_url": "https://arxiv.org/pdf/2024.1000.pdf",
+                "published": "2024-01-15T00:00:00Z",
+                "categories": [
+                  "cs.AI",
+                  "cs.LG"
+                ],
+                "primary_category": "cs.AI"
+              },
+              {
+                "title": "Paper about 'machine learning' #2",
+                "authors": [
+                  "Author A",
+                  "Author B"
+                ],
+                "abstract": "This paper discusses 'machine learning' in detail...",
+                "url": "https://arxiv.org/abs/2024.1001",
+                "pdf_url": "https://arxiv.org/pdf/2024.1001.pdf",
+                "published": "2024-01-15T00:00:00Z",
+                "categories": [
+                  "cs.AI",
+                  "cs.LG"
+                ],
+                "primary_category": "cs.AI"
+              },
+              {
+                "title": "Paper about 'machine learning' #3",
+                "authors": [
+                  "Author A",
+                  "Author B"
+                ],
+                "abstract": "This paper discusses 'machine learning' in detail...",
+                "url": "https://arxiv.org/abs/2024.1002",
+                "pdf_url": "https://arxiv.org/pdf/2024.1002.pdf",
+                "published": "2024-01-15T00:00:00Z",
+                "categories": [
+                  "cs.AI",
+                  "cs.LG"
+                ],
+                "primary_category": "cs.AI"
+              },
+              {
+                "title": "Paper about 'machine learning' #4",
+                "authors": [
+                  "Author A",
+                  "Author B"
+                ],
+                "abstract": "This paper discusses 'machine learning' in detail...",
+                "url": "https://arxiv.org/abs/2024.1003",
+                "pdf_url": "https://arxiv.org/pdf/2024.1003.pdf",
+                "published": "2024-01-15T00:00:00Z",
+                "categories": [
+                  "cs.AI",
+                  "cs.LG"
+                ],
+                "primary_category": "cs.AI"
+              },
+              {
+                "title": "Paper about 'machine learning' #5",
+                "authors": [
+                  "Author A",
+                  "Author B"
+                ],
+                "abstract": "This paper discusses 'machine learning' in detail...",
+                "url": "https://arxiv.org/abs/2024.1004",
+                "pdf_url": "https://arxiv.org/pdf/2024.1004.pdf",
+                "published": "2024-01-15T00:00:00Z",
+                "categories": [
+                  "cs.AI",
+                  "cs.LG"
+                ],
+                "primary_category": "cs.AI"
+              }
+            ],
+            "count": 5,
+            "query": "'machine learning'"
+          },
+          "error": null,
+          "duration": 1.146829605102539,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'asdfghjklqwerty'"
+          },
+          "error": null,
+          "duration": 1.1460390090942383,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "arangodb-search",
+      "timestamp": "2025-06-05T16:07:59.155477",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "results": [
+              {
+                "content": "Document about 'test query' (result 1)",
+                "score": 0.95,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_0"
+              },
+              {
+                "content": "Document about 'test query' (result 2)",
+                "score": 0.85,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_1"
+              },
+              {
+                "content": "Document about 'test query' (result 3)",
+                "score": 0.75,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_2"
+              },
+              {
+                "content": "Document about 'test query' (result 4)",
+                "score": 0.6499999999999999,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_3"
+              },
+              {
+                "content": "Document about 'test query' (result 5)",
+                "score": 0.5499999999999999,
+                "metadata": {
+                  "type": "mock",
+                  "date": "2024-01-15"
+                },
+                "id": "doc/mock_4"
+              }
+            ],
+            "count": 5,
+            "query": "'test query'",
+            "type": "semantic",
+            "visualization": null
+          },
+          "error": null,
+          "duration": 0.19009971618652344,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'xyzxyzxyz123456'",
+            "type": "semantic",
+            "visualization": null
+          },
+          "error": null,
+          "duration": 0.19019412994384766,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "marker-extract",
+      "timestamp": "2025-06-05T16:07:59.331113",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "content": "---\npages: 2\nformat: mock\n---\n\nMock extracted content from document\nMore content here...",
+            "source": "README.md",
+            "format": "markdown",
+            "metadata": {
+              "pages": 2,
+              "format": "mock"
+            }
+          },
+          "error": null,
+          "duration": 0.13794994354248047,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": false,
+          "output": null,
+          "error": "",
+          "duration": 0.037488460540771484,
+          "exit_code": 1,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "yt-search",
+      "timestamp": "2025-06-05T16:08:01.610285",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "results": [
+              {
+                "video_id": "mock_vid_0",
+                "title": "Video about 'python tutorial' - Tutorial Part 1",
+                "channel": "Mock Tutorial Channel",
+                "duration": "12:30",
+                "published": "2025-06-05T16:08:00.466102",
+                "url": "https://youtube.com/watch?v=mock_vid_0",
+                "transcript": "This video teaches about 'python tutorial'...",
+                "transcript_preview": "This video teaches about 'python tutorial'..."
+              },
+              {
+                "video_id": "mock_vid_1",
+                "title": "Video about 'python tutorial' - Tutorial Part 2",
+                "channel": "Mock Tutorial Channel",
+                "duration": "12:30",
+                "published": "2025-06-05T16:08:00.466126",
+                "url": "https://youtube.com/watch?v=mock_vid_1",
+                "transcript": "This video teaches about 'python tutorial'...",
+                "transcript_preview": "This video teaches about 'python tutorial'..."
+              },
+              {
+                "video_id": "mock_vid_2",
+                "title": "Video about 'python tutorial' - Tutorial Part 3",
+                "channel": "Mock Tutorial Channel",
+                "duration": "12:30",
+                "published": "2025-06-05T16:08:00.466130",
+                "url": "https://youtube.com/watch?v=mock_vid_2",
+                "transcript": "This video teaches about 'python tutorial'...",
+                "transcript_preview": "This video teaches about 'python tutorial'..."
+              }
+            ],
+            "count": 3,
+            "query": "'python tutorial'"
+          },
+          "error": null,
+          "duration": 1.1406810283660889,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'qwertyuiopasdfgh'"
+          },
+          "error": null,
+          "duration": 1.1382791996002197,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "darpa-search",
+      "timestamp": "2025-06-05T16:08:03.163341",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'AI'"
+          },
+          "error": null,
+          "duration": 0.7752165794372559,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "results": [],
+            "count": 0,
+            "query": "'underwater basketweaving'"
+          },
+          "error": null,
+          "duration": 0.7776229381561279,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 100
+    },
+    {
+      "command": "test-report",
+      "timestamp": "2025-06-05T16:08:04.444515",
+      "tests": {
+        "basic": {
+          "success": true,
+          "output": {
+            "report_path": "mock_test_report_shared_claude_docs_20250605_160803.html",
+            "summary": {
+              "total_tests": 100,
+              "passed": 95,
+              "failed": 5,
+              "skipped": 0,
+              "duration": 30.5,
+              "coverage": 85
+            },
+            "health_score": 95,
+            "project": "shared_claude_docs"
+          },
+          "error": null,
+          "duration": 0.6403493881225586,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Basic functionality"
+        },
+        "honeypot": {
+          "success": true,
+          "output": {
+            "report_path": "mock_test_report_project_20250605_160804.html",
+            "summary": {
+              "total_tests": 100,
+              "passed": 95,
+              "failed": 5,
+              "skipped": 0,
+              "duration": 30.5,
+              "coverage": 85
+            },
+            "health_score": 95,
+            "project": "project"
+          },
+          "error": null,
+          "duration": 0.6406087875366211,
+          "exit_code": 0,
+          "issues": [],
+          "test_name": "Honeypot test"
+        }
+      },
+      "overall_status": "PASS",
+      "confidence": 80
+    }
+  ],
+  "common_issues": [],
+  "recommendations": [
+    "All commands working well! Consider adding more comprehensive tests."
+  ]
+}

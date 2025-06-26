@@ -1,0 +1,51 @@
+{
+  "timestamp": "20250530_103643",
+  "total_projects": 5,
+  "tests_created": 3,
+  "status_counts": {
+    "passed": 3,
+    "failed": 2
+  },
+  "results": [
+    {
+      "project": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "timestamp": "2025-05-30T10:36:43.762631",
+      "created_test": true,
+      "test_output": "============================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/sparta/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/sparta\nconfigfile: pyproject.toml\nplugins: metadata-3.1.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=auto, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 2 items\n\ntests/test_basic.py::test_module_imports PASSED                          [ 50%]\ntests/test_basic.py::test_basic_functionality PASSED                     [100%]\n\n=============================== warnings summary ===============================\n.venv/lib/python3.10/site-packages/_pytest/config/__init__.py:1441\n  /home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/_pytest/config/__init__.py:1441: PytestConfigWarning: Unknown config option: asyncio_fixture_loop_scope\n  \n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\n\ntests/test_basic.py::test_module_imports\n  /home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 2 passed, 2 warnings in 0.09s =========================\n\nCannot read termcap database;\nusing dumb terminal settings.\n/home/graham/workspace/experiments/sparta/.venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\n",
+      "status": "passed"
+    },
+    {
+      "project": "marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "timestamp": "2025-05-30T10:36:44.128146",
+      "created_test": true,
+      "test_output": "============================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.5.0 -- /home/graham/workspace/experiments/marker/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.5.0'}, 'Plugins': {'metadata': '3.1.1', 'mock': '3.14.0', 'cov': '6.1.1', 'json-report': '1.5.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/marker\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, mock-3.14.0, cov-6.1.1, json-report-1.5.0, anyio-4.9.0\ncollecting ... collected 2 items\n\ntests/test_basic.py::test_module_imports PASSED                          [ 50%]\ntests/test_basic.py::test_basic_functionality PASSED                     [100%]\n\n============================== 2 passed in 0.02s ===============================\n\nCannot read termcap database;\nusing dumb terminal settings.\n",
+      "status": "passed"
+    },
+    {
+      "project": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "timestamp": "2025-05-30T10:36:55.364038",
+      "created_test": false,
+      "test_output": "\u001b[1m============================= test session starts ==============================\u001b[0m\nplatform linux -- Python 3.12.3, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/youtube_transcripts/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.12.3', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'cov': '6.1.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/youtube_transcripts\nconfigfile: pytest.ini\nplugins: metadata-3.1.1, cov-6.1.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\n\u001b[1mcollecting ... \u001b[0mcollected 0 items\n\n\u001b[33m============================ \u001b[33mno tests ran\u001b[0m\u001b[33m in 0.00s\u001b[0m\u001b[33m =============================\u001b[0m\n\n/home/graham/workspace/experiments/youtube_transcripts/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\nERROR: file or directory not found: tests/test_basic.py\n\n",
+      "status": "failed"
+    },
+    {
+      "project": "claude-module-communicator",
+      "path": "/home/graham/workspace/experiments/claude-module-communicator",
+      "timestamp": "2025-05-30T10:36:57.784503",
+      "created_test": true,
+      "test_output": "============================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/claude-module-communicator/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'html': '4.1.1', 'cov': '6.1.1', 'mock': '3.14.1', 'allure-pytest': '2.14.2', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/claude-module-communicator\nconfigfile: pyproject.toml\nplugins: metadata-3.1.1, html-4.1.1, cov-6.1.1, mock-3.14.1, allure-pytest-2.14.2, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=auto, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function\ncollecting ... collected 2 items\n\ntests/test_basic.py::test_module_imports PASSED                          [ 50%]\ntests/test_basic.py::test_basic_functionality PASSED                     [100%]\n\n============================== 2 passed in 0.09s ===============================\n\nCannot read termcap database;\nusing dumb terminal settings.\n",
+      "status": "passed"
+    },
+    {
+      "project": "marker-ground-truth",
+      "path": "/home/graham/workspace/experiments/marker-ground-truth",
+      "timestamp": "2025-05-30T10:36:59.876753",
+      "created_test": false,
+      "test_output": "============================= test session starts ==============================\nplatform linux -- Python 3.11.12, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/experiments/marker-ground-truth/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.11.12', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'base-url': '2.1.0', 'playwright': '0.7.0', 'cov': '6.1.1', 'json-report': '1.5.0', 'typeguard': '3.0.2', 'asyncio': '1.0.0', 'anyio': '4.9.0'}, 'Base URL': ''}\nrootdir: /home/graham/workspace/experiments/marker-ground-truth\nconfigfile: pyproject.toml\nplugins: metadata-3.1.1, base-url-2.1.0, playwright-0.7.0, cov-6.1.1, json-report-1.5.0, typeguard-3.0.2, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 0 items\n\n============================ no tests ran in 0.00s =============================\n\n/home/graham/workspace/experiments/marker-ground-truth/.venv/lib/python3.11/site-packages/pytest_asyncio/plugin.py:208: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))\nERROR: file or directory not found: tests/test_basic.py\n\n",
+      "status": "failed"
+    }
+  ]
+}

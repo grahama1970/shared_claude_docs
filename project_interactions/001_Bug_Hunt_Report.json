@@ -1,0 +1,785 @@
+{
+  "summary": {
+    "date": "2025-06-08T11:07:57.224341",
+    "total_tests": 3,
+    "pass_rate": 100.0,
+    "bugs_found": 3
+  },
+  "results": [
+    {
+      "name": "Security Validation",
+      "status": "PASS",
+      "duration": 0.5048890113830566,
+      "error": null,
+      "work_performed": [
+        "Verified authentication in arangodb",
+        "Tested token validation in arangodb",
+        "Verified authentication in marker",
+        "Tested token validation in marker",
+        "Verified authentication in sparta",
+        "Tested token validation in sparta",
+        "Security boundary testing"
+      ],
+      "metrics": {
+        "duration": 0.5048890113830566,
+        "validations": {
+          "arangodb_auth": true,
+          "arangodb_token_validation": false,
+          "marker_auth": true,
+          "marker_token_validation": false,
+          "sparta_auth": true,
+          "sparta_token_validation": false
+        },
+        "work_performed": [
+          {
+            "action": "Verified authentication in arangodb",
+            "duration": 0.001583099365234375,
+            "result": true,
+            "timestamp": "2025-06-08T11:07:55.163707"
+          },
+          {
+            "action": "Tested token validation in arangodb",
+            "duration": 0.0015921592712402344,
+            "result": false,
+            "timestamp": "2025-06-08T11:07:55.163715"
+          },
+          {
+            "action": "Verified authentication in marker",
+            "duration": 0.0028069019317626953,
+            "result": true,
+            "timestamp": "2025-06-08T11:07:55.164930"
+          },
+          {
+            "action": "Tested token validation in marker",
+            "duration": 0.0028121471405029297,
+            "result": false,
+            "timestamp": "2025-06-08T11:07:55.164935"
+          },
+          {
+            "action": "Verified authentication in sparta",
+            "duration": 0.004069089889526367,
+            "result": true,
+            "timestamp": "2025-06-08T11:07:55.166192"
+          },
+          {
+            "action": "Tested token validation in sparta",
+            "duration": 0.004074811935424805,
+            "result": false,
+            "timestamp": "2025-06-08T11:07:55.166198"
+          },
+          {
+            "action": "Security boundary testing",
+            "duration": 0.5007882118225098,
+            "result": {
+              "tests_performed": 10
+            },
+            "timestamp": "2025-06-08T11:07:55.666998"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pipeline Data Isolation",
+      "status": "PASS",
+      "duration": 0.6511030197143555,
+      "error": null,
+      "work_performed": [
+        "Created real pipeline instance 72040c39...",
+        "Created real pipeline instance 70a000f9...",
+        "Created real pipeline instance 452aae8d...",
+        "Created real pipeline instance 14b3178b...",
+        "Created real pipeline instance d0396442...",
+        "Completed 5 isolation tests",
+        "Completed 10 isolation tests",
+        "Completed 15 isolation tests",
+        "Completed 20 isolation tests",
+        "Completed concurrent access stress test",
+        "Cleaned up all pipeline instances"
+      ],
+      "metrics": {
+        "duration": 0.6511030197143555,
+        "isolation_tests": {
+          "isolation_0_1": true,
+          "cross_isolation_0_1": true,
+          "isolation_0_2": true,
+          "cross_isolation_0_2": true,
+          "isolation_0_3": true,
+          "cross_isolation_0_3": true,
+          "isolation_0_4": true,
+          "cross_isolation_0_4": true,
+          "isolation_1_0": false,
+          "cross_isolation_1_0": true,
+          "isolation_1_2": true,
+          "cross_isolation_1_2": true,
+          "isolation_1_3": true,
+          "cross_isolation_1_3": true,
+          "isolation_1_4": true,
+          "cross_isolation_1_4": true,
+          "isolation_2_0": false,
+          "cross_isolation_2_0": true,
+          "isolation_2_1": false,
+          "cross_isolation_2_1": true,
+          "isolation_2_3": true,
+          "cross_isolation_2_3": true,
+          "isolation_2_4": true,
+          "cross_isolation_2_4": true,
+          "isolation_3_0": false,
+          "cross_isolation_3_0": true,
+          "isolation_3_1": false,
+          "cross_isolation_3_1": true,
+          "isolation_3_2": false,
+          "cross_isolation_3_2": true,
+          "isolation_3_4": true,
+          "cross_isolation_3_4": true,
+          "isolation_4_0": false,
+          "cross_isolation_4_0": true,
+          "isolation_4_1": false,
+          "cross_isolation_4_1": true,
+          "isolation_4_2": false,
+          "cross_isolation_4_2": true,
+          "isolation_4_3": false,
+          "cross_isolation_4_3": true,
+          "cleanup_72040c39": true,
+          "cleanup_70a000f9": true,
+          "cleanup_452aae8d": true,
+          "cleanup_14b3178b": true,
+          "cleanup_d0396442": true
+        },
+        "work_performed": [
+          {
+            "action": "Created real pipeline instance 72040c39...",
+            "duration": 0.026202678680419922,
+            "result": "72040c39-3515-4a6f-a890-959cf8fc76f0",
+            "timestamp": "2025-06-08T11:07:55.693254"
+          },
+          {
+            "action": "Created real pipeline instance 70a000f9...",
+            "duration": 0.026215553283691406,
+            "result": "70a000f9-923c-492b-b3de-713f7c116912",
+            "timestamp": "2025-06-08T11:07:55.693266"
+          },
+          {
+            "action": "Created real pipeline instance 452aae8d...",
+            "duration": 0.026224374771118164,
+            "result": "452aae8d-a1db-43b8-a75a-4d173fba227f",
+            "timestamp": "2025-06-08T11:07:55.693275"
+          },
+          {
+            "action": "Created real pipeline instance 14b3178b...",
+            "duration": 0.026232481002807617,
+            "result": "14b3178b-579e-4b53-87ec-22abc19be5e8",
+            "timestamp": "2025-06-08T11:07:55.693283"
+          },
+          {
+            "action": "Created real pipeline instance d0396442...",
+            "duration": 0.02624034881591797,
+            "result": "d0396442-568e-44e5-a1ad-00eaa8a96688",
+            "timestamp": "2025-06-08T11:07:55.693291"
+          },
+          {
+            "action": "Completed 5 isolation tests",
+            "duration": 0.026261091232299805,
+            "result": {
+              "passed": false
+            },
+            "timestamp": "2025-06-08T11:07:55.693312"
+          },
+          {
+            "action": "Completed 10 isolation tests",
+            "duration": 0.026279687881469727,
+            "result": {
+              "passed": false
+            },
+            "timestamp": "2025-06-08T11:07:55.693330"
+          },
+          {
+            "action": "Completed 15 isolation tests",
+            "duration": 0.026297569274902344,
+            "result": {
+              "passed": false
+            },
+            "timestamp": "2025-06-08T11:07:55.693348"
+          },
+          {
+            "action": "Completed 20 isolation tests",
+            "duration": 0.026314973831176758,
+            "result": {
+              "passed": false
+            },
+            "timestamp": "2025-06-08T11:07:55.693365"
+          },
+          {
+            "action": "Completed concurrent access stress test",
+            "duration": 0.6509737968444824,
+            "result": {
+              "total_operations": 300,
+              "successful": 300
+            },
+            "timestamp": "2025-06-08T11:07:56.318030"
+          },
+          {
+            "action": "Cleaned up all pipeline instances",
+            "duration": 0.6510910987854004,
+            "result": {
+              "instances_cleaned": 5
+            },
+            "timestamp": "2025-06-08T11:07:56.318145"
+          }
+        ],
+        "using_real_manager": true,
+        "tests_performed": 45
+      }
+    },
+    {
+      "name": "Error Handling Quality",
+      "status": "PASS",
+      "duration": 0.9045865535736084,
+      "error": null,
+      "work_performed": [
+        "Analyzed error handling in arangodb (6 tests)",
+        "Analyzed error handling in sparta (6 tests)",
+        "Analyzed error handling in marker (6 tests)"
+      ],
+      "metrics": {
+        "duration": 0.9045865535736084,
+        "error_analysis": {
+          "arangodb": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 0.0015766620635986328
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 7.176399230957031e-05
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.079673767089844e-05
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.365776062011719e-05
+              },
+              {
+                "test": "auth_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.127357482910156e-05
+              },
+              {
+                "test": "timeout",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 0.00011086463928222656
+              }
+            ],
+            "average_quality": 0.5625562556255624,
+            "recommendation": "Needs improvement",
+            "using_analyzer": true,
+            "total_test_time": 0.0019450187683105469
+          },
+          "sparta": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 8.654594421386719e-05
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.127357482910156e-05
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.008148193359375e-05
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 9.012222290039062e-05
+              },
+              {
+                "test": "auth_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 9.107589721679688e-05
+              },
+              {
+                "test": "timeout",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 8.821487426757812e-05
+              }
+            ],
+            "average_quality": 0.5625562556255624,
+            "recommendation": "Needs improvement",
+            "using_analyzer": true,
+            "total_test_time": 0.0004773139953613281
+          },
+          "marker": {
+            "tests": [
+              {
+                "test": "missing_params",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.651878356933594e-05
+              },
+              {
+                "test": "invalid_operation",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 7.62939453125e-05
+              },
+              {
+                "test": "malformed_data",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 0.0001347064971923828
+              },
+              {
+                "test": "connection_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 0.00010657310485839844
+              },
+              {
+                "test": "auth_failure",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 9.632110595703125e-05
+              },
+              {
+                "test": "timeout",
+                "error_msg": "Missing required field: source",
+                "quality_score": 0.5625562556255626,
+                "recommendations": [
+                  "Include suggestions for how to fix the issue",
+                  "Provide examples of correct usage",
+                  "Include location information (file, line, function)",
+                  "Add context about when/where the error occurred"
+                ],
+                "duration": 6.103515625e-05
+              }
+            ],
+            "average_quality": 0.5625562556255624,
+            "recommendation": "Needs improvement",
+            "using_analyzer": true,
+            "total_test_time": 0.0005414485931396484
+          }
+        },
+        "work_performed": [
+          {
+            "action": "Analyzed error handling in arangodb (6 tests)",
+            "duration": 0.3024764060974121,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 0.0015766620635986328
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 7.176399230957031e-05
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.079673767089844e-05
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.365776062011719e-05
+                },
+                {
+                  "test": "auth_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.127357482910156e-05
+                },
+                {
+                  "test": "timeout",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 0.00011086463928222656
+                }
+              ],
+              "average_quality": 0.5625562556255624,
+              "recommendation": "Needs improvement",
+              "using_analyzer": true,
+              "total_test_time": 0.0019450187683105469
+            },
+            "timestamp": "2025-06-08T11:07:56.621169"
+          },
+          {
+            "action": "Analyzed error handling in sparta (6 tests)",
+            "duration": 0.6035065650939941,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 8.654594421386719e-05
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.127357482910156e-05
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.008148193359375e-05
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 9.012222290039062e-05
+                },
+                {
+                  "test": "auth_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 9.107589721679688e-05
+                },
+                {
+                  "test": "timeout",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 8.821487426757812e-05
+                }
+              ],
+              "average_quality": 0.5625562556255624,
+              "recommendation": "Needs improvement",
+              "using_analyzer": true,
+              "total_test_time": 0.0004773139953613281
+            },
+            "timestamp": "2025-06-08T11:07:56.922197"
+          },
+          {
+            "action": "Analyzed error handling in marker (6 tests)",
+            "duration": 0.9045696258544922,
+            "result": {
+              "tests": [
+                {
+                  "test": "missing_params",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.651878356933594e-05
+                },
+                {
+                  "test": "invalid_operation",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 7.62939453125e-05
+                },
+                {
+                  "test": "malformed_data",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 0.0001347064971923828
+                },
+                {
+                  "test": "connection_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 0.00010657310485839844
+                },
+                {
+                  "test": "auth_failure",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 9.632110595703125e-05
+                },
+                {
+                  "test": "timeout",
+                  "error_msg": "Missing required field: source",
+                  "quality_score": 0.5625562556255626,
+                  "recommendations": [
+                    "Include suggestions for how to fix the issue",
+                    "Provide examples of correct usage",
+                    "Include location information (file, line, function)",
+                    "Add context about when/where the error occurred"
+                  ],
+                  "duration": 6.103515625e-05
+                }
+              ],
+              "average_quality": 0.5625562556255624,
+              "recommendation": "Needs improvement",
+              "using_analyzer": true,
+              "total_test_time": 0.0005414485931396484
+            },
+            "timestamp": "2025-06-08T11:07:57.223260"
+          }
+        ],
+        "modules_tested": 3
+      }
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG_001",
+      "title": "Poor Error Messages in arangodb",
+      "severity": "LOW",
+      "modules": [
+        "arangodb"
+      ],
+      "root_cause": "Lack of error message design standards",
+      "fix_recommendation": "Implement error message template with context and suggestions"
+    },
+    {
+      "id": "BUG_002",
+      "title": "Poor Error Messages in sparta",
+      "severity": "LOW",
+      "modules": [
+        "sparta"
+      ],
+      "root_cause": "Lack of error message design standards",
+      "fix_recommendation": "Implement error message template with context and suggestions"
+    },
+    {
+      "id": "BUG_003",
+      "title": "Poor Error Messages in marker",
+      "severity": "LOW",
+      "modules": [
+        "marker"
+      ],
+      "root_cause": "Lack of error message design standards",
+      "fix_recommendation": "Implement error message template with context and suggestions"
+    }
+  ],
+  "performance_metrics": {
+    "arangodb_import_time": 0.0015795230865478516,
+    "marker_import_time": 0.0012104511260986328,
+    "sparta_import_time": 0.001252889633178711
+  }
+}

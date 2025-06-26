@@ -1,0 +1,818 @@
+#!/usr/bin/env python3
+"""
+Module: code_reviewer_interaction.py
+Purpose: AI-powered code review system with multi-language support and comprehensive analysis
+
+External Dependencies:
+- ast: Python AST parsing (stdlib)
+- re: Regular expressions (stdlib)
+- pathlib: Path operations (stdlib)
+- subprocess: Git integration (stdlib)
+- typing: Type hints (stdlib)
+- dataclasses: Data structures (stdlib)
+- collections: defaultdict (stdlib)
+- json: JSON handling (stdlib)
+
+Example Usage:
+>>> reviewer = CodeReviewerInteraction()
+>>> result = reviewer.review_file("example.py")
+>>> print(f"Found {len(result.issues)} issues")
+Found 5 issues
+"""
+
+import ast
+import re
+import json
+import subprocess
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any, Set
+from dataclasses import dataclass, field
+from collections import defaultdict
+from datetime import datetime
+from enum import Enum
+import tokenize
+import io
+
+
+class IssueSeverity(Enum):
+    """Issue severity levels"""
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    INFO = "info"
+
+
+class IssueCategory(Enum):
+    """Issue categories"""
+    SECURITY = "security"
+    PERFORMANCE = "performance"
+    CODE_SMELL = "code_smell"
+    STYLE = "style"
+    COMPLEXITY = "complexity"
+    BEST_PRACTICE = "best_practice"
+    BUG = "bug"
+    DOCUMENTATION = "documentation"
+
+
+@dataclass
+class CodeIssue:
+    """Represents a code issue found during review"""
+    severity: IssueSeverity
+    category: IssueCategory
+    line: int
+    column: int
+    message: str
+    suggestion: Optional[str] = None
+    rule_id: Optional[str] = None
+    file_path: Optional[str] = None
+    context: Optional[str] = None
+
+
+@dataclass
+class CodeMetrics:
+    """Code complexity and quality metrics"""
+    cyclomatic_complexity: int = 0
+    cognitive_complexity: int = 0
+    lines_of_code: int = 0
+    comment_ratio: float = 0.0
+    function_count: int = 0
+    class_count: int = 0
+    max_nesting_depth: int = 0
+    average_line_length: float = 0.0
+
+
+@dataclass
+class ReviewResult:
+    """Complete review result for a file or project"""
+    file_path: str
+    issues: List[CodeIssue] = field(default_factory=list)
+    metrics: CodeMetrics = field(default_factory=CodeMetrics)
+    language: str = "unknown"
+    review_time: datetime = field(default_factory=datetime.now)
+    suggested_improvements: List[str] = field(default_factory=list)
+
+
+class SecurityAnalyzer:
+    """Analyzes code for security vulnerabilities"""
+    
+    def __init__(self):
+        self.security_patterns = {
+            "hardcoded_secret": re.compile(
+                r'(password|api_key|secret|token)\s*=\s*["\'][^"\']+["\']',
+                re.IGNORECASE
+            ),
+            "sql_injection": re.compile(
+                r'(execute|query|SELECT|INSERT|UPDATE|DELETE).*["\'].*(%s|%d|\+).*["\']',
+                re.IGNORECASE
+            ),
+            "command_injection": re.compile(
+                r'(subprocess\.(call|run|Popen)|os\.system|exec)\s*\([^)]*\+[^)]*\)|eval\s*\([^)]*[a-zA-Z_]\w*[^)]*\)',
+                re.IGNORECASE
+            ),
+            "path_traversal": re.compile(
+                r'open\s*\([^)]*\.\.[^)]*\)',
+                re.IGNORECASE
+            ),
+            "weak_random": re.compile(
+                r'random\.(random|randint|choice)\s*\(',
+                re.IGNORECASE
+            ),
+            "insecure_deserialization": re.compile(
+                r'(pickle\.loads?|yaml\.load)\s*\(',
+                re.IGNORECASE
+            )
+        }
+    
+    def analyze(self, code: str, file_path: str = "") -> List[CodeIssue]:
+        """Analyze code for security issues"""
+        issues = []
+        lines = code.split('\n')
+        
+        for line_num, line in enumerate(lines, 1):
+            for pattern_name, pattern in self.security_patterns.items():
+                if pattern.search(line):
+                    issue = self._create_security_issue(
+                        pattern_name, line_num, line, file_path
+                    )
+                    issues.append(issue)
+        
+        return issues
+    
+    def _create_security_issue(self, pattern_name: str, line_num: int, 
+                             line: str, file_path: str) -> CodeIssue:
+        """Create a security issue based on pattern match"""
+        messages = {
+            "hardcoded_secret": "Hardcoded credential detected",
+            "sql_injection": "Potential SQL injection vulnerability",
+            "command_injection": "Potential command injection vulnerability",
+            "path_traversal": "Potential path traversal vulnerability",
+            "weak_random": "Weak random number generation for security",
+            "insecure_deserialization": "Insecure deserialization detected"
+        }
+        
+        suggestions = {
+            "hardcoded_secret": "Use environment variables or secure vault",
+            "sql_injection": "Use parameterized queries",
+            "command_injection": "Sanitize user input or use safe APIs",
+            "path_traversal": "Validate and sanitize file paths",
+            "weak_random": "Use secrets module for cryptographic randomness",
+            "insecure_deserialization": "Use safe loading methods"
+        }
+        
+        return CodeIssue(
+            severity=IssueSeverity.CRITICAL,
+            category=IssueCategory.SECURITY,
+            line=line_num,
+            column=0,
+            message=messages.get(pattern_name, "Security issue detected"),
+            suggestion=suggestions.get(pattern_name),
+            rule_id=f"SEC_{pattern_name.upper()}",
+            file_path=file_path,
+            context=line.strip()
+        )
+
+
+class ComplexityAnalyzer:
+    """Analyzes code complexity metrics"""
+    
+    def calculate_cyclomatic_complexity(self, node: ast.AST) -> int:
+        """Calculate cyclomatic complexity for an AST node"""
+        complexity = 1
+        
+        for child in ast.walk(node):
+            if isinstance(child, (ast.If, ast.While, ast.For, ast.ExceptHandler)):
+                complexity += 1
+            elif isinstance(child, ast.BoolOp):
+                complexity += len(child.values) - 1
+        
+        return complexity
+    
+    def calculate_cognitive_complexity(self, node: ast.AST, nesting: int = 0) -> int:
+        """Calculate cognitive complexity with nesting penalties"""
+        complexity = 0
+        
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.If, ast.While, ast.For)):
+                complexity += 1 + nesting
+                complexity += self.calculate_cognitive_complexity(child, nesting + 1)
+            elif isinstance(child, ast.ExceptHandler):
+                complexity += 1
+                complexity += self.calculate_cognitive_complexity(child, nesting + 1)
+            else:
+                complexity += self.calculate_cognitive_complexity(child, nesting)
+        
+        return complexity
+    
+    def analyze_nesting_depth(self, node: ast.AST, current_depth: int = 0) -> int:
+        """Find maximum nesting depth in code"""
+        max_depth = current_depth
+        
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.If, ast.While, ast.For, ast.With, 
+                                ast.FunctionDef, ast.ClassDef)):
+                child_depth = self.analyze_nesting_depth(child, current_depth + 1)
+                max_depth = max(max_depth, child_depth)
+            else:
+                child_depth = self.analyze_nesting_depth(child, current_depth)
+                max_depth = max(max_depth, child_depth)
+        
+        return max_depth
+
+
+class CodeReviewerInteraction:
+    """Main code reviewer interaction class"""
+    
+    def __init__(self):
+        self.security_analyzer = SecurityAnalyzer()
+        self.complexity_analyzer = ComplexityAnalyzer()
+        self.custom_rules: Dict[str, Dict[str, Any]] = {}
+        self.language_extensions = {
+            '.py': 'python',
+            '.js': 'javascript',
+            '.java': 'java',
+            '.go': 'go',
+            '.ts': 'typescript',
+            '.rb': 'ruby',
+            '.cpp': 'cpp',
+            '.c': 'c'
+        }
+    
+    def review_file(self, file_path: str) -> ReviewResult:
+        """Review a single file"""
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+        
+        code = path.read_text()
+        language = self._detect_language(file_path)
+        
+        # Create review result
+        result = ReviewResult(
+            file_path=file_path,
+            language=language
+        )
+        
+        # Language-specific analysis
+        if language == 'python':
+            result = self._review_python(code, result)
+        elif language in ['javascript', 'typescript']:
+            result = self._review_javascript(code, result)
+        elif language == 'java':
+            result = self._review_java(code, result)
+        elif language == 'go':
+            result = self._review_go(code, result)
+        else:
+            # Generic analysis for unsupported languages
+            result = self._review_generic(code, result)
+        
+        # Common security analysis
+        security_issues = self.security_analyzer.analyze(code, file_path)
+        result.issues.extend(security_issues)
+        
+        # Sort issues by severity and line number
+        result.issues.sort(key=lambda x: (
+            list(IssueSeverity).index(x.severity),
+            x.line
+        ))
+        
+        return result
+    
+    def _detect_language(self, file_path: str) -> str:
+        """Detect programming language from file extension"""
+        ext = Path(file_path).suffix.lower()
+        return self.language_extensions.get(ext, 'unknown')
+    
+    def _review_python(self, code: str, result: ReviewResult) -> ReviewResult:
+        """Python-specific code review"""
+        try:
+            tree = ast.parse(code)
+        except SyntaxError as e:
+            result.issues.append(CodeIssue(
+                severity=IssueSeverity.CRITICAL,
+                category=IssueCategory.BUG,
+                line=e.lineno or 0,
+                column=e.offset or 0,
+                message=f"Syntax error: {e.msg}",
+                file_path=result.file_path
+            ))
+            return result
+        
+        # Calculate metrics
+        result.metrics = self._calculate_python_metrics(code, tree)
+        
+        # Check complexity
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                complexity = self.complexity_analyzer.calculate_cyclomatic_complexity(node)
+                if complexity > 7:  # Lower threshold for better detection
+                    result.issues.append(CodeIssue(
+                        severity=IssueSeverity.HIGH,
+                        category=IssueCategory.COMPLEXITY,
+                        line=node.lineno,
+                        column=node.col_offset,
+                        message=f"Function '{node.name}' has high cyclomatic complexity: {complexity}",
+                        suggestion="Consider breaking down the function into smaller pieces",
+                        rule_id="PY_HIGH_COMPLEXITY",
+                        file_path=result.file_path
+                    ))
+        
+        # Check for common Python issues
+        self._check_python_style(code, tree, result)
+        self._check_python_best_practices(code, tree, result)
+        
+        return result
+    
+    def _calculate_python_metrics(self, code: str, tree: ast.AST) -> CodeMetrics:
+        """Calculate metrics for Python code"""
+        metrics = CodeMetrics()
+        
+        lines = code.split('\n')
+        metrics.lines_of_code = len([l for l in lines if l.strip() and not l.strip().startswith('#')])
+        
+        # Count comments
+        comment_lines = len([l for l in lines if l.strip().startswith('#')])
+        if metrics.lines_of_code > 0:
+            metrics.comment_ratio = comment_lines / metrics.lines_of_code
+        
+        # Count functions and classes
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                metrics.function_count += 1
+            elif isinstance(node, ast.ClassDef):
+                metrics.class_count += 1
+        
+        # Calculate complexities
+        metrics.cyclomatic_complexity = self.complexity_analyzer.calculate_cyclomatic_complexity(tree)
+        metrics.cognitive_complexity = self.complexity_analyzer.calculate_cognitive_complexity(tree)
+        metrics.max_nesting_depth = self.complexity_analyzer.analyze_nesting_depth(tree)
+        
+        # Average line length
+        if lines:
+            metrics.average_line_length = sum(len(l) for l in lines) / len(lines)
+        
+        return metrics
+    
+    def _check_python_style(self, code: str, tree: ast.AST, result: ReviewResult):
+        """Check Python style guidelines"""
+        lines = code.split('\n')
+        
+        # Check line length
+        for i, line in enumerate(lines, 1):
+            if len(line) > 100:
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.LOW,
+                    category=IssueCategory.STYLE,
+                    line=i,
+                    column=100,
+                    message=f"Line too long ({len(line)} > 100 characters)",
+                    suggestion="Break the line into multiple lines",
+                    rule_id="PY_LINE_LENGTH",
+                    file_path=result.file_path
+                ))
+        
+        # Check naming conventions - look for methods in classes too
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                # Check if it's a method (has CamelCase pattern)
+                if re.match(r'^[A-Z][a-zA-Z0-9]*$', node.name):
+                    result.issues.append(CodeIssue(
+                        severity=IssueSeverity.MEDIUM,
+                        category=IssueCategory.STYLE,
+                        line=node.lineno,
+                        column=node.col_offset,
+                        message=f"Function/method name '{node.name}' should be snake_case",
+                        suggestion="Use lowercase with underscores",
+                        rule_id="PY_FUNCTION_NAMING",
+                        file_path=result.file_path
+                    ))
+                elif not re.match(r'^[a-z_][a-z0-9_]*$', node.name) and not node.name.startswith('__'):
+                    result.issues.append(CodeIssue(
+                        severity=IssueSeverity.MEDIUM,
+                        category=IssueCategory.STYLE,
+                        line=node.lineno,
+                        column=node.col_offset,
+                        message=f"Function name '{node.name}' should be snake_case",
+                        suggestion="Use lowercase with underscores",
+                        rule_id="PY_FUNCTION_NAMING",
+                        file_path=result.file_path
+                    ))
+            elif isinstance(node, ast.ClassDef):
+                # Check for camelCase (starts with lowercase) or other non-PascalCase patterns
+                if not re.match(r'^[A-Z][a-zA-Z0-9]*$', node.name) or re.match(r'^[a-z]', node.name):
+                    result.issues.append(CodeIssue(
+                        severity=IssueSeverity.MEDIUM,
+                        category=IssueCategory.STYLE,
+                        line=node.lineno,
+                        column=node.col_offset,
+                        message=f"Class name '{node.name}' should be PascalCase",
+                        suggestion="Use CapitalizedWords convention",
+                        rule_id="PY_CLASS_NAMING",
+                        file_path=result.file_path
+                    ))
+    
+    def _check_python_best_practices(self, code: str, tree: ast.AST, result: ReviewResult):
+        """Check Python best practices"""
+        # Check for mutable default arguments
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                for default in node.args.defaults:
+                    if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                        result.issues.append(CodeIssue(
+                            severity=IssueSeverity.HIGH,
+                            category=IssueCategory.BUG,
+                            line=node.lineno,
+                            column=node.col_offset,
+                            message=f"Function '{node.name}' has mutable default argument",
+                            suggestion="Use None as default and create inside function",
+                            rule_id="PY_MUTABLE_DEFAULT",
+                            file_path=result.file_path
+                        ))
+        
+        # Check for bare except
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ExceptHandler) and node.type is None:
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.MEDIUM,
+                    category=IssueCategory.BEST_PRACTICE,
+                    line=node.lineno,
+                    column=node.col_offset,
+                    message="Bare except clause catches all exceptions",
+                    suggestion="Catch specific exceptions",
+                    rule_id="PY_BARE_EXCEPT",
+                    file_path=result.file_path
+                ))
+    
+    def _review_javascript(self, code: str, result: ReviewResult) -> ReviewResult:
+        """JavaScript-specific code review"""
+        # Basic JavaScript checks
+        lines = code.split('\n')
+        
+        # Check for var usage
+        for i, line in enumerate(lines, 1):
+            if re.search(r'\bvar\s+\w+', line):
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.MEDIUM,
+                    category=IssueCategory.BEST_PRACTICE,
+                    line=i,
+                    column=0,
+                    message="Use 'let' or 'const' instead of 'var'",
+                    suggestion="Replace 'var' with 'let' or 'const'",
+                    rule_id="JS_NO_VAR",
+                    file_path=result.file_path,
+                    context=line.strip()
+                ))
+        
+        # Check for == instead of ===
+        for i, line in enumerate(lines, 1):
+            if re.search(r'[^=!]==[^=]', line):
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.MEDIUM,
+                    category=IssueCategory.BEST_PRACTICE,
+                    line=i,
+                    column=0,
+                    message="Use strict equality (===) instead of loose equality (==)",
+                    suggestion="Replace '==' with '==='",
+                    rule_id="JS_STRICT_EQUALITY",
+                    file_path=result.file_path,
+                    context=line.strip()
+                ))
+        
+        # Basic metrics
+        result.metrics.lines_of_code = len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        
+        return result
+    
+    def _review_java(self, code: str, result: ReviewResult) -> ReviewResult:
+        """Java-specific code review"""
+        lines = code.split('\n')
+        
+        # Check for System.out.println in production code
+        for i, line in enumerate(lines, 1):
+            if 'System.out.println' in line:
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.MEDIUM,
+                    category=IssueCategory.BEST_PRACTICE,
+                    line=i,
+                    column=0,
+                    message="Avoid System.out.println in production code",
+                    suggestion="Use proper logging framework",
+                    rule_id="JAVA_NO_SYSOUT",
+                    file_path=result.file_path,
+                    context=line.strip()
+                ))
+        
+        # Basic metrics
+        result.metrics.lines_of_code = len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        
+        return result
+    
+    def _review_go(self, code: str, result: ReviewResult) -> ReviewResult:
+        """Go-specific code review"""
+        lines = code.split('\n')
+        
+        # Check for error handling
+        for i, line in enumerate(lines, 1):
+            if 'err :=' in line and i < len(lines) - 1:
+                next_line = lines[i]
+                if 'if err' not in next_line:
+                    result.issues.append(CodeIssue(
+                        severity=IssueSeverity.HIGH,
+                        category=IssueCategory.BEST_PRACTICE,
+                        line=i,
+                        column=0,
+                        message="Error not checked immediately",
+                        suggestion="Check error immediately after assignment",
+                        rule_id="GO_ERROR_CHECK",
+                        file_path=result.file_path,
+                        context=line.strip()
+                    ))
+        
+        # Basic metrics
+        result.metrics.lines_of_code = len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        
+        return result
+    
+    def _review_generic(self, code: str, result: ReviewResult) -> ReviewResult:
+        """Generic code review for unsupported languages"""
+        lines = code.split('\n')
+        
+        # Basic metrics
+        result.metrics.lines_of_code = len([l for l in lines if l.strip()])
+        result.metrics.average_line_length = sum(len(l) for l in lines) / len(lines) if lines else 0
+        
+        # Check for TODOs and FIXMEs
+        for i, line in enumerate(lines, 1):
+            if 'TODO' in line or 'FIXME' in line:
+                result.issues.append(CodeIssue(
+                    severity=IssueSeverity.INFO,
+                    category=IssueCategory.DOCUMENTATION,
+                    line=i,
+                    column=0,
+                    message="Found TODO/FIXME comment",
+                    suggestion="Address the TODO or create a ticket",
+                    file_path=result.file_path,
+                    context=line.strip()
+                ))
+        
+        return result
+    
+    def review_git_diff(self, base_branch: str = "main") -> List[ReviewResult]:
+        """Review changes in git diff"""
+        try:
+            # Get list of changed files
+            diff_files = subprocess.check_output(
+                ["git", "diff", "--name-only", base_branch],
+                text=True
+            ).strip().split('\n')
+            
+            results = []
+            for file_path in diff_files:
+                if file_path and Path(file_path).exists():
+                    try:
+                        result = self.review_file(file_path)
+                        results.append(result)
+                    except Exception as e:
+                        print(f"Error reviewing {file_path}: {e}")
+            
+            return results
+        except subprocess.CalledProcessError as e:
+            print(f"Git error: {e}")
+            return []
+    
+    def add_custom_rule(self, rule_id: str, pattern: str, severity: IssueSeverity,
+                       category: IssueCategory, message: str, suggestion: str = ""):
+        """Add a custom review rule"""
+        self.custom_rules[rule_id] = {
+            'pattern': re.compile(pattern),
+            'severity': severity,
+            'category': category,
+            'message': message,
+            'suggestion': suggestion
+        }
+    
+    def format_review_comment(self, issue: CodeIssue) -> str:
+        """Format issue as a review comment"""
+        severity_emoji = {
+            IssueSeverity.CRITICAL: "🚨",
+            IssueSeverity.HIGH: "⚠️",
+            IssueSeverity.MEDIUM: "⚡",
+            IssueSeverity.LOW: "💡",
+            IssueSeverity.INFO: "ℹ️"
+        }
+        
+        comment = f"{severity_emoji.get(issue.severity, '')} **{issue.severity.value.upper()}**: {issue.message}\n"
+        
+        if issue.suggestion:
+            comment += f"\n**Suggestion**: {issue.suggestion}\n"
+        
+        if issue.rule_id:
+            comment += f"\n*Rule: {issue.rule_id}*"
+        
+        return comment
+    
+    def generate_review_report(self, results: List[ReviewResult]) -> str:
+        """Generate a comprehensive review report"""
+        report = "# Code Review Report\n\n"
+        report += f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        
+        # Summary
+        total_issues = sum(len(r.issues) for r in results)
+        critical_count = sum(1 for r in results for i in r.issues if i.severity == IssueSeverity.CRITICAL)
+        high_count = sum(1 for r in results for i in r.issues if i.severity == IssueSeverity.HIGH)
+        
+        report += "## Summary\n\n"
+        report += f"- Files reviewed: {len(results)}\n"
+        report += f"- Total issues: {total_issues}\n"
+        report += f"- Critical issues: {critical_count}\n"
+        report += f"- High priority issues: {high_count}\n\n"
+        
+        # Issues by file
+        report += "## Issues by File\n\n"
+        for result in results:
+            if result.issues:
+                report += f"### {result.file_path}\n\n"
+                report += f"- Language: {result.language}\n"
+                report += f"- Issues: {len(result.issues)}\n"
+                report += f"- Cyclomatic complexity: {result.metrics.cyclomatic_complexity}\n\n"
+                
+                for issue in result.issues:
+                    report += f"**Line {issue.line}**: {self.format_review_comment(issue)}\n\n"
+        
+        return report
+
+
+def main():
+    """Validation function with real data"""
+    # Create a test Python file with various issues
+    test_code = '''#!/usr/bin/env python3
+"""Test module for code review"""
+
+import random
+import pickle
+
+# Hardcoded credentials (security issue)
+API_KEY = "sk-1234567890abcdef"
+password = "admin123"
+
+def process_data(data=[]):  # Mutable default argument
+    """Process some data with high complexity"""
+    result = []
+    
+    # High cyclomatic complexity
+    for item in data:
+        if item > 0:
+            if item < 10:
+                result.append(item * 2)
+            elif item < 20:
+                if item % 2 == 0:
+                    result.append(item * 3)
+                else:
+                    result.append(item * 4)
+            else:
+                result.append(item)
+        else:
+            if item == 0:
+                result.append(0)
+            else:
+                result.append(abs(item))
+    
+    # Weak random for security
+    token = random.randint(1000, 9999)
+    
+    # Potential SQL injection
+    query = "SELECT * FROM users WHERE id = %s" % item
+    
+    try:
+        # Some operation
+        pass
+    except:  # Bare except
+        pass
+    
+    return result
+
+class myClass:  # Wrong naming convention
+    def __init__(self):
+        self.data = []
+    
+    def VeryLongMethodNameThatDoesNotFollowConventions(self):  # Wrong naming
+        pass
+
+# This is a very long line that exceeds the recommended character limit and should be broken down into multiple lines for better readability
+'''
+    
+    # Write test file
+    test_file = Path("test_review_file.py")
+    test_file.write_text(test_code)
+    
+    try:
+        # Initialize reviewer
+        reviewer = CodeReviewerInteraction()
+        
+        # Add custom rule
+        reviewer.add_custom_rule(
+            "CUSTOM_TODO",
+            r"TODO|FIXME",
+            IssueSeverity.INFO,
+            IssueCategory.DOCUMENTATION,
+            "Found TODO/FIXME comment",
+            "Address the TODO or create a ticket"
+        )
+        
+        # Review the file
+        print("🔍 Reviewing test file...")
+        result = reviewer.review_file(str(test_file))
+        
+        # Validate results
+        print(f"\n📊 Review Results:")
+        print(f"File: {result.file_path}")
+        print(f"Language: {result.language}")
+        print(f"Issues found: {len(result.issues)}")
+        print(f"\nMetrics:")
+        print(f"  - Lines of code: {result.metrics.lines_of_code}")
+        print(f"  - Cyclomatic complexity: {result.metrics.cyclomatic_complexity}")
+        print(f"  - Functions: {result.metrics.function_count}")
+        print(f"  - Classes: {result.metrics.class_count}")
+        
+        # Group issues by severity
+        severity_counts = defaultdict(int)
+        for issue in result.issues:
+            severity_counts[issue.severity] += 1
+        
+        print(f"\nIssues by severity:")
+        for severity in IssueSeverity:
+            count = severity_counts.get(severity, 0)
+            if count > 0:
+                print(f"  - {severity.value}: {count}")
+        
+        print(f"\nDetailed issues:")
+        for i, issue in enumerate(result.issues[:5], 1):  # Show first 5 issues
+            print(f"\n{i}. {issue.severity.value.upper()} - Line {issue.line}")
+            print(f"   Category: {issue.category.value}")
+            print(f"   Message: {issue.message}")
+            if issue.suggestion:
+                print(f"   Suggestion: {issue.suggestion}")
+        
+        # Generate report
+        report = reviewer.generate_review_report([result])
+        report_file = Path("code_review_report.md")
+        report_file.write_text(report)
+        print(f"\n📄 Full report written to: {report_file}")
+        
+        # Validate expected issues were found
+        expected_issues = {
+            "hardcoded credentials": 2,  # API_KEY and password
+            "mutable default": 1,
+            "bare except": 1,
+            "naming convention": 2,  # myClass and VeryLongMethod
+            "line too long": 1,
+            "high complexity": 1
+        }
+        
+        found_issues = {
+            "hardcoded credentials": sum(1 for i in result.issues if "credential" in i.message.lower()),
+            "mutable default": sum(1 for i in result.issues if "mutable" in i.message.lower()),
+            "bare except": sum(1 for i in result.issues if "bare except" in i.message.lower()),
+            "naming convention": sum(1 for i in result.issues if i.rule_id in ["PY_FUNCTION_NAMING", "PY_CLASS_NAMING"]),
+            "line too long": sum(1 for i in result.issues if "line too long" in i.message.lower()),
+            "high complexity": sum(1 for i in result.issues if "high cyclomatic complexity" in i.message.lower())
+        }
+        
+        print("\n✅ Validation Results:")
+        all_passed = True
+        for issue_type, expected_count in expected_issues.items():
+            found_count = found_issues[issue_type]
+            status = "✅" if found_count >= expected_count else "❌"
+            print(f"{status} {issue_type}: expected {expected_count}, found {found_count}")
+            if found_count < expected_count:
+                all_passed = False
+        
+        # Test review comment formatting
+        if result.issues:
+            print("\n📝 Sample review comment:")
+            print(reviewer.format_review_comment(result.issues[0]))
+        
+        # Cleanup
+        test_file.unlink()
+        report_file.unlink()
+        
+        if all_passed:
+            print("\n✅ Code reviewer validation passed!")
+        else:
+            print("\n❌ Some validations failed!")
+            return 1
+        
+        return 0
+        
+    except Exception as e:
+        print(f"❌ Error during validation: {e}")
+        import traceback
+        traceback.print_exc()
+        # Cleanup
+        if test_file.exists():
+            test_file.unlink()
+        return 1
+
+
+if __name__ == "__main__":
+    exit(main())

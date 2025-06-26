@@ -1,0 +1,761 @@
+{
+  "summary": {
+    "date": "2025-06-08T11:21:25.974542",
+    "total_tests": 5,
+    "actual_pass_rate": 60.0,
+    "bugs_found": 6,
+    "critical_bugs": 0,
+    "test_coverage": {
+      "statement_coverage": 80,
+      "branch_coverage": 62,
+      "function_coverage": 79,
+      "lines_tested": 120,
+      "lines_total": 1000,
+      "percentage": 74.39999999999999
+    }
+  },
+  "results": [
+    {
+      "name": "Security Validation Suite",
+      "status": "FAIL",
+      "duration": 0.001495361328125,
+      "error": "6 failures",
+      "work_performed": [
+        "Security validation for arangodb",
+        "Security validation for marker",
+        "Security validation for sparta"
+      ],
+      "bugs_found": [
+        "SEC_001",
+        "SEC_002",
+        "SEC_003",
+        "SEC_004",
+        "SEC_005",
+        "SEC_006"
+      ],
+      "metrics": {
+        "duration": 0.001495361328125,
+        "validations": {
+          "arangodb": {
+            "Authentication Required": {
+              "result": true,
+              "expected": true,
+              "passed": true,
+              "duration": 7.152557373046875e-07
+            },
+            "Token Validation": {
+              "result": {
+                "valid": false,
+                "error": "Invalid authentication token"
+              },
+              "expected": {
+                "valid": false,
+                "error": "Invalid authentication"
+              },
+              "passed": false,
+              "duration": 5.4836273193359375e-06
+            },
+            "SQL Injection Protection": {
+              "result": {
+                "protected": true
+              },
+              "expected": {
+                "protected": true
+              },
+              "passed": true,
+              "duration": 3.814697265625e-06
+            },
+            "Rate Limiting": {
+              "result": {
+                "limited": false,
+                "requests": 20,
+                "duration": 1.1920928955078125e-05
+              },
+              "expected": {
+                "limited": true
+              },
+              "passed": false,
+              "duration": 1.3113021850585938e-05
+            }
+          },
+          "marker": {
+            "Authentication Required": {
+              "result": true,
+              "expected": true,
+              "passed": true,
+              "duration": 4.76837158203125e-07
+            },
+            "Token Validation": {
+              "result": {
+                "valid": false,
+                "error": "Invalid authentication token"
+              },
+              "expected": {
+                "valid": false,
+                "error": "Invalid authentication"
+              },
+              "passed": false,
+              "duration": 2.6226043701171875e-06
+            },
+            "SQL Injection Protection": {
+              "result": {
+                "protected": true
+              },
+              "expected": {
+                "protected": true
+              },
+              "passed": true,
+              "duration": 3.5762786865234375e-06
+            },
+            "Rate Limiting": {
+              "result": {
+                "limited": false,
+                "requests": 20,
+                "duration": 1.2159347534179688e-05
+              },
+              "expected": {
+                "limited": true
+              },
+              "passed": false,
+              "duration": 1.3113021850585938e-05
+            }
+          },
+          "sparta": {
+            "Authentication Required": {
+              "result": true,
+              "expected": true,
+              "passed": true,
+              "duration": 4.76837158203125e-07
+            },
+            "Token Validation": {
+              "result": {
+                "valid": false,
+                "error": "Invalid authentication token"
+              },
+              "expected": {
+                "valid": false,
+                "error": "Invalid authentication"
+              },
+              "passed": false,
+              "duration": 2.384185791015625e-06
+            },
+            "SQL Injection Protection": {
+              "result": {
+                "protected": true
+              },
+              "expected": {
+                "protected": true
+              },
+              "passed": true,
+              "duration": 3.5762786865234375e-06
+            },
+            "Rate Limiting": {
+              "result": {
+                "limited": false,
+                "requests": 20,
+                "duration": 1.1444091796875e-05
+              },
+              "expected": {
+                "limited": true
+              },
+              "passed": false,
+              "duration": 1.239776611328125e-05
+            }
+          }
+        },
+        "work_performed": [
+          {
+            "action": "Security validation for arangodb",
+            "duration": 0.000583648681640625,
+            "result": {
+              "Authentication Required": {
+                "result": true,
+                "expected": true,
+                "passed": true,
+                "duration": 7.152557373046875e-07
+              },
+              "Token Validation": {
+                "result": {
+                  "valid": false,
+                  "error": "Invalid authentication token"
+                },
+                "expected": {
+                  "valid": false,
+                  "error": "Invalid authentication"
+                },
+                "passed": false,
+                "duration": 5.4836273193359375e-06
+              },
+              "SQL Injection Protection": {
+                "result": {
+                  "protected": true
+                },
+                "expected": {
+                  "protected": true
+                },
+                "passed": true,
+                "duration": 3.814697265625e-06
+              },
+              "Rate Limiting": {
+                "result": {
+                  "limited": false,
+                  "requests": 20,
+                  "duration": 1.1920928955078125e-05
+                },
+                "expected": {
+                  "limited": true
+                },
+                "passed": false,
+                "duration": 1.3113021850585938e-05
+              }
+            },
+            "timestamp": "2025-06-08T11:21:24.318647"
+          },
+          {
+            "action": "Security validation for marker",
+            "duration": 0.0010352134704589844,
+            "result": {
+              "Authentication Required": {
+                "result": true,
+                "expected": true,
+                "passed": true,
+                "duration": 4.76837158203125e-07
+              },
+              "Token Validation": {
+                "result": {
+                  "valid": false,
+                  "error": "Invalid authentication token"
+                },
+                "expected": {
+                  "valid": false,
+                  "error": "Invalid authentication"
+                },
+                "passed": false,
+                "duration": 2.6226043701171875e-06
+              },
+              "SQL Injection Protection": {
+                "result": {
+                  "protected": true
+                },
+                "expected": {
+                  "protected": true
+                },
+                "passed": true,
+                "duration": 3.5762786865234375e-06
+              },
+              "Rate Limiting": {
+                "result": {
+                  "limited": false,
+                  "requests": 20,
+                  "duration": 1.2159347534179688e-05
+                },
+                "expected": {
+                  "limited": true
+                },
+                "passed": false,
+                "duration": 1.3113021850585938e-05
+              }
+            },
+            "timestamp": "2025-06-08T11:21:24.319098"
+          },
+          {
+            "action": "Security validation for sparta",
+            "duration": 0.0014917850494384766,
+            "result": {
+              "Authentication Required": {
+                "result": true,
+                "expected": true,
+                "passed": true,
+                "duration": 4.76837158203125e-07
+              },
+              "Token Validation": {
+                "result": {
+                  "valid": false,
+                  "error": "Invalid authentication token"
+                },
+                "expected": {
+                  "valid": false,
+                  "error": "Invalid authentication"
+                },
+                "passed": false,
+                "duration": 2.384185791015625e-06
+              },
+              "SQL Injection Protection": {
+                "result": {
+                  "protected": true
+                },
+                "expected": {
+                  "protected": true
+                },
+                "passed": true,
+                "duration": 3.5762786865234375e-06
+              },
+              "Rate Limiting": {
+                "result": {
+                  "limited": false,
+                  "requests": 20,
+                  "duration": 1.1444091796875e-05
+                },
+                "expected": {
+                  "limited": true
+                },
+                "passed": false,
+                "duration": 1.239776611328125e-05
+              }
+            },
+            "timestamp": "2025-06-08T11:21:24.319555"
+          }
+        ],
+        "test_passed": false,
+        "bugs_found": [
+          "SEC_001",
+          "SEC_002",
+          "SEC_003",
+          "SEC_004",
+          "SEC_005",
+          "SEC_006"
+        ]
+      }
+    },
+    {
+      "name": "Error Handling Quality",
+      "status": "PASS",
+      "duration": 0.4508552551269531,
+      "error": null,
+      "work_performed": [
+        "Test operation 1/9",
+        "Test operation 2/9",
+        "Test operation 3/9",
+        "Test operation 4/9",
+        "Test operation 5/9",
+        "Test operation 6/9",
+        "Test operation 7/9",
+        "Test operation 8/9",
+        "Test operation 9/9"
+      ],
+      "bugs_found": [],
+      "metrics": {
+        "duration": 0.4508552551269531,
+        "test_passed": true,
+        "work_performed": [
+          {
+            "action": "Test operation 1/9",
+            "duration": 0.05007195472717285,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.369646"
+          },
+          {
+            "action": "Test operation 2/9",
+            "duration": 0.10016131401062012,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.419737"
+          },
+          {
+            "action": "Test operation 3/9",
+            "duration": 0.1502535343170166,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.469831"
+          },
+          {
+            "action": "Test operation 4/9",
+            "duration": 0.20036053657531738,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.519942"
+          },
+          {
+            "action": "Test operation 5/9",
+            "duration": 0.250471830368042,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.570053"
+          },
+          {
+            "action": "Test operation 6/9",
+            "duration": 0.30057549476623535,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.620152"
+          },
+          {
+            "action": "Test operation 7/9",
+            "duration": 0.3506662845611572,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.670241"
+          },
+          {
+            "action": "Test operation 8/9",
+            "duration": 0.40075063705444336,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.720335"
+          },
+          {
+            "action": "Test operation 9/9",
+            "duration": 0.45084214210510254,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.770417"
+          }
+        ],
+        "bugs_found": []
+      }
+    },
+    {
+      "name": "Pipeline Data Isolation",
+      "status": "PASS",
+      "duration": 0.3006448745727539,
+      "error": null,
+      "work_performed": [
+        "Test operation 1/6",
+        "Test operation 2/6",
+        "Test operation 3/6",
+        "Test operation 4/6",
+        "Test operation 5/6",
+        "Test operation 6/6"
+      ],
+      "bugs_found": [],
+      "metrics": {
+        "duration": 0.3006448745727539,
+        "test_passed": true,
+        "work_performed": [
+          {
+            "action": "Test operation 1/6",
+            "duration": 0.05007576942443848,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.820554"
+          },
+          {
+            "action": "Test operation 2/6",
+            "duration": 0.10019254684448242,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.870673"
+          },
+          {
+            "action": "Test operation 3/6",
+            "duration": 0.15029072761535645,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.920772"
+          },
+          {
+            "action": "Test operation 4/6",
+            "duration": 0.20040130615234375,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:24.970881"
+          },
+          {
+            "action": "Test operation 5/6",
+            "duration": 0.2505040168762207,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.020986"
+          },
+          {
+            "action": "Test operation 6/6",
+            "duration": 0.300616979598999,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.071101"
+          }
+        ],
+        "bugs_found": []
+      }
+    },
+    {
+      "name": "Performance Benchmarks",
+      "status": "PASS",
+      "duration": 0.45098233222961426,
+      "error": null,
+      "work_performed": [
+        "Test operation 1/9",
+        "Test operation 2/9",
+        "Test operation 3/9",
+        "Test operation 4/9",
+        "Test operation 5/9",
+        "Test operation 6/9",
+        "Test operation 7/9",
+        "Test operation 8/9",
+        "Test operation 9/9"
+      ],
+      "bugs_found": [],
+      "metrics": {
+        "duration": 0.45098233222961426,
+        "test_passed": true,
+        "work_performed": [
+          {
+            "action": "Test operation 1/9",
+            "duration": 0.05009031295776367,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.121427"
+          },
+          {
+            "action": "Test operation 2/9",
+            "duration": 0.10018754005432129,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.171521"
+          },
+          {
+            "action": "Test operation 3/9",
+            "duration": 0.1502828598022461,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.221617"
+          },
+          {
+            "action": "Test operation 4/9",
+            "duration": 0.2004094123840332,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.271743"
+          },
+          {
+            "action": "Test operation 5/9",
+            "duration": 0.25050973892211914,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.321849"
+          },
+          {
+            "action": "Test operation 6/9",
+            "duration": 0.3006246089935303,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.371964"
+          },
+          {
+            "action": "Test operation 7/9",
+            "duration": 0.350740909576416,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.422079"
+          },
+          {
+            "action": "Test operation 8/9",
+            "duration": 0.4008464813232422,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.472190"
+          },
+          {
+            "action": "Test operation 9/9",
+            "duration": 0.4509611129760742,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.522296"
+          }
+        ],
+        "bugs_found": []
+      }
+    },
+    {
+      "name": "Integration Compatibility",
+      "status": "FAIL",
+      "duration": 0.4509615898132324,
+      "error": "3 failures",
+      "work_performed": [
+        "Test operation 1/9",
+        "Test operation 2/9",
+        "Test operation 3/9",
+        "Test operation 4/9",
+        "Test operation 5/9",
+        "Test operation 6/9",
+        "Test operation 7/9",
+        "Test operation 8/9",
+        "Test operation 9/9"
+      ],
+      "bugs_found": [],
+      "metrics": {
+        "duration": 0.4509615898132324,
+        "test_passed": false,
+        "work_performed": [
+          {
+            "action": "Test operation 1/9",
+            "duration": 0.05009889602661133,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.572465"
+          },
+          {
+            "action": "Test operation 2/9",
+            "duration": 0.10021495819091797,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.622580"
+          },
+          {
+            "action": "Test operation 3/9",
+            "duration": 0.1503298282623291,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.672692"
+          },
+          {
+            "action": "Test operation 4/9",
+            "duration": 0.20044827461242676,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.722810"
+          },
+          {
+            "action": "Test operation 5/9",
+            "duration": 0.2505495548248291,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.772911"
+          },
+          {
+            "action": "Test operation 6/9",
+            "duration": 0.3006408214569092,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.823000"
+          },
+          {
+            "action": "Test operation 7/9",
+            "duration": 0.35072898864746094,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.873088"
+          },
+          {
+            "action": "Test operation 8/9",
+            "duration": 0.4008193016052246,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.923182"
+          },
+          {
+            "action": "Test operation 9/9",
+            "duration": 0.4509258270263672,
+            "result": {
+              "completed": true
+            },
+            "timestamp": "2025-06-08T11:21:25.973303"
+          }
+        ],
+        "bugs_found": []
+      }
+    }
+  ],
+  "bugs": [
+    {
+      "id": "SEC_001",
+      "title": "arangodb - Token Validation Failure",
+      "severity": "HIGH",
+      "severity_justification": "Token validation failure allows unauthorized access",
+      "modules": [
+        "arangodb"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Unauthorized access to sensitive data. Reputation damage.",
+      "fix_recommendation": "Implement appropriate security control"
+    },
+    {
+      "id": "SEC_002",
+      "title": "arangodb - Rate Limiting Failure",
+      "severity": "MEDIUM",
+      "severity_justification": "Rate limiting prevents abuse but not critical data exposure",
+      "modules": [
+        "arangodb"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Service degradation. Poor user experience.",
+      "fix_recommendation": "\n1. Implement rate limiting middleware in arangodb\n2. Use Redis for distributed rate limiting\n3. Configure limits: 100 requests/minute per IP\n4. Example: from granger_hub.rate_limit import limit\n"
+    },
+    {
+      "id": "SEC_003",
+      "title": "marker - Token Validation Failure",
+      "severity": "HIGH",
+      "severity_justification": "Token validation failure allows unauthorized access",
+      "modules": [
+        "marker"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Unauthorized access to sensitive data. Reputation damage.",
+      "fix_recommendation": "Implement appropriate security control"
+    },
+    {
+      "id": "SEC_004",
+      "title": "marker - Rate Limiting Failure",
+      "severity": "MEDIUM",
+      "severity_justification": "Rate limiting prevents abuse but not critical data exposure",
+      "modules": [
+        "marker"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Service degradation. Poor user experience.",
+      "fix_recommendation": "\n1. Implement rate limiting middleware in marker\n2. Use Redis for distributed rate limiting\n3. Configure limits: 100 requests/minute per IP\n4. Example: from granger_hub.rate_limit import limit\n"
+    },
+    {
+      "id": "SEC_005",
+      "title": "sparta - Token Validation Failure",
+      "severity": "HIGH",
+      "severity_justification": "Token validation failure allows unauthorized access",
+      "modules": [
+        "sparta"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Unauthorized access to sensitive data. Reputation damage.",
+      "fix_recommendation": "Implement appropriate security control"
+    },
+    {
+      "id": "SEC_006",
+      "title": "sparta - Rate Limiting Failure",
+      "severity": "MEDIUM",
+      "severity_justification": "Rate limiting prevents abuse but not critical data exposure",
+      "modules": [
+        "sparta"
+      ],
+      "root_cause": "Security control not implemented",
+      "business_impact": "Service degradation. Poor user experience.",
+      "fix_recommendation": "\n1. Implement rate limiting middleware in sparta\n2. Use Redis for distributed rate limiting\n3. Configure limits: 100 requests/minute per IP\n4. Example: from granger_hub.rate_limit import limit\n"
+    }
+  ],
+  "performance_metrics": {
+    "arangodb_import_time": 0.0005106925964355469,
+    "marker_import_time": 0.0003986358642578125,
+    "sparta_import_time": 0.00040793418884277344
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "auth-service",
+      "label": "auth-service",
+      "version": "1.2.0",
+      "group": "authentication",
+      "health": "unknown"
+    },
+    {
+      "id": "user-service",
+      "label": "user-service",
+      "version": "2.1.0",
+      "group": "users",
+      "health": "unknown"
+    },
+    {
+      "id": "order-service",
+      "label": "order-service",
+      "version": "1.5.0",
+      "group": "orders",
+      "health": "unknown"
+    },
+    {
+      "id": "inventory-service",
+      "label": "inventory-service",
+      "version": "1.0.0",
+      "group": "inventory",
+      "health": "unknown"
+    },
+    {
+      "id": "notification-service",
+      "label": "notification-service",
+      "version": "1.1.0",
+      "group": "notifications",
+      "health": "unknown"
+    }
+  ],
+  "links": [
+    {
+      "source": "user-service",
+      "target": "postgres-users",
+      "type": "database",
+      "value": 0
+    },
+    {
+      "source": "user-service",
+      "target": "auth-service",
+      "type": "api",
+      "value": 1
+    },
+    {
+      "source": "order-service",
+      "target": "user-service",
+      "type": "api",
+      "value": 1
+    },
+    {
+      "source": "order-service",
+      "target": "inventory-service",
+      "type": "api",
+      "value": 1
+    },
+    {
+      "source": "order-service",
+      "target": "payment-gateway",
+      "type": "external",
+      "value": 1
+    },
+    {
+      "source": "notification-service",
+      "target": "rabbitmq",
+      "type": "queue",
+      "value": 0
+    }
+  ]
+}

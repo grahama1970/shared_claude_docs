@@ -1,0 +1,468 @@
+"""
+Module: real_sparta_handlers_fixed.py
+Purpose: Real SPARTA handlers for GRANGER integration using actual SPARTA functionality
+
+External Dependencies:
+- aiohttp: For async HTTP requests
+- fastmcp: For MCP server integration
+- loguru: For logging
+
+Example Usage:
+>>> from real_sparta_handlers_fixed import SPARTADownloadHandler
+>>> handler = SPARTADownloadHandler()
+>>> result = handler.run(limit=10)
+>>> print(f"Downloaded {result.output_data['result']['resources_downloaded']} resources")
+"""
+
+import time
+import json
+import asyncio
+from pathlib import Path
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+import sys
+import os
+
+# Add SPARTA to path
+sparta_path = Path("/home/graham/workspace/experiments/sparta/src")
+if sparta_path.exists():
+    sys.path.insert(0, str(sparta_path))
+
+try:
+    # Import real SPARTA components
+    from sparta.core.downloader import (
+        download_sparta_dataset,
+        extract_urls_from_stix,
+        download_resource,
+        create_download_summary,
+        ResourceDownloadResult,
+        DownloadMethod
+    )
+    from sparta.config import settings
+    from sparta.core.mitre_integration import MitreDataManager
+    from sparta.integrations.real_apis import NASAApi, CVEApi
+    from sparta.integrations.sparta_module import SPARTAModule
+    SPARTA_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: SPARTA imports failed: {e}")
+    SPARTA_AVAILABLE = False
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from templates.interaction_framework import (
+    Level0Interaction,
+    InteractionResult,
+    InteractionLevel
+)
+
+
+class SPARTADownloadHandler(Level0Interaction):
+    """
+    Real SPARTA resource download handler.
+    Downloads cybersecurity resources from STIX dataset.
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="sparta_resource_download",
+            description="Downloads cybersecurity resources from STIX dataset"
+        )
+        self.sparta_available = SPARTA_AVAILABLE
+        
+    def initialize_module(self):
+        """Initialize SPARTA downloader"""
+        return None  # No module needed for direct API calls
+        
+    def validate_output(self, output):
+        """Validate download results"""
+        if not isinstance(output, dict):
+            return False
+        return output.get("resources_downloaded", 0) > 0
+        
+    def execute(self, dataset_url: Optional[str] = None, limit: int = 10, **kwargs):
+        """
+        Download SPARTA resources using real downloader.
+        
+        Args:
+            dataset_url: URL to STIX dataset (uses default if not provided)
+            limit: Maximum number of resources to download
+        """
+        if not self.sparta_available:
+            return {
+                "error": "SPARTA module not available",
+                "resources_downloaded": 0
+            }
+        
+        try:
+            # Run async code in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            # Use default SPARTA dataset URL if not provided
+            url = dataset_url or str(settings.sparta_dataset_url)
+            output_dir = settings.download_dir
+            
+            # Extract URLs from STIX
+            urls = loop.run_until_complete(extract_urls_from_stix(url))
+            
+            if limit:
+                urls = urls[:limit]
+            
+            # Download resources
+            results = loop.run_until_complete(download_sparta_dataset(
+                urls=urls,
+                output_dir=output_dir,
+                max_concurrent=5
+            ))
+            
+            # Create summary
+            summary = create_download_summary(results)
+            
+            # Calculate metrics
+            successful = len([r for r in results if r.local_path])
+            failed = len([r for r in results if r.method == DownloadMethod.FAILED])
+            paywall = len([r for r in results if r.is_paywall])
+            
+            return {
+                "resources_downloaded": successful,
+                "download_failures": failed,
+                "paywall_resources": paywall,
+                "summary": summary,
+                "output_directory": str(output_dir),
+                "sample_results": [
+                    {
+                        "url": r.url,
+                        "local_path": str(r.local_path) if r.local_path else None,
+                        "method": r.method.value,
+                        "is_paywall": r.is_paywall
+                    } for r in results[:5]
+                ],
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            return {
+                "error": str(e),
+                "resources_downloaded": 0
+            }
+        finally:
+            loop.close()
+
+
+class SPARTAMissionSearchHandler(Level0Interaction):
+    """
+    Real NASA mission search handler using SPARTA's NASA API integration.
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="sparta_mission_search",
+            description="Search NASA missions using real API"
+        )
+        self.sparta_available = SPARTA_AVAILABLE
+        self.nasa_api = NASAApi() if SPARTA_AVAILABLE else None
+        
+    def initialize_module(self):
+        """Initialize NASA API"""
+        return self.nasa_api
+        
+    def validate_output(self, output):
+        """Validate mission search results"""
+        if not isinstance(output, dict):
+            return False
+        return output.get("missions_found", 0) > 0
+        
+    def execute(self, query: str = "Apollo", limit: int = 10, **kwargs):
+        """
+        Search NASA missions using real API.
+        
+        Args:
+            query: Search query for missions
+            limit: Maximum number of results
+        """
+        if not self.sparta_available or not self.nasa_api:
+            return {
+                "error": "SPARTA NASA API not available",
+                "missions_found": 0,
+                "missions": []
+            }
+        
+        try:
+            # Run async code in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            # Search missions using real NASA API
+            missions = loop.run_until_complete(self.nasa_api.search_missions(query, limit))
+            
+            return {
+                "missions_found": len(missions),
+                "missions": missions,
+                "api_source": "NASA Images API",
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            return {
+                "error": str(e),
+                "missions_found": 0,
+                "missions": []
+            }
+        finally:
+            loop.close()
+
+
+class SPARTACVESearchHandler(Level0Interaction):
+    """
+    Real CVE search handler using SPARTA's NVD API integration.
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="sparta_cve_search",
+            description="Search CVE database using real NVD API"
+        )
+        self.sparta_available = SPARTA_AVAILABLE
+        self.cve_api = CVEApi() if SPARTA_AVAILABLE else None
+        
+    def initialize_module(self):
+        """Initialize CVE API"""
+        return self.cve_api
+        
+    def validate_output(self, output):
+        """Validate CVE search results"""
+        if not isinstance(output, dict):
+            return False
+        return output.get("vulnerabilities_found", 0) > 0
+        
+    def execute(self, keywords: str = "satellite", severity: Optional[str] = None, limit: int = 10, **kwargs):
+        """
+        Search CVE database using real NVD API.
+        
+        Args:
+            keywords: Keywords to search for
+            severity: Filter by severity (LOW, MEDIUM, HIGH, CRITICAL)
+            limit: Maximum number of results
+        """
+        if not self.sparta_available or not self.cve_api:
+            return {
+                "error": "SPARTA CVE API not available",
+                "vulnerabilities_found": 0,
+                "vulnerabilities": []
+            }
+        
+        try:
+            # Run async code in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            # Search CVEs using real NVD API
+            vulnerabilities = loop.run_until_complete(self.cve_api.search_cves(keywords, severity, limit))
+            
+            # Calculate severity distribution
+            severity_dist = {}
+            for vuln in vulnerabilities:
+                sev = vuln.get("cvss", {}).get("severity", "UNKNOWN")
+                severity_dist[sev] = severity_dist.get(sev, 0) + 1
+            
+            return {
+                "vulnerabilities_found": len(vulnerabilities),
+                "vulnerabilities": vulnerabilities,
+                "severity_distribution": severity_dist,
+                "api_source": "NIST National Vulnerability Database",
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            return {
+                "error": str(e),
+                "vulnerabilities_found": 0,
+                "vulnerabilities": []
+            }
+        finally:
+            loop.close()
+
+
+class SPARTAMITREHandler(Level0Interaction):
+    """
+    Real MITRE framework handler using SPARTA's MITRE integration.
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="sparta_mitre_query",
+            description="Query MITRE framework data"
+        )
+        self.sparta_available = SPARTA_AVAILABLE
+        self.mitre_manager = MitreDataManager() if SPARTA_AVAILABLE else None
+        
+    def initialize_module(self):
+        """Initialize MITRE manager"""
+        return self.mitre_manager
+        
+    def validate_output(self, output):
+        """Validate MITRE query results"""
+        if not isinstance(output, dict):
+            return False
+        return output.get("found", False)
+        
+    def execute(self, framework: str = "attack", query: str = "T1055", **kwargs):
+        """
+        Query MITRE framework data.
+        
+        Args:
+            framework: Framework to query (attack, capec, d3fend)
+            query: Query string (technique ID, pattern ID, etc.)
+        """
+        if not self.sparta_available or not self.mitre_manager:
+            return {
+                "error": "SPARTA MITRE integration not available",
+                "found": False,
+                "result": None
+            }
+        
+        try:
+            # Query MITRE data (sync call)
+            result = None
+            if framework == "attack":
+                result = self.mitre_manager.get_attack_technique(query)
+            elif framework == "capec":
+                result = self.mitre_manager.get_capec_pattern(query)
+            elif framework == "d3fend":
+                result = self.mitre_manager.get_d3fend_defense(query)
+            else:
+                raise ValueError(f"Unknown framework: {framework}")
+            
+            return {
+                "framework": framework,
+                "query": query,
+                "result": result,
+                "found": result is not None,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            return {
+                "error": str(e),
+                "found": False,
+                "result": None
+            }
+
+
+class SPARTAModuleHandler(Level0Interaction):
+    """
+    Handler using SPARTA's module interface for claude-module-communicator.
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="sparta_module_process",
+            description="Execute SPARTA module action through process() interface"
+        )
+        self.sparta_available = SPARTA_AVAILABLE
+        self.sparta_module = SPARTAModule() if SPARTA_AVAILABLE else None
+        
+    def initialize_module(self):
+        """Initialize SPARTA module"""
+        return self.sparta_module
+        
+    def validate_output(self, output):
+        """Validate module process results"""
+        if not isinstance(output, dict):
+            return False
+        return output.get("success", False)
+        
+    def execute(self, action: str, data: Dict[str, Any], **kwargs):
+        """
+        Execute SPARTA module action through process() interface.
+        
+        Args:
+            action: Action to perform
+            data: Data for the action
+        """
+        if not self.sparta_available or not self.sparta_module:
+            return {
+                "success": False,
+                "error": "SPARTA module not available",
+                "module": "sparta"
+            }
+        
+        try:
+            # Run async code in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            # Process through SPARTA module
+            result = loop.run_until_complete(self.sparta_module.process({
+                "action": action,
+                "data": data
+            }))
+            
+            return result
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "module": "sparta"
+            }
+        finally:
+            loop.close()
+
+
+if __name__ == "__main__":
+    def test_handlers():
+        """Test real SPARTA handlers (synchronous)"""
+        print("Testing Real SPARTA Handlers")
+        print("=" * 50)
+        
+        # Test 1: Resource Download
+        print("\n1. Testing Resource Download...")
+        download_handler = SPARTADownloadHandler()
+        download_result = download_handler.run(limit=5)
+        print(f"   Success: {download_result.success}")
+        if download_result.output_data.get("result"):
+            print(f"   Downloaded: {download_result.output_data['result'].get('resources_downloaded', 0)} resources")
+        print(f"   Duration: {download_result.duration:.2f}s")
+        
+        # Test 2: Mission Search
+        print("\n2. Testing NASA Mission Search...")
+        mission_handler = SPARTAMissionSearchHandler()
+        mission_result = mission_handler.run(query="Apollo", limit=5)
+        print(f"   Success: {mission_result.success}")
+        if mission_result.output_data.get("result"):
+            print(f"   Found: {mission_result.output_data['result'].get('missions_found', 0)} missions")
+        print(f"   Duration: {mission_result.duration:.2f}s")
+        
+        # Test 3: CVE Search
+        print("\n3. Testing CVE Search...")
+        cve_handler = SPARTACVESearchHandler()
+        cve_result = cve_handler.run(keywords="satellite", severity="HIGH", limit=5)
+        print(f"   Success: {cve_result.success}")
+        if cve_result.output_data.get("result"):
+            print(f"   Found: {cve_result.output_data['result'].get('vulnerabilities_found', 0)} vulnerabilities")
+        print(f"   Duration: {cve_result.duration:.2f}s")
+        
+        # Test 4: MITRE Query
+        print("\n4. Testing MITRE Query...")
+        mitre_handler = SPARTAMITREHandler()
+        mitre_result = mitre_handler.run(framework="attack", query="T1055")
+        print(f"   Success: {mitre_result.success}")
+        if mitre_result.output_data.get("result"):
+            print(f"   Found: {mitre_result.output_data['result'].get('found', False)}")
+        print(f"   Duration: {mitre_result.duration:.2f}s")
+        
+        # Test 5: Module Process
+        print("\n5. Testing SPARTA Module Process...")
+        module_handler = SPARTAModuleHandler()
+        module_result = module_handler.run(
+            action="search_space_missions",
+            data={"query": "Mars", "limit": 3}
+        )
+        print(f"   Success: {module_result.success}")
+        print(f"   Duration: {module_result.duration:.2f}s")
+        
+        print("\n" + "=" * 50)
+        print("✅ Real SPARTA handler tests complete!")
+    
+    # Run tests
+    test_handlers()

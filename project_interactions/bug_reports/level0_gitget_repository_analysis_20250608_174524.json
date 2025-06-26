@@ -1,0 +1,138 @@
+{
+  "test_name": "GitGet Repository Analysis",
+  "level": 0,
+  "modules": [
+    "GitGet",
+    "Test Reporter"
+  ],
+  "timestamp": "20250608_174524",
+  "duration": 0.0010714530944824219,
+  "verification": {
+    "verified": false,
+    "reason": "Test Reporter not available",
+    "confidence_score": 0.5,
+    "total_tests": 10,
+    "passed_tests": 7,
+    "failed_tests": 3,
+    "bugs_found": 0,
+    "suspicious_patterns": []
+  },
+  "bugs": [],
+  "test_results": [
+    {
+      "test": "gitget_import",
+      "passed": true,
+      "timestamp": 1749419124.0630546,
+      "duration": 0.0009658336639404297,
+      "details": {}
+    },
+    {
+      "test": "analyze_Small Python project",
+      "passed": true,
+      "timestamp": 1749419124.0630684,
+      "duration": 0.0009799003601074219,
+      "details": {
+        "files": 5432,
+        "size_mb": 487.3,
+        "languages": [
+          "Python",
+          "C",
+          "C++"
+        ]
+      }
+    },
+    {
+      "test": "analyze_JavaScript project",
+      "passed": true,
+      "timestamp": 1749419124.063074,
+      "duration": 0.000985860824584961,
+      "details": {
+        "files": 3210,
+        "size_mb": 312.7,
+        "languages": [
+          "JavaScript",
+          "C++",
+          "Python"
+        ]
+      }
+    },
+    {
+      "test": "analyze_Multi-language project",
+      "passed": true,
+      "timestamp": 1749419124.0630786,
+      "duration": 0.000990152359008789,
+      "details": {
+        "files": 12543,
+        "size_mb": 1247.8,
+        "languages": [
+          "C++",
+          "Python",
+          "CUDA"
+        ]
+      }
+    },
+    {
+      "test": "analyze_Invalid repository URL",
+      "passed": false,
+      "timestamp": 1749419124.0630822,
+      "duration": 0.0009937286376953125,
+      "details": {
+        "error": "No result"
+      }
+    },
+    {
+      "test": "analyze_Private repository",
+      "passed": false,
+      "timestamp": 1749419124.0630848,
+      "duration": 0.0009963512420654297,
+      "details": {
+        "error": "No result"
+      }
+    },
+    {
+      "test": "analyze_Empty URL",
+      "passed": false,
+      "timestamp": 1749419124.0630887,
+      "duration": 0.0010001659393310547,
+      "details": {
+        "error": "Empty URL provided"
+      }
+    },
+    {
+      "test": "metadata_extraction",
+      "passed": true,
+      "timestamp": 1749419124.063095,
+      "duration": 0.0010066032409667969,
+      "details": {
+        "name": "cpython",
+        "stars": 52341,
+        "forks": 26123,
+        "open_issues": 1876,
+        "language": "Python",
+        "created_at": "2017-02-10",
+        "updated_at": "2025-06-08",
+        "description": "The Python programming language"
+      }
+    },
+    {
+      "test": "quality_High quality code",
+      "passed": true,
+      "timestamp": 1749419124.0631018,
+      "duration": 0.0010132789611816406,
+      "details": {
+        "score": 87,
+        "issue_count": 1
+      }
+    },
+    {
+      "test": "quality_Legacy codebase",
+      "passed": true,
+      "timestamp": 1749419124.0631094,
+      "duration": 0.0010209083557128906,
+      "details": {
+        "score": 42,
+        "issue_count": 2
+      }
+    }
+  ]
+}

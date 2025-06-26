@@ -1,0 +1,50 @@
+
+Hello everyone, welcome back to the channel! Today we're going to talk about 10 Python anti-patterns 
+that I see way too often in production code. These are mistakes that can break your code, make it 
+harder to maintain, or cause subtle bugs that are difficult to track down.
+
+Let's start with number one: mutable default arguments. This is probably the most common anti-pattern 
+I see, especially from developers coming from other languages. When you define a function with a 
+default argument that's a mutable object like a list or dictionary, that object is created only once 
+when the function is defined, not each time it's called.
+
+Here's an example of what NOT to do:
+def add_item(item, items=[]):
+    items.append(item)
+    return items
+
+The problem is that the same list object is reused across all calls to this function. So if you call 
+add_item('apple'), then add_item('banana'), the second call will return ['apple', 'banana'] instead 
+of just ['banana'] as you might expect.
+
+The correct way to handle this is:
+def add_item(item, items=None):
+    if items is None:
+        items = []
+    items.append(item)
+    return items
+
+Anti-pattern number two: using bare except clauses. I see this all the time:
+try:
+    result = risky_operation()
+except:
+    result = None
+
+This catches ALL exceptions, including KeyboardInterrupt and SystemExit, which you almost never want 
+to catch. It also makes debugging much harder because you lose information about what went wrong.
+
+Instead, always catch specific exceptions:
+try:
+    result = risky_operation()
+except ValueError as e:
+    logger.error(f"Invalid value: {e}")
+    result = None
+
+[... transcript continues with all 10 anti-patterns ...]
+
+Remember, writing good Python code isn't just about making it work - it's about making it maintainable, 
+debuggable, and following the conventions that other Python developers expect. Avoid these anti-patterns 
+and your future self (and your teammates) will thank you!
+
+If you found this video helpful, please like and subscribe. Let me know in the comments if there are 
+other anti-patterns you've encountered that I didn't cover here. Until next time, happy coding!

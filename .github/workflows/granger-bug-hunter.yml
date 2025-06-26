@@ -1,0 +1,314 @@
+name: Granger Bug Hunter - Autonomous Testing
+
+on:
+  schedule:
+    # Run nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  
+  workflow_dispatch:
+    inputs:
+      duration_hours:
+        description: 'Hunt duration in hours'
+        required: false
+        default: '4'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '4'
+          - '8'
+          - '24'
+      
+      focus_modules:
+        description: 'Modules to focus on (comma-separated, leave empty for all)'
+        required: false
+        default: ''
+        type: string
+      
+      create_issues:
+        description: 'Create GitHub issues for critical bugs'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  bug-hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1440  # 24 hours max
+    
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    
+    services:
+      arangodb:
+        image: arangodb:latest
+        ports:
+          - 8529:8529
+        env:
+          ARANGO_NO_AUTH: 1
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:8529/_api/version || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          path: shared_claude_docs
+      
+      - name: Checkout Granger Modules
+        run: |
+          # Clone required Granger modules
+          git clone https://github.com/grahama1970/arangodb.git ../experiments/arangodb || true
+          git clone https://github.com/grahama1970/marker.git ../experiments/marker || true
+          git clone https://github.com/grahama1970/sparta.git ../experiments/sparta || true
+          git clone https://github.com/grahama1970/arxiv-mcp-server.git ../mcp-servers/arxiv-mcp-server || true
+          git clone https://github.com/grahama1970/granger_hub.git ../experiments/granger_hub || true
+          git clone https://github.com/grahama1970/memvid.git ../experiments/memvid || true
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install UV Package Manager
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Install Dependencies
+        run: |
+          cd shared_claude_docs
+          uv venv
+          source .venv/bin/activate
+          uv sync
+          
+          # Install additional dependencies for bug hunter
+          uv add pytest psutil loguru pandas matplotlib jinja2
+      
+      - name: Verify No Mocks
+        run: |
+          cd shared_claude_docs
+          echo "🔍 Checking for mock usage..."
+          
+          # Check Python files
+          if grep -r "mock\|Mock\|@patch" project_interactions/ --include="*.py" | grep -v "honeypot"; then
+            echo "❌ Mock usage detected!"
+            exit 1
+          fi
+          
+          # Check for banned validate_* files
+          if find . -name "validate_*.py" -type f | grep -v ".venv"; then
+            echo "❌ Banned validate_* files found!"
+            exit 1
+          fi
+          
+          echo "✅ No mocks detected"
+      
+      - name: Run Honeypot Tests
+        run: |
+          cd shared_claude_docs
+          source .venv/bin/activate
+          
+          echo "🍯 Running honeypot tests (should fail)..."
+          
+          # Create honeypot test file
+          cat > test_honeypot_ci.py << 'EOF'
+          import pytest
+          
+          @pytest.mark.honeypot
+          def test_always_fails():
+              assert 1 == 2, "This should always fail"
+          
+          @pytest.mark.honeypot  
+          def test_framework_integrity():
+              # If this passes, framework is compromised
+              assert False, "Framework integrity check"
+          EOF
+          
+          # Run and expect failure
+          if pytest test_honeypot_ci.py -v; then
+            echo "❌ Honeypot tests passed - framework compromised!"
+            exit 1
+          else
+            echo "✅ Honeypot tests correctly failed"
+          fi
+      
+      - name: Check Service Health
+        run: |
+          echo "🏥 Checking service health..."
+          
+          # Check ArangoDB
+          curl -f http://localhost:8529/_api/version || exit 1
+          echo "✅ ArangoDB is healthy"
+          
+          # Check Redis
+          redis-cli -h localhost ping || exit 1
+          echo "✅ Redis is healthy"
+      
+      - name: Run Bug Hunter
+        id: bug-hunt
+        env:
+          GRANGER_BUG_HUNT_MODE: "ci"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd shared_claude_docs
+          source .venv/bin/activate
+          
+          # Build command
+          DURATION="${{ github.event.inputs.duration_hours || '4' }}"
+          FOCUS="${{ github.event.inputs.focus_modules }}"
+          
+          echo "🎯 Starting bug hunt for $DURATION hours"
+          
+          # Run bug hunter
+          if [ -n "$FOCUS" ]; then
+            python -m project_interactions.granger_bug_hunter \
+              --duration "$DURATION" \
+              --focus $FOCUS \
+              --output bug_hunt_report.md
+          else
+            python -m project_interactions.granger_bug_hunter \
+              --duration "$DURATION" \
+              --output bug_hunt_report.md
+          fi
+          
+          # Capture exit code
+          HUNT_EXIT_CODE=$?
+          
+          # Extract summary statistics
+          if [ -f bug_hunt_report.json ]; then
+            TOTAL_BUGS=$(jq -r '.total_bugs_found // 0' bug_hunt_report.json)
+            CRITICAL_BUGS=$(jq -r '.critical_bugs // 0' bug_hunt_report.json)
+            
+            echo "total_bugs=$TOTAL_BUGS" >> $GITHUB_OUTPUT
+            echo "critical_bugs=$CRITICAL_BUGS" >> $GITHUB_OUTPUT
+          fi
+          
+          exit $HUNT_EXIT_CODE
+      
+      - name: Generate Reports
+        if: always()
+        run: |
+          cd shared_claude_docs
+          source .venv/bin/activate
+          
+          # Create reports directory
+          mkdir -p bug_hunt_reports
+          
+          # Generate additional report formats
+          python -c "
+          from project_interactions.granger_bug_hunter_reporter import create_json_report, create_bug_dashboard
+          import json
+          
+          try:
+              with open('bug_hunt_report.json', 'r') as f:
+                  results = json.load(f)
+              
+              # Enhanced JSON report
+              create_json_report(results, 'bug_hunt_reports/detailed_report.json')
+              
+              # Visual dashboard
+              dashboard = create_bug_dashboard(results, 'bug_hunt_reports')
+              print(f'Dashboard created: {dashboard}')
+          except Exception as e:
+              print(f'Report generation error: {e}')
+          "
+      
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bug-hunt-reports-${{ github.run_id }}
+          path: |
+            shared_claude_docs/bug_hunt_report.md
+            shared_claude_docs/bug_hunt_report.json
+            shared_claude_docs/bug_hunt_reports/
+          retention-days: 30
+      
+      - name: Create GitHub Issues
+        if: github.event.inputs.create_issues == 'true' && steps.bug-hunt.outputs.critical_bugs > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd shared_claude_docs
+          source .venv/bin/activate
+          
+          echo "🐛 Creating issues for critical bugs..."
+          
+          python scripts/create_bug_issues.py \
+            --json-report bug_hunt_report.json \
+            --repo ${{ github.repository }} \
+            --label "bug-hunter"
+      
+      - name: Post Summary Comment
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const totalBugs = '${{ steps.bug-hunt.outputs.total_bugs }}' || '0';
+            const criticalBugs = '${{ steps.bug-hunt.outputs.critical_bugs }}' || '0';
+            
+            const comment = `## 🎯 Bug Hunt Results
+            
+            - **Total Bugs Found**: ${totalBugs}
+            - **Critical Bugs**: ${criticalBugs}
+            - **Duration**: ${{ github.event.inputs.duration_hours || '4' }} hours
+            - **Focus**: ${{ github.event.inputs.focus_modules || 'All modules' }}
+            
+            📊 [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ${criticalBugs > 0 ? '⚠️ **Critical issues require immediate attention!**' : '✅ No critical issues found.'}`;
+            
+            github.rest.actions.createWorkflowDispatchComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: context.workflow,
+              ref: context.ref,
+              body: comment
+            });
+      
+      - name: Notify on Critical Bugs
+        if: steps.bug-hunt.outputs.critical_bugs > 0
+        run: |
+          echo "::error::Found ${{ steps.bug-hunt.outputs.critical_bugs }} critical bugs!"
+          echo "::warning::Review the bug hunt report for details"
+      
+      - name: Update Bug Tracking Dashboard
+        if: always()
+        continue-on-error: true
+        run: |
+          cd shared_claude_docs
+          
+          # Update central bug tracking (if exists)
+          if [ -f scripts/update_bug_dashboard.py ]; then
+            python scripts/update_bug_dashboard.py \
+              --report bug_hunt_report.json \
+              --dashboard-url "${{ vars.BUG_DASHBOARD_URL }}"
+          fi
+
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: bug-hunt
+    if: failure()
+    
+    steps:
+      - name: Notify Team
+        run: |
+          echo "::error::Bug hunt workflow failed!"
+          # Add Slack/Discord/email notification here

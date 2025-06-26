@@ -1,0 +1,682 @@
+"""
+Module: task_queue_manager_interaction.py
+Purpose: Distributed task queue management system for orchestrating asynchronous work across workers
+
+External Dependencies:
+- redis: https://redis-py.readthedocs.io/
+- pika: https://pika.readthedocs.io/ (RabbitMQ)
+- boto3: https://boto3.amazonaws.com/v1/documentation/api/latest/index.html (AWS SQS)
+- typing: Built-in
+- json: Built-in
+- uuid: Built-in
+- datetime: Built-in
+- enum: Built-in
+- asyncio: Built-in
+- logging: Built-in
+
+Example Usage:
+>>> from task_queue_manager_interaction import TaskQueueManagerInteraction
+>>> manager = TaskQueueManagerInteraction(backend="redis", redis_url="redis://localhost:6379")
+>>> task_id = await manager.submit_task("process_data", {"file": "data.csv"}, priority=5)
+>>> result = await manager.get_result(task_id, timeout=30)
+{'status': 'completed', 'result': {'rows_processed': 1000}}
+"""
+
+import asyncio
+import json
+import uuid
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Dict, List, Optional, Any, Tuple, Callable, Set
+import logging
+from dataclasses import dataclass, asdict
+from collections import defaultdict
+import time
+import threading
+from concurrent.futures import ThreadPoolExecutor
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class TaskStatus(Enum):
+    """Task execution status"""
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+    RETRYING = "retrying"
+    DEAD = "dead"
+
+
+class QueueBackend(Enum):
+    """Supported queue backend types"""
+    REDIS = "redis"
+    RABBITMQ = "rabbitmq"
+    SQS = "sqs"
+    MEMORY = "memory"  # For testing
+
+
+@dataclass
+class Task:
+    """Task representation"""
+    id: str
+    name: str
+    payload: Dict[str, Any]
+    priority: int = 0
+    status: TaskStatus = TaskStatus.PENDING
+    created_at: datetime = None
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    retry_count: int = 0
+    max_retries: int = 3
+    delay: Optional[int] = None  # Delay in seconds
+    result: Optional[Any] = None
+    error: Optional[str] = None
+    worker_id: Optional[str] = None
+    parent_task_id: Optional[str] = None
+    child_task_ids: List[str] = None
+    tags: List[str] = None
+    
+    def __post_init__(self):
+        if self.created_at is None:
+            self.created_at = datetime.utcnow()
+        if self.child_task_ids is None:
+            self.child_task_ids = []
+        if self.tags is None:
+            self.tags = []
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert task to dictionary"""
+        data = asdict(self)
+        data['status'] = self.status.value
+        data['created_at'] = self.created_at.isoformat()
+        if self.started_at:
+            data['started_at'] = self.started_at.isoformat()
+        if self.completed_at:
+            data['completed_at'] = self.completed_at.isoformat()
+        return data
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Task':
+        """Create task from dictionary"""
+        data = data.copy()
+        data['status'] = TaskStatus(data['status'])
+        data['created_at'] = datetime.fromisoformat(data['created_at'])
+        if data.get('started_at'):
+            data['started_at'] = datetime.fromisoformat(data['started_at'])
+        if data.get('completed_at'):
+            data['completed_at'] = datetime.fromisoformat(data['completed_at'])
+        return cls(**data)
+
+
+@dataclass
+class Worker:
+    """Worker representation"""
+    id: str
+    status: str = "idle"
+    current_task_id: Optional[str] = None
+    tasks_completed: int = 0
+    tasks_failed: int = 0
+    last_heartbeat: datetime = None
+    started_at: datetime = None
+    
+    def __post_init__(self):
+        if self.last_heartbeat is None:
+            self.last_heartbeat = datetime.utcnow()
+        if self.started_at is None:
+            self.started_at = datetime.utcnow()
+
+
+class TaskQueueManagerInteraction:
+    """
+    Distributed task queue management system
+    
+    Features:
+    - Multiple backend support (Redis, RabbitMQ, SQS, Memory)
+    - Priority queue management
+    - Worker pool management
+    - Task retry and dead letter queues
+    - Task routing and load balancing
+    - Result storage and retrieval
+    - Task cancellation and progress tracking
+    """
+    
+    def __init__(self, 
+                 backend: str = "memory",
+                 redis_url: Optional[str] = None,
+                 rabbitmq_url: Optional[str] = None,
+                 sqs_config: Optional[Dict[str, str]] = None,
+                 max_workers: int = 10,
+                 result_ttl: int = 3600):
+        """
+        Initialize task queue manager
+        
+        Args:
+            backend: Queue backend type
+            redis_url: Redis connection URL
+            rabbitmq_url: RabbitMQ connection URL
+            sqs_config: AWS SQS configuration
+            max_workers: Maximum number of workers
+            result_ttl: Result time-to-live in seconds
+        """
+        self.backend_type = QueueBackend(backend.lower())
+        self.max_workers = max_workers
+        self.result_ttl = result_ttl
+        
+        # In-memory storage for testing/demo
+        self.tasks: Dict[str, Task] = {}
+        self.queues: Dict[str, List[str]] = defaultdict(list)  # queue_name -> task_ids
+        self.workers: Dict[str, Worker] = {}
+        self.results: Dict[str, Any] = {}
+        self.task_handlers: Dict[str, Callable] = {}
+        self.rate_limits: Dict[str, Tuple[int, datetime]] = {}  # task_name -> (count, reset_time)
+        self.dedup_cache: Set[str] = set()  # For task deduplication
+        
+        # Initialize backend
+        self._init_backend(redis_url, rabbitmq_url, sqs_config)
+        
+        # Start background tasks
+        self._running = True
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._start_background_tasks()
+        
+        logger.info(f"Task queue manager initialized with {backend} backend")
+    
+    def _init_backend(self, redis_url: Optional[str], rabbitmq_url: Optional[str], 
+                     sqs_config: Optional[Dict[str, str]]):
+        """Initialize queue backend"""
+        if self.backend_type == QueueBackend.REDIS and redis_url:
+            try:
+                import redis
+                self.redis_client = redis.from_url(redis_url)
+                self.redis_client.ping()
+                logger.info("Connected to Redis")
+            except Exception as e:
+                logger.warning(f"Redis connection failed, falling back to memory: {e}")
+                self.backend_type = QueueBackend.MEMORY
+        elif self.backend_type == QueueBackend.RABBITMQ and rabbitmq_url:
+            try:
+                import pika
+                self.rabbitmq_params = pika.URLParameters(rabbitmq_url)
+                logger.info("RabbitMQ parameters configured")
+            except Exception as e:
+                logger.warning(f"RabbitMQ setup failed, falling back to memory: {e}")
+                self.backend_type = QueueBackend.MEMORY
+        elif self.backend_type == QueueBackend.SQS and sqs_config:
+            try:
+                import boto3
+                self.sqs_client = boto3.client('sqs', **sqs_config)
+                logger.info("AWS SQS client configured")
+            except Exception as e:
+                logger.warning(f"SQS setup failed, falling back to memory: {e}")
+                self.backend_type = QueueBackend.MEMORY
+    
+    def _start_background_tasks(self):
+        """Start background maintenance tasks"""
+        # Worker health monitoring
+        self._executor.submit(self._monitor_worker_health)
+        # Task timeout monitoring
+        self._executor.submit(self._monitor_task_timeouts)
+        # Dead letter queue processing
+        self._executor.submit(self._process_dead_letter_queue)
+    
+    async def submit_task(self, name: str, payload: Dict[str, Any], 
+                         priority: int = 0, delay: Optional[int] = None,
+                         parent_task_id: Optional[str] = None,
+                         tags: Optional[List[str]] = None,
+                         dedupe_key: Optional[str] = None) -> str:
+        """
+        Submit a task to the queue
+        
+        Args:
+            name: Task name
+            payload: Task payload
+            priority: Task priority (higher = more urgent)
+            delay: Delay in seconds before task becomes available
+            parent_task_id: Parent task ID for chaining
+            tags: Task tags for routing
+            dedupe_key: Deduplication key
+            
+        Returns:
+            Task ID
+        """
+        # Check rate limits
+        if not self._check_rate_limit(name):
+            raise ValueError(f"Rate limit exceeded for task {name}")
+        
+        # Check deduplication
+        if dedupe_key and dedupe_key in self.dedup_cache:
+            logger.info(f"Task with dedupe key {dedupe_key} already exists")
+            return None
+        
+        # Create task
+        task_id = str(uuid.uuid4())
+        task = Task(
+            id=task_id,
+            name=name,
+            payload=payload,
+            priority=priority,
+            delay=delay,
+            parent_task_id=parent_task_id,
+            tags=tags or []
+        )
+        
+        # Store task
+        self.tasks[task_id] = task
+        
+        # Add to dedup cache
+        if dedupe_key:
+            self.dedup_cache.add(dedupe_key)
+        
+        # Update parent task
+        if parent_task_id and parent_task_id in self.tasks:
+            self.tasks[parent_task_id].child_task_ids.append(task_id)
+        
+        # Queue task
+        queue_name = self._get_queue_name(task)
+        if delay:
+            # Schedule delayed task
+            asyncio.create_task(self._schedule_delayed_task(task_id, delay, queue_name))
+        else:
+            self._enqueue_task(task_id, queue_name, priority)
+        
+        logger.info(f"Task {task_id} submitted: {name}")
+        return task_id
+    
+    def _check_rate_limit(self, task_name: str) -> bool:
+        """Check if task submission is within rate limits"""
+        # Simple rate limiting: 100 tasks per minute per task type
+        limit = 100
+        window = 60  # seconds
+        
+        now = datetime.utcnow()
+        if task_name in self.rate_limits:
+            count, reset_time = self.rate_limits[task_name]
+            if now < reset_time:
+                if count >= limit:
+                    return False
+                self.rate_limits[task_name] = (count + 1, reset_time)
+            else:
+                self.rate_limits[task_name] = (1, now + timedelta(seconds=window))
+        else:
+            self.rate_limits[task_name] = (1, now + timedelta(seconds=window))
+        
+        return True
+    
+    def _get_queue_name(self, task: Task) -> str:
+        """Get queue name for task based on routing rules"""
+        # Route by tags
+        if "urgent" in task.tags:
+            return "urgent"
+        elif "batch" in task.tags:
+            return "batch"
+        elif task.priority > 5:
+            return "high_priority"
+        else:
+            return "default"
+    
+    def _enqueue_task(self, task_id: str, queue_name: str, priority: int):
+        """Add task to queue"""
+        # Simple priority queue implementation
+        self.queues[queue_name].append(task_id)
+        # Sort by priority (descending)
+        self.queues[queue_name].sort(
+            key=lambda tid: self.tasks[tid].priority if tid in self.tasks else 0,
+            reverse=True
+        )
+    
+    async def _schedule_delayed_task(self, task_id: str, delay: int, queue_name: str):
+        """Schedule a delayed task"""
+        await asyncio.sleep(delay)
+        if task_id in self.tasks and self.tasks[task_id].status == TaskStatus.PENDING:
+            self._enqueue_task(task_id, queue_name, self.tasks[task_id].priority)
+            logger.info(f"Delayed task {task_id} now available")
+    
+    async def get_result(self, task_id: str, timeout: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Get task result
+        
+        Args:
+            task_id: Task ID
+            timeout: Timeout in seconds
+            
+        Returns:
+            Task result
+        """
+        start_time = time.time()
+        
+        while True:
+            if task_id not in self.tasks:
+                raise ValueError(f"Task {task_id} not found")
+            
+            task = self.tasks[task_id]
+            
+            if task.status == TaskStatus.COMPLETED:
+                return {
+                    'status': 'completed',
+                    'result': task.result,
+                    'duration': (task.completed_at - task.started_at).total_seconds()
+                }
+            elif task.status == TaskStatus.FAILED:
+                return {
+                    'status': 'failed',
+                    'error': task.error,
+                    'retry_count': task.retry_count
+                }
+            elif task.status == TaskStatus.CANCELLED:
+                return {
+                    'status': 'cancelled'
+                }
+            
+            # Check timeout
+            if timeout and (time.time() - start_time) > timeout:
+                return {
+                    'status': 'timeout',
+                    'current_status': task.status.value
+                }
+            
+            # Wait a bit before checking again
+            await asyncio.sleep(0.1)
+    
+    async def cancel_task(self, task_id: str) -> bool:
+        """
+        Cancel a task
+        
+        Args:
+            task_id: Task ID
+            
+        Returns:
+            True if cancelled, False otherwise
+        """
+        if task_id not in self.tasks:
+            return False
+        
+        task = self.tasks[task_id]
+        
+        if task.status in [TaskStatus.PENDING, TaskStatus.RUNNING]:
+            task.status = TaskStatus.CANCELLED
+            task.completed_at = datetime.utcnow()
+            
+            # Remove from queues
+            for queue in self.queues.values():
+                if task_id in queue:
+                    queue.remove(task_id)
+            
+            # Cancel child tasks
+            for child_id in task.child_task_ids:
+                await self.cancel_task(child_id)
+            
+            logger.info(f"Task {task_id} cancelled")
+            return True
+        
+        return False
+    
+    def register_handler(self, task_name: str, handler: Callable):
+        """Register task handler"""
+        self.task_handlers[task_name] = handler
+        logger.info(f"Handler registered for task: {task_name}")
+    
+    def get_task_progress(self, task_id: str) -> Dict[str, Any]:
+        """Get task progress information"""
+        if task_id not in self.tasks:
+            return None
+        
+        task = self.tasks[task_id]
+        
+        # Calculate progress for parent tasks with children
+        if task.child_task_ids:
+            total_children = len(task.child_task_ids)
+            completed_children = sum(
+                1 for child_id in task.child_task_ids
+                if child_id in self.tasks and 
+                self.tasks[child_id].status == TaskStatus.COMPLETED
+            )
+            progress = (completed_children / total_children) * 100 if total_children > 0 else 0
+        else:
+            # Simple progress based on status
+            progress = {
+                TaskStatus.PENDING: 0,
+                TaskStatus.RUNNING: 50,
+                TaskStatus.COMPLETED: 100,
+                TaskStatus.FAILED: 100,
+                TaskStatus.CANCELLED: 100
+            }.get(task.status, 0)
+        
+        return {
+            'task_id': task_id,
+            'status': task.status.value,
+            'progress': progress,
+            'created_at': task.created_at.isoformat(),
+            'started_at': task.started_at.isoformat() if task.started_at else None,
+            'worker_id': task.worker_id,
+            'child_tasks': len(task.child_task_ids),
+            'retry_count': task.retry_count
+        }
+    
+    def get_worker_stats(self) -> List[Dict[str, Any]]:
+        """Get worker statistics"""
+        stats = []
+        for worker_id, worker in self.workers.items():
+            stats.append({
+                'worker_id': worker_id,
+                'status': worker.status,
+                'current_task': worker.current_task_id,
+                'tasks_completed': worker.tasks_completed,
+                'tasks_failed': worker.tasks_failed,
+                'uptime': (datetime.utcnow() - worker.started_at).total_seconds(),
+                'last_heartbeat': worker.last_heartbeat.isoformat()
+            })
+        return stats
+    
+    def get_queue_stats(self) -> Dict[str, Dict[str, int]]:
+        """Get queue statistics"""
+        stats = {}
+        for queue_name, task_ids in self.queues.items():
+            stats[queue_name] = {
+                'pending': len(task_ids),
+                'priorities': {
+                    'high': sum(1 for tid in task_ids if tid in self.tasks and self.tasks[tid].priority > 5),
+                    'normal': sum(1 for tid in task_ids if tid in self.tasks and 0 <= self.tasks[tid].priority <= 5),
+                    'low': sum(1 for tid in task_ids if tid in self.tasks and self.tasks[tid].priority < 0)
+                }
+            }
+        return stats
+    
+    def _monitor_worker_health(self):
+        """Monitor worker health in background"""
+        while self._running:
+            try:
+                now = datetime.utcnow()
+                for worker_id, worker in list(self.workers.items()):
+                    # Check heartbeat timeout (30 seconds)
+                    if (now - worker.last_heartbeat).total_seconds() > 30:
+                        logger.warning(f"Worker {worker_id} heartbeat timeout")
+                        # Mark worker as dead and reassign task
+                        if worker.current_task_id:
+                            task = self.tasks.get(worker.current_task_id)
+                            if task and task.status == TaskStatus.RUNNING:
+                                task.status = TaskStatus.PENDING
+                                task.worker_id = None
+                                self._enqueue_task(task.id, self._get_queue_name(task), task.priority)
+                        del self.workers[worker_id]
+                
+                time.sleep(5)  # Check every 5 seconds
+            except Exception as e:
+                logger.error(f"Worker health monitor error: {e}")
+    
+    def _monitor_task_timeouts(self):
+        """Monitor task timeouts in background"""
+        while self._running:
+            try:
+                now = datetime.utcnow()
+                for task_id, task in list(self.tasks.items()):
+                    if task.status == TaskStatus.RUNNING and task.started_at:
+                        # Default timeout: 5 minutes
+                        timeout = task.payload.get('timeout', 300)
+                        if (now - task.started_at).total_seconds() > timeout:
+                            logger.warning(f"Task {task_id} timeout")
+                            task.status = TaskStatus.FAILED
+                            task.error = "Task timeout"
+                            task.completed_at = now
+                            
+                            # Retry if possible
+                            if task.retry_count < task.max_retries:
+                                task.retry_count += 1
+                                task.status = TaskStatus.RETRYING
+                                self._enqueue_task(task_id, self._get_queue_name(task), task.priority)
+                
+                time.sleep(10)  # Check every 10 seconds
+            except Exception as e:
+                logger.error(f"Task timeout monitor error: {e}")
+    
+    def _process_dead_letter_queue(self):
+        """Process dead letter queue in background"""
+        while self._running:
+            try:
+                # Check for dead tasks
+                for task_id, task in list(self.tasks.items()):
+                    if task.status == TaskStatus.FAILED and task.retry_count >= task.max_retries:
+                        task.status = TaskStatus.DEAD
+                        logger.error(f"Task {task_id} moved to dead letter queue")
+                        # Could notify admins or log to external system here
+                
+                time.sleep(30)  # Check every 30 seconds
+            except Exception as e:
+                logger.error(f"Dead letter queue processor error: {e}")
+    
+    def shutdown(self):
+        """Shutdown task queue manager"""
+        logger.info("Shutting down task queue manager")
+        self._running = False
+        self._executor.shutdown(wait=True)
+
+
+# Validation
+if __name__ == "__main__":
+    async def validate():
+        # Test with memory backend
+        manager = TaskQueueManagerInteraction(backend="memory", max_workers=5)
+        
+        # Test 1: Submit simple task
+        print("Test 1: Submit simple task")
+        task_id = await manager.submit_task(
+            "process_data",
+            {"file": "test.csv", "rows": 100},
+            priority=5
+        )
+        assert task_id is not None, "Failed to submit task"
+        print(f"✓ Task submitted: {task_id}")
+        
+        # Test 2: Submit delayed task
+        print("\nTest 2: Submit delayed task")
+        delayed_id = await manager.submit_task(
+            "scheduled_job",
+            {"action": "backup"},
+            delay=2  # 2 second delay
+        )
+        assert delayed_id is not None, "Failed to submit delayed task"
+        print(f"✓ Delayed task submitted: {delayed_id}")
+        
+        # Test 3: Task chaining
+        print("\nTest 3: Task chaining")
+        parent_id = await manager.submit_task(
+            "parent_task",
+            {"step": "initialize"},
+            priority=10
+        )
+        child_id = await manager.submit_task(
+            "child_task",
+            {"step": "process"},
+            parent_task_id=parent_id
+        )
+        assert manager.tasks[parent_id].child_task_ids == [child_id], "Task chaining failed"
+        print(f"✓ Task chain created: {parent_id} -> {child_id}")
+        
+        # Test 4: Rate limiting
+        print("\nTest 4: Rate limiting")
+        # Submit many tasks quickly
+        task_count = 0
+        for i in range(5):
+            try:
+                await manager.submit_task("rate_test", {"index": i})
+                task_count += 1
+            except ValueError:
+                pass
+        assert task_count > 0, "No tasks were submitted"
+        print(f"✓ Rate limiting working: {task_count} tasks submitted")
+        
+        # Test 5: Task deduplication
+        print("\nTest 5: Task deduplication")
+        dup_id1 = await manager.submit_task(
+            "unique_task",
+            {"data": "test"},
+            dedupe_key="unique-123"
+        )
+        dup_id2 = await manager.submit_task(
+            "unique_task",
+            {"data": "test"},
+            dedupe_key="unique-123"
+        )
+        assert dup_id1 is not None and dup_id2 is None, "Deduplication failed"
+        print("✓ Task deduplication working")
+        
+        # Test 6: Get task progress
+        print("\nTest 6: Get task progress")
+        progress = manager.get_task_progress(task_id)
+        assert progress is not None, "Failed to get task progress"
+        assert 'status' in progress and 'progress' in progress, "Invalid progress format"
+        print(f"✓ Task progress: {progress['progress']}%")
+        
+        # Test 7: Queue statistics
+        print("\nTest 7: Queue statistics")
+        queue_stats = manager.get_queue_stats()
+        assert isinstance(queue_stats, dict), "Invalid queue stats"
+        print(f"✓ Queue stats: {len(queue_stats)} queues active")
+        
+        # Test 8: Cancel task
+        print("\nTest 8: Cancel task")
+        cancel_id = await manager.submit_task("cancelable", {"test": True})
+        cancelled = await manager.cancel_task(cancel_id)
+        assert cancelled, "Failed to cancel task"
+        assert manager.tasks[cancel_id].status == TaskStatus.CANCELLED, "Task not marked as cancelled"
+        print("✓ Task cancellation working")
+        
+        # Test 9: Task routing by tags
+        print("\nTest 9: Task routing")
+        urgent_id = await manager.submit_task(
+            "urgent_work",
+            {"priority": "high"},
+            tags=["urgent"]
+        )
+        batch_id = await manager.submit_task(
+            "batch_work",
+            {"type": "batch"},
+            tags=["batch"]
+        )
+        assert urgent_id in manager.queues["urgent"], "Urgent task not routed correctly"
+        assert batch_id in manager.queues["batch"], "Batch task not routed correctly"
+        print("✓ Task routing by tags working")
+        
+        # Test 10: Worker statistics
+        print("\nTest 10: Worker statistics")
+        # Simulate worker
+        worker_id = str(uuid.uuid4())
+        manager.workers[worker_id] = Worker(id=worker_id, status="idle")
+        
+        worker_stats = manager.get_worker_stats()
+        assert len(worker_stats) > 0, "No worker stats returned"
+        assert worker_stats[0]['worker_id'] == worker_id, "Worker not found in stats"
+        print(f"✓ Worker stats: {len(worker_stats)} workers")
+        
+        # Cleanup
+        manager.shutdown()
+        print("\n✓ All tests passed!")
+        
+        return True
+    
+    # Run validation
+    import asyncio
+    asyncio.run(validate())

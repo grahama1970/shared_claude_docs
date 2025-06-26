@@ -1,0 +1,184 @@
+{
+  "test_name": "World Model State Tracking",
+  "level": 0,
+  "modules": [
+    "World Model",
+    "Test Reporter"
+  ],
+  "timestamp": "20250608_174545",
+  "duration": 1.0035924911499023,
+  "verification": {
+    "verified": false,
+    "reason": "Test Reporter not available",
+    "confidence_score": 0.5,
+    "total_tests": 14,
+    "passed_tests": 11,
+    "failed_tests": 3,
+    "bugs_found": 2,
+    "suspicious_patterns": []
+  },
+  "bugs": [
+    {
+      "bug": "Exception tracking Empty state",
+      "severity": "HIGH",
+      "timestamp": 1749419144.671921,
+      "test_level": 0,
+      "modules": [
+        "World Model",
+        "Test Reporter"
+      ],
+      "error": "Empty state not allowed"
+    },
+    {
+      "bug": "Invalid metrics accepted",
+      "severity": "MEDIUM",
+      "timestamp": 1749419144.6719327,
+      "test_level": 0,
+      "modules": [
+        "World Model",
+        "Test Reporter"
+      ],
+      "state": {
+        "module": "test",
+        "cpu": -50,
+        "memory": "not_a_number",
+        "requests": null
+      }
+    }
+  ],
+  "test_results": [
+    {
+      "test": "world_model_import",
+      "passed": true,
+      "timestamp": 1749419144.6718996,
+      "duration": 0.0003681182861328125,
+      "details": {}
+    },
+    {
+      "test": "world_model_init",
+      "passed": true,
+      "timestamp": 1749419144.6719024,
+      "duration": 0.0003714561462402344,
+      "details": {}
+    },
+    {
+      "test": "track_Normal module state",
+      "passed": true,
+      "timestamp": 1749419144.671909,
+      "duration": 0.0003781318664550781,
+      "details": {
+        "state_id": "state_1"
+      }
+    },
+    {
+      "test": "track_Error state",
+      "passed": true,
+      "timestamp": 1749419144.6719127,
+      "duration": 0.00038170814514160156,
+      "details": {
+        "state_id": "state_2"
+      }
+    },
+    {
+      "test": "track_High resource usage",
+      "passed": true,
+      "timestamp": 1749419144.6719153,
+      "duration": 0.00038433074951171875,
+      "details": {
+        "state_id": "state_3"
+      }
+    },
+    {
+      "test": "bug_check_1",
+      "passed": false,
+      "timestamp": 1749419144.6719227,
+      "duration": 0.0003917217254638672,
+      "details": {
+        "bug": "Exception tracking Empty state",
+        "severity": "HIGH",
+        "error": "Empty state not allowed"
+      }
+    },
+    {
+      "test": "track_Empty state",
+      "passed": false,
+      "timestamp": 1749419144.6719236,
+      "duration": 0.00039267539978027344,
+      "details": {
+        "error": "Empty state not allowed"
+      }
+    },
+    {
+      "test": "track_Invalid metrics",
+      "passed": true,
+      "timestamp": 1749419144.671926,
+      "duration": 0.00039505958557128906,
+      "details": {
+        "state_id": "state_4"
+      }
+    },
+    {
+      "test": "bug_check_2",
+      "passed": false,
+      "timestamp": 1749419144.6719337,
+      "duration": 0.00040268898010253906,
+      "details": {
+        "bug": "Invalid metrics accepted",
+        "severity": "MEDIUM",
+        "state": {
+          "module": "test",
+          "cpu": -50,
+          "memory": "not_a_number",
+          "requests": null
+        }
+      }
+    },
+    {
+      "test": "track_Rapid state changes",
+      "passed": true,
+      "timestamp": 1749419144.6719358,
+      "duration": 0.0004050731658935547,
+      "details": {
+        "state_id": "state_5"
+      }
+    },
+    {
+      "test": "prediction_basic",
+      "passed": true,
+      "timestamp": 1749419145.673446,
+      "duration": 1.00191330909729,
+      "details": {
+        "module": "test_module",
+        "cpu": 65,
+        "memory": 190,
+        "prediction_confidence": 0.7
+      }
+    },
+    {
+      "test": "anomaly_detection",
+      "passed": true,
+      "timestamp": 1749419145.6734567,
+      "duration": 1.0019252300262451,
+      "details": {}
+    },
+    {
+      "test": "memory_usage",
+      "passed": true,
+      "timestamp": 1749419145.6749573,
+      "duration": 1.0034260749816895,
+      "details": {
+        "growth_mb": 0.01,
+        "states": 1000
+      }
+    },
+    {
+      "test": "cleanup",
+      "passed": true,
+      "timestamp": 1749419145.6749656,
+      "duration": 1.003434181213379,
+      "details": {
+        "removed": 0
+      }
+    }
+  ]
+}

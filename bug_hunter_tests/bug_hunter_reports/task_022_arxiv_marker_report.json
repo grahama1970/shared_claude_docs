@@ -1,0 +1,126 @@
+{
+  "task": "Task #022: ArXiv-Marker Integration",
+  "module": "arxiv-marker-integration",
+  "duration": "0.00s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 12,
+  "bug_details": [
+    {
+      "type": "latex_rendering_issues",
+      "severity": "medium",
+      "description": "LaTeX equations not properly extracted",
+      "expected": "Preserve equation structure",
+      "actual": "Equations converted to garbled text"
+    },
+    {
+      "type": "no_streaming_download",
+      "severity": "high",
+      "description": "Downloads entire 100MB file to memory",
+      "expected": "Stream download to disk",
+      "actual": "Memory spike during download"
+    },
+    {
+      "type": "short_paper_rejected",
+      "severity": "low",
+      "description": "Papers < 3 pages rejected as invalid",
+      "expected": "Process any valid PDF",
+      "actual": "Minimum page requirement"
+    },
+    {
+      "type": "metadata_not_merged",
+      "severity": "medium",
+      "description": "abstract from arxiv not included",
+      "expected": "Merge ArXiv metadata with extracted data",
+      "actual": "Only PDF content processed"
+    },
+    {
+      "type": "metadata_not_merged",
+      "severity": "medium",
+      "description": "categories from arxiv not included",
+      "expected": "Merge ArXiv metadata with extracted data",
+      "actual": "Only PDF content processed"
+    },
+    {
+      "type": "metadata_not_merged",
+      "severity": "medium",
+      "description": "doi from paper not included",
+      "expected": "Merge ArXiv metadata with extracted data",
+      "actual": "Only PDF content processed"
+    },
+    {
+      "type": "download_conflicts",
+      "severity": "high",
+      "description": "Concurrent downloads conflict with 10 workers",
+      "expected": "Coordinated download queue",
+      "actual": "Multiple workers download same paper"
+    },
+    {
+      "type": "unhandled_error",
+      "severity": "high",
+      "description": "rate_limit at arxiv_api not handled",
+      "expected": "Graceful error handling with retry",
+      "actual": "Error terminates entire batch"
+    },
+    {
+      "type": "unhandled_error",
+      "severity": "high",
+      "description": "invalid_id at arxiv_api not handled",
+      "expected": "Graceful error handling with retry",
+      "actual": "Error terminates entire batch"
+    },
+    {
+      "type": "unhandled_error",
+      "severity": "high",
+      "description": "out_of_memory at processing not handled",
+      "expected": "Graceful error handling with retry",
+      "actual": "Error terminates entire batch"
+    },
+    {
+      "type": "no_category_rules",
+      "severity": "low",
+      "description": "No special handling for cs.AI papers",
+      "expected": "code_extraction for this category",
+      "actual": "Generic processing for all categories"
+    },
+    {
+      "type": "version_unaware",
+      "severity": "medium",
+      "description": "Always reprocesses full paper for new versions",
+      "expected": "Process only changed sections",
+      "actual": "Full reprocessing every time"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "PDF Download and Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Metadata Extraction",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Concurrent Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Error Handling Chain",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Category-based Processing",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Version Handling",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

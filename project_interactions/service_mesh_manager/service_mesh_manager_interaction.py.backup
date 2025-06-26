@@ -1,0 +1,725 @@
+"""
+Module: service_mesh_manager_interaction.py
+Purpose: Service mesh configuration management system for Istio/Linkerd with comprehensive
+         traffic management, security, and observability features.
+
+External Dependencies:
+- pydantic: https://docs.pydantic.dev/
+- asyncio: https://docs.python.org/3/library/asyncio.html
+- yaml: https://pyyaml.org/wiki/PyYAMLDocumentation
+
+Example Usage:
+>>> manager = ServiceMeshManager("istio")
+>>> config = manager.create_traffic_policy("web-app", weight_distribution={"v1": 80, "v2": 20})
+>>> manager.apply_configuration(config)
+TrafficPolicy(name='web-app-traffic', routes=[...])
+"""
+
+import asyncio
+import yaml
+import json
+from typing import Dict, List, Optional, Union, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+from datetime import datetime, timedelta
+import random
+from pathlib import Path
+from loguru import logger
+
+from pydantic import BaseModel, Field, field_validator
+
+# Configure logging
+logger.add("service_mesh.log", rotation="10 MB", level="DEBUG")
+
+
+class MeshProvider(str, Enum):
+    """Supported service mesh providers"""
+    ISTIO = "istio"
+    LINKERD = "linkerd"
+    CONSUL = "consul"
+    KUMA = "kuma"
+
+
+class LoadBalancerType(str, Enum):
+    """Load balancing strategies"""
+    ROUND_ROBIN = "round_robin"
+    LEAST_REQUEST = "least_request"
+    RANDOM = "random"
+    CONSISTENT_HASH = "consistent_hash"
+    MAGLEV = "maglev"
+    RING_HASH = "ring_hash"
+
+
+class CircuitBreakerState(str, Enum):
+    """Circuit breaker states"""
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+
+# Pydantic Models for Configuration
+class RetryPolicy(BaseModel):
+    """Retry configuration for services"""
+    attempts: int = Field(default=3, ge=1, le=10)
+    per_try_timeout: str = Field(default="30s")
+    retry_on: List[str] = Field(default_factory=lambda: ["5xx", "reset", "connect-failure"])
+    retry_on_status_codes: List[int] = Field(default_factory=list)
+    backoff_base_interval: str = Field(default="1s")
+    backoff_max_interval: str = Field(default="30s")
+
+    @field_validator('per_try_timeout', 'backoff_base_interval', 'backoff_max_interval')
+    def validate_duration(cls, v):
+        """Validate duration format"""
+        if not v.endswith(('s', 'm', 'h')):
+            raise ValueError("Duration must end with s, m, or h")
+        return v
+
+
+class CircuitBreakerConfig(BaseModel):
+    """Circuit breaker configuration"""
+    consecutive_errors: int = Field(default=5, ge=1)
+    interval: str = Field(default="30s")
+    base_ejection_time: str = Field(default="30s")
+    max_ejection_percent: int = Field(default=50, ge=0, le=100)
+    min_healthy_percent: int = Field(default=30, ge=0, le=100)
+    split_external_local_errors: bool = Field(default=False)
+
+
+class TimeoutPolicy(BaseModel):
+    """Timeout configuration"""
+    request_timeout: str = Field(default="30s")
+    idle_timeout: str = Field(default="900s")
+    stream_idle_timeout: str = Field(default="300s")
+
+
+class RateLimitConfig(BaseModel):
+    """Rate limiting configuration"""
+    requests_per_unit: int = Field(default=100, ge=1)
+    unit: str = Field(default="minute", pattern="^(second|minute|hour|day)$")
+    burst_size: int = Field(default=10, ge=0)
+    response_headers_to_add: Dict[str, str] = Field(default_factory=dict)
+
+
+class TrafficSplitConfig(BaseModel):
+    """Traffic split configuration for canary/A-B testing"""
+    version: str
+    weight: int = Field(ge=0, le=100)
+    headers: Optional[Dict[str, str]] = None
+    labels: Optional[Dict[str, str]] = None
+
+
+class MutualTLSConfig(BaseModel):
+    """mTLS configuration"""
+    mode: str = Field(default="STRICT", pattern="^(DISABLE|PERMISSIVE|STRICT)$")
+    port_level_mtls: Optional[Dict[int, str]] = None
+    client_certificates: Optional[List[str]] = None
+
+
+class ObservabilityConfig(BaseModel):
+    """Observability configuration"""
+    metrics_enabled: bool = Field(default=True)
+    tracing_enabled: bool = Field(default=True)
+    access_logs_enabled: bool = Field(default=True)
+    tracing_sampling_rate: float = Field(default=1.0, ge=0.0, le=1.0)
+    custom_metrics: List[str] = Field(default_factory=list)
+    custom_dimensions: Dict[str, str] = Field(default_factory=dict)
+
+
+class AuthorizationPolicy(BaseModel):
+    """Authorization policy configuration"""
+    rules: List[Dict[str, Any]] = Field(default_factory=list)
+    action: str = Field(default="ALLOW", pattern="^(ALLOW|DENY|AUDIT|CUSTOM)$")
+    provider: Optional[str] = None
+
+
+class FaultInjectionConfig(BaseModel):
+    """Fault injection for chaos testing"""
+    delay: Optional[Dict[str, Any]] = None
+    abort: Optional[Dict[str, Any]] = None
+    percentage: float = Field(default=100.0, ge=0.0, le=100.0)
+
+
+@dataclass
+class ServiceEndpoint:
+    """Service endpoint information"""
+    name: str
+    namespace: str
+    port: int
+    protocol: str = "http"
+    version: Optional[str] = None
+    labels: Dict[str, str] = field(default_factory=dict)
+    health_check_path: str = "/health"
+
+
+@dataclass
+class VirtualService:
+    """Virtual service configuration"""
+    name: str
+    hosts: List[str]
+    gateways: List[str] = field(default_factory=list)
+    http_routes: List[Dict[str, Any]] = field(default_factory=list)
+    tcp_routes: List[Dict[str, Any]] = field(default_factory=list)
+    tls_routes: List[Dict[str, Any]] = field(default_factory=list)
+
+
+class ServiceMeshManager:
+    """Main service mesh configuration manager"""
+    
+    def __init__(self, provider: Union[str, MeshProvider] = MeshProvider.ISTIO):
+        self.provider = MeshProvider(provider) if isinstance(provider, str) else provider
+        self.services: Dict[str, ServiceEndpoint] = {}
+        self.virtual_services: Dict[str, VirtualService] = {}
+        self.policies: Dict[str, Any] = {}
+        self.circuit_breakers: Dict[str, CircuitBreakerState] = {}
+        
+        logger.info(f"Initialized ServiceMeshManager with provider: {self.provider}")
+    
+    def register_service(self, service: ServiceEndpoint) -> ServiceEndpoint:
+        """Register a service in the mesh"""
+        key = f"{service.namespace}/{service.name}"
+        self.services[key] = service
+        logger.info(f"Registered service: {key}")
+        return service
+    
+    def create_traffic_policy(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        weight_distribution: Optional[Dict[str, int]] = None,
+        retry_policy: Optional[RetryPolicy] = None,
+        circuit_breaker: Optional[CircuitBreakerConfig] = None,
+        timeout_policy: Optional[TimeoutPolicy] = None,
+        load_balancer: LoadBalancerType = LoadBalancerType.ROUND_ROBIN
+    ) -> Dict[str, Any]:
+        """Create comprehensive traffic management policy"""
+        
+        policy = {
+            "apiVersion": self._get_api_version("DestinationRule"),
+            "kind": "DestinationRule",
+            "metadata": {
+                "name": f"{service_name}-destination-rule",
+                "namespace": namespace
+            },
+            "spec": {
+                "host": service_name,
+                "trafficPolicy": {
+                    "loadBalancer": {"simple": load_balancer.value.upper()}
+                }
+            }
+        }
+        
+        # Add retry policy
+        if retry_policy:
+            policy["spec"]["trafficPolicy"]["retryPolicy"] = {
+                "attempts": retry_policy.attempts,
+                "perTryTimeout": retry_policy.per_try_timeout,
+                "retryOn": ",".join(retry_policy.retry_on),
+                "retryRemoteLocalities": True
+            }
+        
+        # Add circuit breaker
+        if circuit_breaker:
+            policy["spec"]["trafficPolicy"]["connectionPool"] = {
+                "tcp": {"maxConnections": 100},
+                "http": {
+                    "http1MaxPendingRequests": 10,
+                    "http2MaxRequests": 100
+                }
+            }
+            policy["spec"]["trafficPolicy"]["outlierDetection"] = {
+                "consecutiveErrors": circuit_breaker.consecutive_errors,
+                "interval": circuit_breaker.interval,
+                "baseEjectionTime": circuit_breaker.base_ejection_time,
+                "maxEjectionPercent": circuit_breaker.max_ejection_percent
+            }
+        
+        # Add timeout policy
+        if timeout_policy:
+            policy["spec"]["trafficPolicy"]["timeout"] = timeout_policy.request_timeout
+        
+        # Add traffic splitting for versions
+        if weight_distribution:
+            subsets = []
+            for version, weight in weight_distribution.items():
+                subsets.append({
+                    "name": version,
+                    "labels": {"version": version},
+                    "trafficPolicy": policy["spec"]["trafficPolicy"].copy()
+                })
+            policy["spec"]["subsets"] = subsets
+        
+        self.policies[f"{namespace}/{service_name}"] = policy
+        return policy
+    
+    def create_canary_deployment(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        stable_version: str = "v1",
+        canary_version: str = "v2",
+        canary_weight: int = 10,
+        header_based_routing: Optional[Dict[str, str]] = None
+    ) -> VirtualService:
+        """Create canary deployment configuration"""
+        
+        vs_name = f"{service_name}-canary"
+        routes = []
+        
+        # Header-based routing for testing
+        if header_based_routing:
+            routes.append({
+                "match": [{"headers": header_based_routing}],
+                "route": [{
+                    "destination": {
+                        "host": service_name,
+                        "subset": canary_version
+                    }
+                }]
+            })
+        
+        # Weight-based routing
+        routes.append({
+            "route": [
+                {
+                    "destination": {
+                        "host": service_name,
+                        "subset": stable_version
+                    },
+                    "weight": 100 - canary_weight
+                },
+                {
+                    "destination": {
+                        "host": service_name,
+                        "subset": canary_version
+                    },
+                    "weight": canary_weight
+                }
+            ]
+        })
+        
+        virtual_service = VirtualService(
+            name=vs_name,
+            hosts=[service_name],
+            http_routes=routes
+        )
+        
+        self.virtual_services[vs_name] = virtual_service
+        logger.info(f"Created canary deployment for {service_name}: {canary_weight}% to {canary_version}")
+        
+        return virtual_service
+    
+    def configure_mtls(
+        self,
+        namespace: str = "default",
+        mode: str = "STRICT",
+        exclude_ports: Optional[List[int]] = None
+    ) -> Dict[str, Any]:
+        """Configure mutual TLS for namespace"""
+        
+        policy = {
+            "apiVersion": "security.istio.io/v1beta1",
+            "kind": "PeerAuthentication",
+            "metadata": {
+                "name": f"{namespace}-mtls",
+                "namespace": namespace
+            },
+            "spec": {
+                "mtls": {"mode": mode}
+            }
+        }
+        
+        if exclude_ports:
+            policy["spec"]["portLevelMtls"] = {
+                str(port): {"mode": "DISABLE"} for port in exclude_ports
+            }
+        
+        return policy
+    
+    def create_rate_limit_policy(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        rate_limit: RateLimitConfig = None
+    ) -> Dict[str, Any]:
+        """Create rate limiting policy"""
+        
+        if not rate_limit:
+            rate_limit = RateLimitConfig()
+        
+        policy = {
+            "apiVersion": self._get_api_version("EnvoyFilter"),
+            "kind": "EnvoyFilter",
+            "metadata": {
+                "name": f"{service_name}-ratelimit",
+                "namespace": namespace
+            },
+            "spec": {
+                "workloadSelector": {
+                    "labels": {"app": service_name}
+                },
+                "configPatches": [{
+                    "applyTo": "HTTP_FILTER",
+                    "match": {
+                        "context": "SIDECAR_INBOUND",
+                        "listener": {
+                            "filterChain": {
+                                "filter": {
+                                    "name": "envoy.filters.network.http_connection_manager"
+                                }
+                            }
+                        }
+                    },
+                    "patch": {
+                        "operation": "INSERT_BEFORE",
+                        "value": {
+                            "name": "envoy.filters.http.local_ratelimit",
+                            "typed_config": {
+                                "@type": "type.googleapis.com/udpa.type.v1.TypedStruct",
+                                "type_url": "type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit",
+                                "value": {
+                                    "stat_prefix": "http_local_rate_limiter",
+                                    "token_bucket": {
+                                        "max_tokens": rate_limit.burst_size,
+                                        "tokens_per_fill": rate_limit.requests_per_unit,
+                                        "fill_interval": f"1{rate_limit.unit[0]}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }]
+            }
+        }
+        
+        return policy
+    
+    def setup_observability(
+        self,
+        namespace: str = "default",
+        config: Optional[ObservabilityConfig] = None
+    ) -> Dict[str, Any]:
+        """Configure observability settings"""
+        
+        if not config:
+            config = ObservabilityConfig()
+        
+        telemetry_config = {
+            "apiVersion": "telemetry.istio.io/v1alpha1",
+            "kind": "Telemetry",
+            "metadata": {
+                "name": f"{namespace}-telemetry",
+                "namespace": namespace
+            },
+            "spec": {
+                "metrics": [{
+                    "providers": [{"name": "prometheus"}],
+                    "dimensions": config.custom_dimensions
+                }] if config.metrics_enabled else [],
+                "accessLogging": [{
+                    "providers": [{"name": "otel"}]
+                }] if config.access_logs_enabled else [],
+                "tracing": [{
+                    "providers": [{"name": "jaeger"}],
+                    "randomSamplingPercentage": config.tracing_sampling_rate * 100
+                }] if config.tracing_enabled else []
+            }
+        }
+        
+        return telemetry_config
+    
+    def inject_fault(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        fault_config: Optional[FaultInjectionConfig] = None
+    ) -> Dict[str, Any]:
+        """Inject faults for chaos testing"""
+        
+        if not fault_config:
+            fault_config = FaultInjectionConfig(
+                delay={"fixedDelay": "5s", "percentage": {"value": 10}},
+                abort={"httpStatus": 503, "percentage": {"value": 5}}
+            )
+        
+        vs_config = {
+            "apiVersion": self._get_api_version("VirtualService"),
+            "kind": "VirtualService",
+            "metadata": {
+                "name": f"{service_name}-fault-injection",
+                "namespace": namespace
+            },
+            "spec": {
+                "hosts": [service_name],
+                "http": [{
+                    "match": [{"headers": {"x-test-fault": {"exact": "true"}}}],
+                    "fault": {
+                        "delay": fault_config.delay,
+                        "abort": fault_config.abort
+                    },
+                    "route": [{
+                        "destination": {"host": service_name}
+                    }]
+                }]
+            }
+        }
+        
+        return vs_config
+    
+    def create_authorization_policy(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        rules: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Create authorization policy"""
+        
+        default_rules = [
+            {
+                "from": [{"source": {"namespaces": [namespace]}}],
+                "to": [{"operation": {"methods": ["GET", "POST"]}}]
+            }
+        ]
+        
+        policy = {
+            "apiVersion": "security.istio.io/v1beta1",
+            "kind": "AuthorizationPolicy",
+            "metadata": {
+                "name": f"{service_name}-authz",
+                "namespace": namespace
+            },
+            "spec": {
+                "selector": {
+                    "matchLabels": {"app": service_name}
+                },
+                "action": "ALLOW",
+                "rules": rules or default_rules
+            }
+        }
+        
+        return policy
+    
+    def setup_traffic_mirroring(
+        self,
+        service_name: str,
+        namespace: str = "default",
+        mirror_destination: str = None,
+        mirror_percentage: float = 100.0
+    ) -> Dict[str, Any]:
+        """Setup traffic mirroring for testing"""
+        
+        vs_config = {
+            "apiVersion": self._get_api_version("VirtualService"),
+            "kind": "VirtualService",
+            "metadata": {
+                "name": f"{service_name}-mirror",
+                "namespace": namespace
+            },
+            "spec": {
+                "hosts": [service_name],
+                "http": [{
+                    "route": [{
+                        "destination": {"host": service_name}
+                    }],
+                    "mirror": {
+                        "host": mirror_destination or f"{service_name}-mirror",
+                        "subset": "v2"
+                    },
+                    "mirrorPercentage": {
+                        "value": mirror_percentage
+                    }
+                }]
+            }
+        }
+        
+        return vs_config
+    
+    def _get_api_version(self, kind: str) -> str:
+        """Get appropriate API version for resource kind"""
+        api_versions = {
+            "VirtualService": "networking.istio.io/v1beta1",
+            "DestinationRule": "networking.istio.io/v1beta1",
+            "Gateway": "networking.istio.io/v1beta1",
+            "ServiceEntry": "networking.istio.io/v1beta1",
+            "EnvoyFilter": "networking.istio.io/v1alpha3",
+            "PeerAuthentication": "security.istio.io/v1beta1",
+            "AuthorizationPolicy": "security.istio.io/v1beta1"
+        }
+        return api_versions.get(kind, "networking.istio.io/v1beta1")
+    
+    def apply_configuration(self, config: Dict[str, Any]) -> bool:
+        """Apply configuration to mesh (simulation)"""
+        try:
+            # In real implementation, this would use kubectl or mesh API
+            config_type = config.get("kind", "Unknown")
+            config_name = config.get("metadata", {}).get("name", "unnamed")
+            
+            logger.info(f"Applying {config_type} configuration: {config_name}")
+            
+            # Simulate validation
+            if not config.get("apiVersion") or not config.get("kind"):
+                raise ValueError("Invalid configuration: missing apiVersion or kind")
+            
+            # Store configuration
+            self.policies[config_name] = config
+            
+            logger.success(f"Successfully applied {config_type}: {config_name}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to apply configuration: {e}")
+            return False
+    
+    def get_service_health(self, service_name: str, namespace: str = "default") -> Dict[str, Any]:
+        """Get service health status"""
+        key = f"{namespace}/{service_name}"
+        
+        # Simulate health check
+        health = {
+            "service": service_name,
+            "namespace": namespace,
+            "status": "healthy",
+            "endpoints": random.randint(3, 10),
+            "success_rate": round(random.uniform(95.0, 99.9), 2),
+            "latency_p50": random.randint(10, 50),
+            "latency_p99": random.randint(100, 500),
+            "circuit_breaker": self.circuit_breakers.get(key, CircuitBreakerState.CLOSED).value
+        }
+        
+        return health
+    
+    def export_configuration(self, output_dir: Path) -> List[Path]:
+        """Export all configurations to files"""
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        exported_files = []
+        
+        for name, config in self.policies.items():
+            filename = f"{name.replace('/', '-')}.yaml"
+            filepath = output_dir / filename
+            
+            with open(filepath, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+            
+            exported_files.append(filepath)
+            logger.info(f"Exported configuration to: {filepath}")
+        
+        return exported_files
+    
+    async def monitor_mesh_health(self, interval: int = 30) -> None:
+        """Monitor mesh health continuously"""
+        logger.info(f"Starting mesh health monitoring (interval: {interval}s)")
+        
+        while True:
+            try:
+                for service_key in self.services:
+                    namespace, service_name = service_key.split('/')
+                    health = self.get_service_health(service_name, namespace)
+                    
+                    if health["success_rate"] < 90:
+                        logger.warning(f"Service {service_key} degraded: {health['success_rate']}% success rate")
+                    
+                    if health["latency_p99"] > 1000:
+                        logger.warning(f"Service {service_key} high latency: {health['latency_p99']}ms p99")
+                
+                await asyncio.sleep(interval)
+                
+            except Exception as e:
+                logger.error(f"Error in health monitoring: {e}")
+                await asyncio.sleep(interval)
+
+
+# Validation and testing
+if __name__ == "__main__":
+    # Test with real-world scenario
+    manager = ServiceMeshManager(MeshProvider.ISTIO)
+    
+    # Register services
+    web_service = ServiceEndpoint(
+        name="web-frontend",
+        namespace="production",
+        port=8080,
+        version="v1",
+        labels={"app": "web", "tier": "frontend"}
+    )
+    api_service = ServiceEndpoint(
+        name="api-backend",
+        namespace="production",
+        port=9090,
+        version="v1",
+        labels={"app": "api", "tier": "backend"}
+    )
+    
+    manager.register_service(web_service)
+    manager.register_service(api_service)
+    
+    # Create traffic policy with retry and circuit breaker
+    retry_policy = RetryPolicy(attempts=3, per_try_timeout="10s")
+    circuit_breaker = CircuitBreakerConfig(consecutive_errors=5, interval="30s")
+    
+    traffic_policy = manager.create_traffic_policy(
+        "web-frontend",
+        namespace="production",
+        retry_policy=retry_policy,
+        circuit_breaker=circuit_breaker,
+        load_balancer=LoadBalancerType.LEAST_REQUEST
+    )
+    
+    print(f"✅ Created traffic policy: {traffic_policy['metadata']['name']}")
+    
+    # Create canary deployment
+    canary_vs = manager.create_canary_deployment(
+        "api-backend",
+        namespace="production",
+        stable_version="v1",
+        canary_version="v2",
+        canary_weight=20
+    )
+    
+    print(f"✅ Created canary deployment: {canary_vs.name}")
+    
+    # Configure mTLS
+    mtls_config = manager.configure_mtls(namespace="production", mode="STRICT")
+    print(f"✅ Configured mTLS: {mtls_config['metadata']['name']}")
+    
+    # Setup rate limiting
+    rate_limit = RateLimitConfig(requests_per_unit=100, unit="minute", burst_size=20)
+    rate_limit_policy = manager.create_rate_limit_policy(
+        "api-backend",
+        namespace="production",
+        rate_limit=rate_limit
+    )
+    print(f"✅ Created rate limit policy: {rate_limit_policy['metadata']['name']}")
+    
+    # Configure observability
+    obs_config = ObservabilityConfig(
+        metrics_enabled=True,
+        tracing_enabled=True,
+        tracing_sampling_rate=0.1
+    )
+    telemetry = manager.setup_observability("production", obs_config)
+    print(f"✅ Configured observability: {telemetry['metadata']['name']}")
+    
+    # Setup fault injection for testing
+    fault_config = FaultInjectionConfig(
+        delay={"fixedDelay": "3s", "percentage": {"value": 10}},
+        percentage=10.0
+    )
+    fault_injection = manager.inject_fault("web-frontend", "production", fault_config)
+    print(f"✅ Created fault injection: {fault_injection['metadata']['name']}")
+    
+    # Apply configurations
+    for config in [traffic_policy, mtls_config, rate_limit_policy, telemetry, fault_injection]:
+        success = manager.apply_configuration(config)
+        assert success, f"Failed to apply {config['kind']}"
+    
+    # Export configurations
+    export_dir = Path("project_interactions/service-mesh-manager/configs")
+    exported = manager.export_configuration(export_dir)
+    print(f"✅ Exported {len(exported)} configurations to {export_dir}")
+    
+    # Get service health
+    health = manager.get_service_health("web-frontend", "production")
+    print(f"✅ Service health: {json.dumps(health, indent=2)}")
+    
+    print("\n✅ Service mesh manager validation passed!")

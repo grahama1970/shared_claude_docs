@@ -1,0 +1,66 @@
+{
+  "success": true,
+  "duration_hours": 0.02,
+  "tests_run": 7,
+  "total_bugs_found": 10,
+  "critical_bugs": 0,
+  "high_bugs": 5,
+  "bugs_by_module": {
+    "arangodb": 5,
+    "marker": 1,
+    "sparta": 1,
+    "granger_hub": 2
+  },
+  "bug_patterns": {},
+  "test_history": [
+    {
+      "scenario": "Security Boundary Testing",
+      "timestamp": "2025-06-08T09:04:05.611350",
+      "bugs_found": 5,
+      "duration": 1.52587890625e-05,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Performance and Scale Testing",
+      "timestamp": "2025-06-08T09:04:06.112956",
+      "bugs_found": 0,
+      "duration": 4.5299530029296875e-06,
+      "success": false
+    },
+    {
+      "scenario": "Pipeline State Corruption Testing",
+      "timestamp": "2025-06-08T09:04:06.854370",
+      "bugs_found": 2,
+      "duration": 0.2400813102722168,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Temporal Evolution Testing",
+      "timestamp": "2025-06-08T09:04:07.356465",
+      "bugs_found": 0,
+      "duration": 4.291534423828125e-06,
+      "success": false
+    },
+    {
+      "scenario": "Memvid Integration Testing",
+      "timestamp": "2025-06-08T09:04:07.858664",
+      "bugs_found": 0,
+      "duration": 6.67572021484375e-06,
+      "success": false
+    },
+    {
+      "scenario": "Module Resilience Testing",
+      "timestamp": "2025-06-08T09:05:02.883810",
+      "bugs_found": 3,
+      "duration": 54.52382826805115,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Visual Memory Resilience",
+      "timestamp": "2025-06-08T09:05:03.385704",
+      "bugs_found": 0,
+      "duration": 8.58306884765625e-06,
+      "success": false
+    }
+  ]
+}

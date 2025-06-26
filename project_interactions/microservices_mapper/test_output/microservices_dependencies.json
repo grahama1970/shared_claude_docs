@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "api",
+      "label": "api",
+      "version": "2.5.1",
+      "group": "default",
+      "health": "unknown"
+    },
+    {
+      "id": "worker",
+      "label": "worker",
+      "version": "1.0.0-beta",
+      "group": "default",
+      "health": "unknown"
+    }
+  ],
+  "links": []
+}

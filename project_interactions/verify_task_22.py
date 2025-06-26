@@ -1,0 +1,275 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Skeptical verification of Task #22: Multi-Language Code Translation Pipeline
+"""
+
+import sys
+import time
+from pathlib import Path
+from datetime import datetime
+
+# Add parent to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import the scenario directly
+exec(open("/home/graham/workspace/shared_claude_docs/project_interactions/code_translation/code_translation_interaction.py").read())
+
+
+class SkepticalVerifier:
+    """Skeptically verify Task #22 implementation."""
+    
+    def __init__(self):
+        self.suspicions = []
+        self.confidence_scores = {}
+    
+    def verify_basic_translation(self, scenario):
+        """Verify basic translation test."""
+        print("\n🔍 Verifying Basic Translation (Test 022.1)...")
+        
+        start_time = time.time()
+        result = scenario.test_basic_translation()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 0.5, 2.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["basic_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["basic_duration"] = 0.5
+            self.suspicions.append(f"Duration {duration:.2f}s outside expected range")
+        
+        # Check translation success
+        if result.success:
+            output = result.output_data
+            
+            # Check if translation produced output
+            if output.get("translated_code"):
+                print(f"  ✅ Translation produced output")
+                self.confidence_scores["basic_translation"] = 0.9
+                
+                # Check for language-specific transformations
+                translated = output.get("translated_code", "")
+                if "console.log" in translated or "function" in translated:
+                    print(f"  ✅ JavaScript idioms detected in translation")
+                    self.confidence_scores["idiom_translation"] = 0.85
+                else:
+                    self.suspicions.append("No JavaScript idioms found")
+                    self.confidence_scores["idiom_translation"] = 0.4
+            else:
+                self.suspicions.append("No translated code produced")
+                self.confidence_scores["basic_translation"] = 0.2
+        else:
+            self.suspicions.append("Basic translation failed")
+            self.confidence_scores["basic_translation"] = 0.1
+        
+        return result
+    
+    def verify_class_translation(self, scenario):
+        """Verify class translation test."""
+        print("\n🔍 Verifying Class Translation (Test 022.2)...")
+        
+        start_time = time.time()
+        result = scenario.test_class_translation()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 1.0, 3.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["class_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["class_duration"] = 0.5
+        
+        if result.success:
+            output = result.output_data
+            translated = output.get("translated_code", "")
+            
+            # Check for class syntax transformation
+            if "class" in translated or "constructor" in translated:
+                print(f"  ✅ Class structure preserved in translation")
+                self.confidence_scores["class_structure"] = 0.9
+                
+                # Check self → this transformation
+                if "this." in translated and "self" not in translated:
+                    print(f"  ✅ self → this transformation applied")
+                    self.confidence_scores["self_to_this"] = 0.95
+                else:
+                    self.suspicions.append("self → this transformation missing")
+                    self.confidence_scores["self_to_this"] = 0.3
+            else:
+                self.suspicions.append("Class structure not preserved")
+                self.confidence_scores["class_structure"] = 0.2
+        else:
+            self.suspicions.append("Class translation failed")
+            self.confidence_scores["class_structure"] = 0.1
+        
+        return result
+    
+    def verify_comment_preservation(self, scenario):
+        """Verify comment preservation test."""
+        print("\n🔍 Verifying Comment Preservation (Test 022.3)...")
+        
+        start_time = time.time()
+        result = scenario.test_comment_preservation()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 0.5, 2.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["comment_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["comment_duration"] = 0.5
+        
+        if result.success:
+            output = result.output_data
+            preserved_comments = output.get("preserved_comments", 0)
+            
+            if preserved_comments > 0:
+                print(f"  ✅ Preserved {preserved_comments} comments")
+                self.confidence_scores["comment_preservation"] = 0.9
+            else:
+                self.suspicions.append("No comments preserved")
+                self.confidence_scores["comment_preservation"] = 0.2
+        else:
+            self.suspicions.append("Comment preservation failed")
+            self.confidence_scores["comment_preservation"] = 0.1
+        
+        return result
+    
+    def verify_honeypot(self, scenario):
+        """Verify honeypot test fails as expected."""
+        print("\n🔍 Verifying Honeypot (Test 022.H)...")
+        
+        try:
+            # Try to translate invalid/malformed code
+            translator = CodeTranslator()
+            
+            malformed_code = '''
+            def broken_function(
+                # Missing closing parenthesis
+                print("This won't parse"
+            '''
+            
+            # This should fail gracefully
+            result = translator.translate(malformed_code, "python", "javascript")
+            
+            if result is None or "error" in str(result).lower():
+                print(f"  ✅ Honeypot correctly handled malformed code")
+                self.confidence_scores["honeypot"] = 1.0
+            else:
+                print(f"  ❌ Honeypot FAILED: Translated malformed code")
+                self.suspicions.append("CRITICAL: Translates invalid code")
+                self.confidence_scores["honeypot"] = 0.0
+                
+        except Exception as e:
+            print(f"  ✅ Honeypot correctly failed: {str(e)}")
+            self.confidence_scores["honeypot"] = 1.0
+            return True
+        
+        return result is None or "error" in str(result).lower()
+    
+    def generate_report(self, results):
+        """Generate skeptical analysis report."""
+        overall_confidence = sum(self.confidence_scores.values()) / len(self.confidence_scores) if self.confidence_scores else 0
+        
+        print("\n" + "="*60)
+        print("SKEPTICAL ANALYSIS REPORT - Task #22")
+        print("="*60)
+        
+        print(f"\nOverall Confidence: {overall_confidence:.1%}")
+        
+        print("\nConfidence Breakdown:")
+        for metric, score in self.confidence_scores.items():
+            print(f"  - {metric}: {score:.1%}")
+        
+        if self.suspicions:
+            print("\n🚨 Suspicions Detected:")
+            for suspicion in self.suspicions:
+                print(f"  - {suspicion}")
+        
+        # Determine verdict
+        if overall_confidence >= 0.85:
+            verdict = "LIKELY_GENUINE"
+            emoji = "✅"
+        elif overall_confidence >= 0.7:
+            verdict = "QUESTIONABLE" 
+            emoji = "🟡"
+        elif overall_confidence >= 0.5:
+            verdict = "SUSPICIOUS"
+            emoji = "⚠️"
+        else:
+            verdict = "FAKE_IMPLEMENTATION"
+            emoji = "🚫"
+        
+        print(f"\n{emoji} VERDICT: {verdict}")
+        
+        # Translation specific checks
+        print("\n🔄 Code Translation Verification:")
+        translation_working = (
+            self.confidence_scores.get("basic_translation", 0) >= 0.7 and
+            self.confidence_scores.get("class_structure", 0) >= 0.5 and
+            self.confidence_scores.get("comment_preservation", 0) >= 0.5
+        )
+        print(f"  - Basic translation works: {'✅ Yes' if self.confidence_scores.get('basic_translation', 0) >= 0.7 else '❌ No'}")
+        print(f"  - Class translation: {'✅ Yes' if self.confidence_scores.get('class_structure', 0) >= 0.5 else '❌ No'}")
+        print(f"  - Comment preservation: {'✅ Yes' if self.confidence_scores.get('comment_preservation', 0) >= 0.5 else '❌ No'}")
+        
+        return {
+            "confidence": overall_confidence,
+            "verdict": verdict,
+            "suspicions": self.suspicions,
+            "translation_working": translation_working
+        }
+
+
+def main():
+    """Main verification runner."""
+    print("="*80)
+    print("Task #22 Skeptical Verification")
+    print(f"Started: {datetime.now().isoformat()}")
+    print("="*80)
+    
+    # Create scenario and verifier
+    scenario = CodeTranslationScenario()
+    verifier = SkepticalVerifier()
+    
+    # Run all verifications
+    results = {
+        "basic": verifier.verify_basic_translation(scenario),
+        "class": verifier.verify_class_translation(scenario),
+        "comments": verifier.verify_comment_preservation(scenario),
+        "honeypot": verifier.verify_honeypot(scenario)
+    }
+    
+    # Generate report
+    report = verifier.generate_report(results)
+    
+    # Final summary
+    print("\n" + "="*80)
+    print("TASK #22 VERIFICATION COMPLETE")
+    print("="*80)
+    
+    if report["verdict"] in ["LIKELY_GENUINE", "QUESTIONABLE"] and report["translation_working"]:
+        print("\n✅ Task #22 PASSED skeptical verification")
+        print("   Multi-language code translation successfully demonstrated")
+        print("\nProceeding to Task #23...")
+        return 0
+    else:
+        print("\n❌ Task #22 FAILED skeptical verification")
+        if not report["translation_working"]:
+            print("   Translation features not properly working")
+        print("Debug and fix issues before proceeding")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

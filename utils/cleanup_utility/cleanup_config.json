@@ -1,0 +1,22 @@
+{
+  "connection_command": "ssh -i ~/.ssh/id_ed25519_wsl2 graham@192.168.86.49",
+  "timeout_ms": 5000,
+  "communicator_project": "/home/graham/workspace/experiments/claude-module-communicator/",
+  "test_guide": "/home/graham/workspace/experiments/marker/docs/guides/TASK_LIST_TEMPLATE_GUIDE_V2.md",
+  "test_reporter_repo": "claude-test-reporter @ git+https://github.com/grahama1970/claude-test-reporter.git@main",
+  "parallel_workers": 4,
+  "ci_mode": false,
+  "projects": [
+    "/home/graham/workspace/experiments/sparta/",
+    "/home/graham/workspace/experiments/marker/",
+    "/home/graham/workspace/experiments/arangodb/",
+    "/home/graham/workspace/experiments/youtube_transcripts/",
+    "/home/graham/workspace/experiments/claude_max_proxy/",
+    "/home/graham/workspace/mcp-servers/arxiv-mcp-server/",
+    "/home/graham/workspace/experiments/claude-module-communicator/",
+    "/home/graham/workspace/experiments/claude-test-reporter/",
+    "/home/graham/workspace/experiments/unsloth_wip/",
+    "/home/graham/workspace/experiments/marker-ground-truth/",
+    "/home/graham/workspace/experiments/mcp-screenshot/"
+  ]
+}

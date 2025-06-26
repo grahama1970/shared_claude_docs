@@ -1,0 +1,8 @@
+[
+  {
+    "bug": "YouTube module import failure",
+    "error": "No module named 'youtube_transcripts'",
+    "severity": "CRITICAL",
+    "impact": "Cannot use YouTube functionality"
+  }
+]

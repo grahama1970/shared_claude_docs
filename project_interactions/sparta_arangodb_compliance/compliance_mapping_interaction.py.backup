@@ -1,0 +1,767 @@
+#!/usr/bin/env python3
+"""
+Module: compliance_mapping_interaction.py
+Purpose: Map security controls from SPARTA to compliance frameworks in ArangoDB
+
+This module creates a pipeline between SPARTA (cybersecurity data) and ArangoDB 
+(graph storage) to map security controls to multiple compliance frameworks and 
+provide gap analysis capabilities.
+
+External Dependencies:
+- pyarango: https://pyarango.readthedocs.io/
+- loguru: https://loguru.readthedocs.io/
+
+Example Usage:
+>>> mapper = ComplianceMapper()
+>>> mapper.load_sparta_controls()
+>>> mapper.map_to_frameworks()
+>>> gaps = mapper.analyze_compliance_gaps("NIST")
+>>> print(f"Found {len(gaps)} compliance gaps")
+"""
+
+import json
+import time
+from datetime import datetime
+from typing import Dict, List, Optional, Set, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+
+from loguru import logger
+
+
+class ComplianceFramework(Enum):
+    """Supported compliance frameworks"""
+    NIST = "NIST 800-53"
+    ISO27001 = "ISO 27001:2022"
+    SOC2 = "SOC 2 Type II"
+    PCI_DSS = "PCI DSS v4.0"
+    HIPAA = "HIPAA Security Rule"
+    GDPR = "GDPR"
+    CIS = "CIS Controls v8"
+
+
+@dataclass
+class SecurityControl:
+    """Represents a security control from SPARTA"""
+    control_id: str
+    title: str
+    description: str
+    category: str
+    implementation_status: str = "Not Implemented"
+    priority: str = "Medium"
+    tags: List[str] = field(default_factory=list)
+    source_document: Optional[str] = None
+    extracted_date: Optional[datetime] = None
+
+
+@dataclass
+class ComplianceRequirement:
+    """Represents a requirement from a compliance framework"""
+    requirement_id: str
+    framework: ComplianceFramework
+    title: str
+    description: str
+    category: str
+    control_mappings: List[str] = field(default_factory=list)
+    is_mandatory: bool = True
+
+
+@dataclass
+class ComplianceGap:
+    """Represents a gap in compliance coverage"""
+    framework: ComplianceFramework
+    requirement_id: str
+    requirement_title: str
+    missing_controls: List[str]
+    partial_controls: List[str]
+    risk_level: str
+    remediation_effort: str
+    recommendations: List[str]
+
+
+class MockSpartaData:
+    """Mock SPARTA output data for testing"""
+    
+    @staticmethod
+    def get_sample_controls() -> List[SecurityControl]:
+        """Generate sample security controls from SPARTA"""
+        return [
+            SecurityControl(
+                control_id="AC-2",
+                title="Account Management",
+                description="Manage information system accounts, including establishing, activating, modifying, reviewing, disabling, and removing accounts.",
+                category="Access Control",
+                implementation_status="Implemented",
+                priority="High",
+                tags=["identity", "access-management", "user-accounts"],
+                source_document="NIST-800-53-Rev5.pdf",
+                extracted_date=datetime.now()
+            ),
+            SecurityControl(
+                control_id="AC-3",
+                title="Access Enforcement",
+                description="Enforce approved authorizations for logical access to information and system resources.",
+                category="Access Control",
+                implementation_status="Partially Implemented",
+                priority="High",
+                tags=["authorization", "access-control", "permissions"],
+                source_document="NIST-800-53-Rev5.pdf"
+            ),
+            SecurityControl(
+                control_id="AU-2",
+                title="Audit Events",
+                description="Determine that the information system is capable of auditing defined events.",
+                category="Audit and Accountability",
+                implementation_status="Implemented",
+                priority="Medium",
+                tags=["logging", "audit", "monitoring"],
+                source_document="NIST-800-53-Rev5.pdf"
+            ),
+            SecurityControl(
+                control_id="SC-7",
+                title="Boundary Protection",
+                description="Monitor and control communications at the external boundary of the system.",
+                category="System and Communications Protection",
+                implementation_status="Not Implemented",
+                priority="High",
+                tags=["network-security", "firewall", "boundary"],
+                source_document="NIST-800-53-Rev5.pdf"
+            ),
+            SecurityControl(
+                control_id="IR-4",
+                title="Incident Handling",
+                description="Implement an incident handling capability for security incidents.",
+                category="Incident Response",
+                implementation_status="Partially Implemented",
+                priority="High",
+                tags=["incident-response", "security-operations"],
+                source_document="NIST-800-53-Rev5.pdf"
+            ),
+            SecurityControl(
+                control_id="CP-9",
+                title="Information System Backup",
+                description="Conduct backups of user-level and system-level information.",
+                category="Contingency Planning",
+                implementation_status="Implemented",
+                priority="Medium",
+                tags=["backup", "disaster-recovery", "data-protection"],
+                source_document="NIST-800-53-Rev5.pdf"
+            )
+        ]
+
+
+class MockArangoDBClient:
+    """Mock ArangoDB client for testing"""
+    
+    def __init__(self):
+        self.collections = {
+            "controls": {},
+            "frameworks": {},
+            "requirements": {},
+            "mappings": [],
+            "gaps": []
+        }
+        self.edges = {
+            "control_to_requirement": [],
+            "requirement_to_framework": [],
+            "gap_to_control": []
+        }
+        
+    def create_collection(self, name: str, edge: bool = False) -> None:
+        """Create a collection in the mock database"""
+        logger.debug(f"Creating {'edge' if edge else 'document'} collection: {name}")
+        if edge:
+            self.edges[name] = []
+        else:
+            self.collections[name] = {}
+    
+    def insert_document(self, collection: str, document: Dict) -> str:
+        """Insert a document and return its ID"""
+        doc_id = f"{collection}/{len(self.collections.get(collection, {}))}"
+        if collection in self.collections:
+            self.collections[collection][doc_id] = document
+        logger.debug(f"Inserted document {doc_id} into {collection}")
+        return doc_id
+    
+    def insert_edge(self, collection: str, from_id: str, to_id: str, data: Dict) -> None:
+        """Insert an edge between two documents"""
+        edge = {
+            "_from": from_id,
+            "_to": to_id,
+            "data": data
+        }
+        if collection in self.edges:
+            self.edges[collection].append(edge)
+        logger.debug(f"Created edge from {from_id} to {to_id} in {collection}")
+    
+    def query(self, aql: str) -> List[Dict]:
+        """Execute a mock AQL query"""
+        logger.debug(f"Executing AQL: {aql[:100]}...")
+        # Return mock results based on query pattern
+        if "FOR gap IN gaps" in aql:
+            return list(self.collections.get("gaps", {}).values())
+        return []
+
+
+class ComplianceMapper:
+    """Maps security controls to compliance frameworks"""
+    
+    def __init__(self, arango_client: Optional[MockArangoDBClient] = None):
+        """Initialize the compliance mapper"""
+        self.arango = arango_client or MockArangoDBClient()
+        self.controls: List[SecurityControl] = []
+        self.frameworks: Dict[ComplianceFramework, List[ComplianceRequirement]] = {}
+        self.mappings: Dict[str, Dict[ComplianceFramework, List[str]]] = {}
+        self._initialize_frameworks()
+        self._setup_database()
+        
+    def _setup_database(self) -> None:
+        """Set up ArangoDB collections and indexes"""
+        logger.info("Setting up ArangoDB collections")
+        
+        # Document collections
+        self.arango.create_collection("controls")
+        self.arango.create_collection("frameworks")
+        self.arango.create_collection("requirements")
+        self.arango.create_collection("gaps")
+        
+        # Edge collections
+        self.arango.create_collection("control_to_requirement", edge=True)
+        self.arango.create_collection("requirement_to_framework", edge=True)
+        self.arango.create_collection("gap_to_control", edge=True)
+        
+    def _initialize_frameworks(self) -> None:
+        """Initialize compliance framework requirements"""
+        # NIST 800-53 requirements
+        self.frameworks[ComplianceFramework.NIST] = [
+            ComplianceRequirement(
+                requirement_id="AC-2",
+                framework=ComplianceFramework.NIST,
+                title="Account Management",
+                description="Organizations must manage information system accounts",
+                category="Access Control",
+                control_mappings=["AC-2"]
+            ),
+            ComplianceRequirement(
+                requirement_id="AC-3",
+                framework=ComplianceFramework.NIST,
+                title="Access Enforcement",
+                description="Organizations must enforce approved authorizations",
+                category="Access Control",
+                control_mappings=["AC-3"]
+            ),
+            ComplianceRequirement(
+                requirement_id="AU-2",
+                framework=ComplianceFramework.NIST,
+                title="Audit Events",
+                description="Organizations must audit specific events",
+                category="Audit and Accountability",
+                control_mappings=["AU-2"]
+            ),
+            ComplianceRequirement(
+                requirement_id="SC-7",
+                framework=ComplianceFramework.NIST,
+                title="Boundary Protection",
+                description="Organizations must monitor and control communications",
+                category="System and Communications Protection",
+                control_mappings=["SC-7"]
+            )
+        ]
+        
+        # ISO 27001 requirements
+        self.frameworks[ComplianceFramework.ISO27001] = [
+            ComplianceRequirement(
+                requirement_id="A.9.2",
+                framework=ComplianceFramework.ISO27001,
+                title="User Access Management",
+                description="Control allocation of access rights to users",
+                category="Access Control",
+                control_mappings=["AC-2", "AC-3"]
+            ),
+            ComplianceRequirement(
+                requirement_id="A.12.4",
+                framework=ComplianceFramework.ISO27001,
+                title="Logging and Monitoring",
+                description="Record events and generate evidence",
+                category="Operations Security",
+                control_mappings=["AU-2"]
+            ),
+            ComplianceRequirement(
+                requirement_id="A.13.1",
+                framework=ComplianceFramework.ISO27001,
+                title="Network Security Management",
+                description="Protect information in networks",
+                category="Communications Security",
+                control_mappings=["SC-7"]
+            ),
+            ComplianceRequirement(
+                requirement_id="A.16.1",
+                framework=ComplianceFramework.ISO27001,
+                title="Management of Security Incidents",
+                description="Ensure consistent and effective approach to incidents",
+                category="Incident Management",
+                control_mappings=["IR-4"]
+            )
+        ]
+        
+        # SOC 2 requirements
+        self.frameworks[ComplianceFramework.SOC2] = [
+            ComplianceRequirement(
+                requirement_id="CC6.1",
+                framework=ComplianceFramework.SOC2,
+                title="Logical Access Controls",
+                description="Restrict logical access to systems",
+                category="Common Criteria",
+                control_mappings=["AC-2", "AC-3"]
+            ),
+            ComplianceRequirement(
+                requirement_id="CC7.2",
+                framework=ComplianceFramework.SOC2,
+                title="System Monitoring",
+                description="Monitor system performance and security",
+                category="Common Criteria",
+                control_mappings=["AU-2"]
+            ),
+            ComplianceRequirement(
+                requirement_id="A1.2",
+                framework=ComplianceFramework.SOC2,
+                title="System Recovery",
+                description="Recover system functionality",
+                category="Availability",
+                control_mappings=["CP-9"]
+            )
+        ]
+    
+    def load_sparta_controls(self, controls: Optional[List[SecurityControl]] = None) -> None:
+        """Load security controls from SPARTA output"""
+        logger.info("Loading security controls from SPARTA")
+        start_time = time.time()
+        
+        self.controls = controls or MockSpartaData.get_sample_controls()
+        
+        # Store controls in ArangoDB
+        for control in self.controls:
+            doc = {
+                "control_id": control.control_id,
+                "title": control.title,
+                "description": control.description,
+                "category": control.category,
+                "implementation_status": control.implementation_status,
+                "priority": control.priority,
+                "tags": control.tags,
+                "source_document": control.source_document,
+                "extracted_date": control.extracted_date.isoformat() if control.extracted_date else None
+            }
+            control_key = self.arango.insert_document("controls", doc)
+            control.db_key = control_key
+        
+        duration = time.time() - start_time
+        logger.success(f"Loaded {len(self.controls)} controls in {duration:.2f}s")
+    
+    def map_to_frameworks(self) -> Dict[ComplianceFramework, int]:
+        """Map controls to all compliance frameworks"""
+        logger.info("Mapping controls to compliance frameworks")
+        start_time = time.time()
+        mapping_counts = {}
+        
+        for framework, requirements in self.frameworks.items():
+            logger.debug(f"Processing {framework.value}")
+            framework_key = self.arango.insert_document("frameworks", {
+                "name": framework.value,
+                "description": f"Compliance framework: {framework.value}"
+            })
+            
+            mapped_count = 0
+            for requirement in requirements:
+                # Store requirement
+                req_doc = {
+                    "requirement_id": requirement.requirement_id,
+                    "framework": framework.value,
+                    "title": requirement.title,
+                    "description": requirement.description,
+                    "category": requirement.category,
+                    "is_mandatory": requirement.is_mandatory
+                }
+                req_key = self.arango.insert_document("requirements", req_doc)
+                
+                # Create framework edge
+                self.arango.insert_edge(
+                    "requirement_to_framework",
+                    req_key,
+                    framework_key,
+                    {"relationship": "belongs_to"}
+                )
+                
+                # Map controls to requirements
+                for control in self.controls:
+                    if control.control_id in requirement.control_mappings:
+                        self.arango.insert_edge(
+                            "control_to_requirement",
+                            control.db_key,
+                            req_key,
+                            {
+                                "mapping_strength": "direct",
+                                "mapped_date": datetime.now().isoformat()
+                            }
+                        )
+                        mapped_count += 1
+                        
+                        # Track mapping
+                        if control.control_id not in self.mappings:
+                            self.mappings[control.control_id] = {}
+                        if framework not in self.mappings[control.control_id]:
+                            self.mappings[control.control_id][framework] = []
+                        self.mappings[control.control_id][framework].append(requirement.requirement_id)
+            
+            mapping_counts[framework] = mapped_count
+        
+        duration = time.time() - start_time
+        logger.success(f"Completed mapping in {duration:.2f}s")
+        for framework, count in mapping_counts.items():
+            logger.info(f"  {framework.value}: {count} mappings")
+        
+        return mapping_counts
+    
+    def analyze_compliance_gaps(self, framework: Optional[str] = None) -> List[ComplianceGap]:
+        """Analyze gaps in compliance coverage"""
+        logger.info(f"Analyzing compliance gaps{f' for {framework}' if framework else ''}")
+        start_time = time.time()
+        gaps = []
+        
+        frameworks_to_analyze = []
+        if framework:
+            # Find matching framework
+            for fw in ComplianceFramework:
+                if fw.value == framework or fw.name == framework:
+                    frameworks_to_analyze = [fw]
+                    break
+        else:
+            frameworks_to_analyze = list(self.frameworks.keys())
+        
+        for fw in frameworks_to_analyze:
+            requirements = self.frameworks.get(fw, [])
+            
+            for requirement in requirements:
+                missing_controls = []
+                partial_controls = []
+                
+                for control_id in requirement.control_mappings:
+                    # Find control implementation status
+                    control = next((c for c in self.controls if c.control_id == control_id), None)
+                    
+                    if not control or control.implementation_status == "Not Implemented":
+                        missing_controls.append(control_id)
+                    elif control.implementation_status == "Partially Implemented":
+                        partial_controls.append(control_id)
+                
+                # Create gap if controls are missing or partial
+                if missing_controls or partial_controls:
+                    gap = ComplianceGap(
+                        framework=fw,
+                        requirement_id=requirement.requirement_id,
+                        requirement_title=requirement.title,
+                        missing_controls=missing_controls,
+                        partial_controls=partial_controls,
+                        risk_level=self._calculate_risk_level(requirement, missing_controls),
+                        remediation_effort=self._estimate_remediation_effort(missing_controls, partial_controls),
+                        recommendations=self._generate_recommendations(requirement, missing_controls, partial_controls)
+                    )
+                    gaps.append(gap)
+                    
+                    # Store gap in ArangoDB
+                    gap_doc = {
+                        "framework": fw.value,
+                        "requirement_id": requirement.requirement_id,
+                        "requirement_title": requirement.title,
+                        "missing_controls": missing_controls,
+                        "partial_controls": partial_controls,
+                        "risk_level": gap.risk_level,
+                        "remediation_effort": gap.remediation_effort,
+                        "recommendations": gap.recommendations,
+                        "identified_date": datetime.now().isoformat()
+                    }
+                    gap_key = self.arango.insert_document("gaps", gap_doc)
+        
+        duration = time.time() - start_time
+        logger.success(f"Identified {len(gaps)} compliance gaps in {duration:.2f}s")
+        
+        # Log gap summary
+        by_risk = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
+        for gap in gaps:
+            by_risk[gap.risk_level] += 1
+        
+        logger.info("Gap Summary by Risk Level:")
+        for level, count in by_risk.items():
+            if count > 0:
+                logger.info(f"  {level}: {count} gaps")
+        
+        return gaps
+    
+    def _calculate_risk_level(self, requirement: ComplianceRequirement, missing_controls: List[str]) -> str:
+        """Calculate risk level based on missing controls"""
+        if not missing_controls:
+            return "Low"
+        
+        # Check control priorities
+        high_priority_missing = 0
+        for control_id in missing_controls:
+            control = next((c for c in self.controls if c.control_id == control_id), None)
+            if control and control.priority == "High":
+                high_priority_missing += 1
+        
+        if high_priority_missing > 1 or (high_priority_missing == 1 and requirement.is_mandatory):
+            return "Critical"
+        elif high_priority_missing == 1:
+            return "High"
+        elif len(missing_controls) > 1:
+            return "Medium"
+        else:
+            return "Low"
+    
+    def _estimate_remediation_effort(self, missing_controls: List[str], partial_controls: List[str]) -> str:
+        """Estimate effort required to remediate gaps"""
+        total_controls = len(missing_controls) + len(partial_controls)
+        
+        if total_controls == 0:
+            return "None"
+        elif total_controls == 1 and partial_controls:
+            return "Low"
+        elif total_controls <= 2:
+            return "Medium"
+        elif total_controls <= 4:
+            return "High"
+        else:
+            return "Very High"
+    
+    def _generate_recommendations(self, requirement: ComplianceRequirement, 
+                                 missing_controls: List[str], 
+                                 partial_controls: List[str]) -> List[str]:
+        """Generate remediation recommendations"""
+        recommendations = []
+        
+        for control_id in missing_controls:
+            control = next((c for c in self.controls if c.control_id == control_id), None)
+            if control:
+                if "access" in control.tags:
+                    recommendations.append(f"Implement {control.title} using identity management system")
+                elif "audit" in control.tags or "logging" in control.tags:
+                    recommendations.append(f"Deploy centralized logging for {control.title}")
+                elif "network" in control.tags:
+                    recommendations.append(f"Configure network security controls for {control.title}")
+                else:
+                    recommendations.append(f"Develop implementation plan for {control.title}")
+        
+        for control_id in partial_controls:
+            control = next((c for c in self.controls if c.control_id == control_id), None)
+            if control:
+                recommendations.append(f"Complete implementation of {control.title}")
+        
+        # Add framework-specific recommendations
+        if requirement.framework == ComplianceFramework.SOC2:
+            recommendations.append("Schedule SOC 2 readiness assessment")
+        elif requirement.framework == ComplianceFramework.ISO27001:
+            recommendations.append("Update ISMS documentation")
+        
+        return recommendations[:5]  # Limit to top 5 recommendations
+    
+    def generate_compliance_report(self, output_path: Optional[Path] = None) -> Path:
+        """Generate comprehensive compliance report"""
+        logger.info("Generating compliance report")
+        start_time = time.time()
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = output_path or Path(f"compliance_report_{timestamp}.md")
+        
+        # Build report content
+        report = [
+            "# Compliance Framework Mapping Report",
+            f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            f"\nTotal Controls: {len(self.controls)}",
+            f"Total Frameworks: {len(self.frameworks)}",
+            "\n## Executive Summary\n"
+        ]
+        
+        # Control implementation summary
+        impl_status = {"Implemented": 0, "Partially Implemented": 0, "Not Implemented": 0}
+        for control in self.controls:
+            impl_status[control.implementation_status] += 1
+        
+        report.append("### Control Implementation Status\n")
+        report.append("| Status | Count | Percentage |")
+        report.append("|--------|-------|------------|")
+        total = len(self.controls)
+        for status, count in impl_status.items():
+            pct = (count / total * 100) if total > 0 else 0
+            report.append(f"| {status} | {count} | {pct:.1f}% |")
+        
+        # Framework coverage
+        report.append("\n### Framework Coverage\n")
+        report.append("| Framework | Requirements | Mapped Controls | Coverage |")
+        report.append("|-----------|--------------|-----------------|----------|")
+        
+        for framework, requirements in self.frameworks.items():
+            total_mappings = sum(len(r.control_mappings) for r in requirements)
+            mapped = sum(1 for c in self.controls 
+                        for r in requirements 
+                        if c.control_id in r.control_mappings)
+            coverage = (mapped / total_mappings * 100) if total_mappings > 0 else 0
+            report.append(f"| {framework.value} | {len(requirements)} | {mapped} | {coverage:.1f}% |")
+        
+        # Detailed gap analysis
+        gaps = self.analyze_compliance_gaps()
+        
+        report.append("\n## Gap Analysis\n")
+        report.append(f"Total Gaps Identified: {len(gaps)}\n")
+        
+        # Group gaps by framework
+        gaps_by_framework = {}
+        for gap in gaps:
+            if gap.framework not in gaps_by_framework:
+                gaps_by_framework[gap.framework] = []
+            gaps_by_framework[gap.framework].append(gap)
+        
+        for framework, fw_gaps in gaps_by_framework.items():
+            report.append(f"\n### {framework.value}\n")
+            report.append("| Requirement | Risk Level | Missing | Partial | Effort |")
+            report.append("|-------------|------------|---------|---------|--------|")
+            
+            for gap in fw_gaps:
+                report.append(f"| {gap.requirement_id}: {gap.requirement_title} | "
+                            f"{gap.risk_level} | {len(gap.missing_controls)} | "
+                            f"{len(gap.partial_controls)} | {gap.remediation_effort} |")
+        
+        # Recommendations
+        report.append("\n## Prioritized Recommendations\n")
+        
+        # Get critical and high risk gaps
+        critical_gaps = [g for g in gaps if g.risk_level == "Critical"]
+        high_gaps = [g for g in gaps if g.risk_level == "High"]
+        
+        if critical_gaps:
+            report.append("\n### Critical Priority\n")
+            for gap in critical_gaps[:5]:  # Top 5 critical
+                report.append(f"\n**{gap.framework.value} - {gap.requirement_id}**")
+                for rec in gap.recommendations[:3]:
+                    report.append(f"- {rec}")
+        
+        if high_gaps:
+            report.append("\n### High Priority\n")
+            for gap in high_gaps[:3]:  # Top 3 high
+                report.append(f"\n**{gap.framework.value} - {gap.requirement_id}**")
+                for rec in gap.recommendations[:2]:
+                    report.append(f"- {rec}")
+        
+        # Write report
+        output_path.write_text("\n".join(report))
+        
+        duration = time.time() - start_time
+        logger.success(f"Generated compliance report in {duration:.2f}s: {output_path}")
+        
+        return output_path
+
+
+def test_compliance_mapping():
+    """Test compliance mapping functionality"""
+    logger.info("=== Testing Compliance Mapping Pipeline ===")
+    
+    # Test 1: Load SPARTA controls
+    logger.info("\n[Test 1] Loading SPARTA controls")
+    start = time.time()
+    mapper = ComplianceMapper()
+    mapper.load_sparta_controls()
+    duration = time.time() - start
+    
+    assert len(mapper.controls) == 6, f"Expected 6 controls, got {len(mapper.controls)}"
+    logger.success(f"✅ Loaded {len(mapper.controls)} controls in {duration:.2f}s")
+    
+    # Test 2: Map to frameworks
+    logger.info("\n[Test 2] Mapping controls to frameworks")
+    start = time.time()
+    mapping_counts = mapper.map_to_frameworks()
+    duration = time.time() - start
+    
+    assert len(mapping_counts) == 3, f"Expected 3 frameworks, got {len(mapping_counts)}"
+    assert mapping_counts[ComplianceFramework.NIST] > 0, "No NIST mappings found"
+    logger.success(f"✅ Created framework mappings in {duration:.2f}s")
+    
+    # Test 3: Analyze compliance gaps
+    logger.info("\n[Test 3] Analyzing compliance gaps")
+    start = time.time()
+    gaps = mapper.analyze_compliance_gaps()
+    duration = time.time() - start
+    
+    assert len(gaps) > 0, "No compliance gaps identified"
+    critical_gaps = [g for g in gaps if g.risk_level == "Critical"]
+    logger.success(f"✅ Identified {len(gaps)} gaps ({len(critical_gaps)} critical) in {duration:.2f}s")
+    
+    # Test 4: Framework-specific gap analysis
+    logger.info("\n[Test 4] Framework-specific gap analysis")
+    start = time.time()
+    nist_gaps = mapper.analyze_compliance_gaps("NIST")
+    duration = time.time() - start
+    
+    assert all(g.framework == ComplianceFramework.NIST for g in nist_gaps), "Non-NIST gaps returned"
+    logger.success(f"✅ Analyzed NIST-specific gaps in {duration:.2f}s")
+    
+    # Test 5: Generate compliance report
+    logger.info("\n[Test 5] Generating compliance report")
+    start = time.time()
+    report_path = mapper.generate_compliance_report()
+    duration = time.time() - start
+    
+    assert report_path.exists(), "Report file not created"
+    assert report_path.stat().st_size > 1000, "Report seems too small"
+    logger.success(f"✅ Generated report ({report_path.stat().st_size} bytes) in {duration:.2f}s")
+    
+    # Test 6: Edge case - missing control
+    logger.info("\n[Test 6] Testing edge case - missing control mapping")
+    orphan_requirement = ComplianceRequirement(
+        requirement_id="XX-99",
+        framework=ComplianceFramework.NIST,
+        title="Orphan Requirement",
+        description="Requirement with no matching controls",
+        category="Test",
+        control_mappings=["XX-99"]  # Non-existent control
+    )
+    mapper.frameworks[ComplianceFramework.NIST].append(orphan_requirement)
+    
+    gaps = mapper.analyze_compliance_gaps("NIST")
+    orphan_gaps = [g for g in gaps if g.requirement_id == "XX-99"]
+    assert len(orphan_gaps) == 1, "Orphan requirement gap not found"
+    assert len(orphan_gaps[0].missing_controls) == 1, "Missing control not identified"
+    logger.success("✅ Correctly handled missing control mapping")
+    
+    # Summary
+    logger.info("\n=== Test Summary ===")
+    logger.info(f"Total controls loaded: {len(mapper.controls)}")
+    logger.info(f"Total frameworks: {len(mapper.frameworks)}")
+    logger.info(f"Total gaps identified: {len(gaps)}")
+    logger.info(f"Report generated: {report_path}")
+    
+    return True
+
+
+if __name__ == "__main__":
+    # Configure logging
+    logger.remove()
+    logger.add(
+        lambda msg: print(msg),
+        format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
+        colorize=True
+    )
+    
+    try:
+        # Run validation tests
+        success = test_compliance_mapping()
+        
+        if success:
+            logger.success("\n✅ All compliance mapping tests passed!")
+            exit(0)
+        else:
+            logger.error("\n❌ Some tests failed")
+            exit(1)
+            
+    except Exception as e:
+        logger.exception(f"❌ Unexpected error: {e}")
+        exit(1)

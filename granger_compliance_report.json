@@ -1,0 +1,849 @@
+{
+  "timestamp": "2025-06-10T08:08:08.879861",
+  "total_projects": 14,
+  "summary": {
+    "fully_compliant": 0,
+    "minor_issues": 3,
+    "major_issues": 11,
+    "not_found": 0
+  },
+  "projects": {
+    "granger_hub": {
+      "name": "granger_hub",
+      "path": "/home/graham/workspace/experiments/granger_hub",
+      "github": "git+https://github.com/grahama1970/granger_hub.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [
+            "Mock usage found in tests/integration_scenarios/base/module_mock.py"
+          ],
+          "total_mock_issues": 1,
+          "severity": "major"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "rl_commons": {
+      "name": "rl_commons",
+      "path": "/home/graham/workspace/experiments/rl_commons",
+      "github": "git+https://github.com/grahama1970/rl-commons.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons/issues",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons/docs"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [
+            "Missing required directory: examples/"
+          ],
+          "severity": "minor"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found",
+            "No mcp/ directory found in src/"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "claude-test-reporter": {
+      "name": "claude-test-reporter",
+      "path": "/home/graham/workspace/experiments/claude-test-reporter",
+      "github": "git+https://github.com/grahama1970/claude-test-reporter.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "sparta": {
+      "name": "sparta",
+      "path": "/home/graham/workspace/experiments/sparta",
+      "github": "git+https://github.com/grahama1970/SPARTA.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/llm_call.git"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "marker": {
+      "name": "marker",
+      "path": "/home/graham/workspace/experiments/marker",
+      "github": "git+https://github.com/grahama1970/marker.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/marker",
+            "GitHub dependency missing git+ prefix: https://github.com/VikParuchuri/marker"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "arangodb": {
+      "name": "arangodb",
+      "path": "/home/graham/workspace/experiments/arangodb",
+      "github": "git+https://github.com/grahama1970/arangodb.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "minor"
+    },
+    "youtube_transcripts": {
+      "name": "youtube_transcripts",
+      "path": "/home/graham/workspace/experiments/youtube_transcripts",
+      "github": "git+https://github.com/grahama1970/youtube-transcripts-search.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools",
+            "numpy version not locked to 1.26.4",
+            "pandas not constrained to >=2.2.3,<2.3.0",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/youtube_transcripts",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/youtube_transcripts/blob/main/README.md"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "llm_call": {
+      "name": "llm_call",
+      "path": "/home/graham/workspace/experiments/llm_call",
+      "github": "git+https://github.com/grahama1970/llm_call.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Python version ~=3.10 does not meet >=3.10.11 requirement",
+            "Using hatchling/poetry instead of setuptools",
+            "pillow not constrained to >=10.1.0,<11.0.0",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/llm_call",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl-commons.git"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found",
+            "No mcp/ directory found in src/"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "unsloth_wip": {
+      "name": "unsloth_wip",
+      "path": "/home/graham/workspace/experiments/unsloth_wip",
+      "github": "git+https://github.com/grahama1970/unsloth_wip.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "minor"
+    },
+    "arxiv-mcp-server": {
+      "name": "arxiv-mcp-server",
+      "path": "/home/graham/workspace/mcp-servers/arxiv-mcp-server",
+      "github": "git+https://github.com/blazickjp/arxiv-mcp-server.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/claude-test-reporter.git",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/claude-test-reporter.git"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "mcp-screenshot": {
+      "name": "mcp-screenshot",
+      "path": "/home/graham/workspace/experiments/mcp-screenshot",
+      "github": "git+https://github.com/grahama1970/mcp-screenshot.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "uv.lock file not found"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "minor"
+    },
+    "annotator": {
+      "name": "annotator",
+      "path": "/home/graham/workspace/experiments/annotator",
+      "github": "git+https://github.com/grahama1970/marker-ground-truth.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found",
+            "No mcp/ directory found in src/"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "aider-daemon": {
+      "name": "aider-daemon",
+      "path": "/home/graham/workspace/experiments/aider-daemon",
+      "github": "git+https://github.com/grahama1970/aider-daemon.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Using hatchling/poetry instead of setuptools",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/aider-daemon",
+            "GitHub dependency missing git+ prefix: https://github.com/Aider-AI/aider",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/aider-daemon/tree/main/docs"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    },
+    "memvid": {
+      "name": "memvid",
+      "path": "/home/graham/workspace/experiments/memvid",
+      "github": "git+https://github.com/grahama1970/memvid.git",
+      "exists": true,
+      "checks": {
+        "pyproject": {
+          "exists": true,
+          "issues": [
+            "Python version >=3.9 does not meet >=3.10.11 requirement",
+            "numpy version not locked to 1.26.4",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid/issues",
+            "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid/blob/main/README.md"
+          ],
+          "severity": "major"
+        },
+        "env_example": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "structure": {
+          "exists": true,
+          "issues": [],
+          "severity": "compliant"
+        },
+        "uv_usage": {
+          "exists": true,
+          "issues": [
+            "uv.lock file not found",
+            "README.md does not mention UV usage"
+          ],
+          "severity": "minor"
+        },
+        "no_mocks": {
+          "exists": true,
+          "issues": [],
+          "total_mock_issues": 0,
+          "severity": "compliant"
+        },
+        "mcp_integration": {
+          "exists": true,
+          "issues": [
+            "mcp.json not found",
+            "No mcp/ directory found in src/"
+          ],
+          "severity": "minor"
+        }
+      },
+      "issues": [],
+      "severity": "major"
+    }
+  },
+  "action_plan": [
+    {
+      "priority": 1,
+      "project": "aider-daemon",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/aider-daemon",
+        "GitHub dependency missing git+ prefix: https://github.com/Aider-AI/aider",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/aider-daemon/tree/main/docs"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "annotator",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "arxiv-mcp-server",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/claude-test-reporter.git",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/claude-test-reporter.git"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "claude-test-reporter",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "granger_hub",
+      "category": "no_mocks",
+      "issues": [
+        "Mock usage found in tests/integration_scenarios/base/module_mock.py"
+      ],
+      "action": "Replace mock usage with real service connections in tests"
+    },
+    {
+      "priority": 1,
+      "project": "llm_call",
+      "category": "pyproject",
+      "issues": [
+        "Python version ~=3.10 does not meet >=3.10.11 requirement",
+        "Using hatchling/poetry instead of setuptools",
+        "pillow not constrained to >=10.1.0,<11.0.0",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/llm_call",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl-commons.git"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "marker",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/marker",
+        "GitHub dependency missing git+ prefix: https://github.com/VikParuchuri/marker"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "memvid",
+      "category": "pyproject",
+      "issues": [
+        "Python version >=3.9 does not meet >=3.10.11 requirement",
+        "numpy version not locked to 1.26.4",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid/issues",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/memvid/blob/main/README.md"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "rl_commons",
+      "category": "pyproject",
+      "issues": [
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons/issues",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/rl_commons/docs"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "sparta",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/llm_call.git"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 1,
+      "project": "youtube_transcripts",
+      "category": "pyproject",
+      "issues": [
+        "Using hatchling/poetry instead of setuptools",
+        "numpy version not locked to 1.26.4",
+        "pandas not constrained to >=2.2.3,<2.3.0",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/youtube_transcripts",
+        "GitHub dependency missing git+ prefix: https://github.com/grahama1970/youtube_transcripts/blob/main/README.md"
+      ],
+      "action": "Update pyproject.toml to use setuptools and correct dependency versions"
+    },
+    {
+      "priority": 2,
+      "project": "arangodb",
+      "category": "mcp_integration",
+      "issues": [
+        "mcp.json not found"
+      ],
+      "action": "Add MCP integration following the standards guide"
+    },
+    {
+      "priority": 2,
+      "project": "mcp-screenshot",
+      "category": "uv_usage",
+      "issues": [
+        "uv.lock file not found"
+      ],
+      "action": "Run 'uv init' and update README.md with UV instructions"
+    },
+    {
+      "priority": 2,
+      "project": "mcp-screenshot",
+      "category": "mcp_integration",
+      "issues": [
+        "mcp.json not found"
+      ],
+      "action": "Add MCP integration following the standards guide"
+    },
+    {
+      "priority": 2,
+      "project": "unsloth_wip",
+      "category": "uv_usage",
+      "issues": [
+        "README.md does not mention UV usage"
+      ],
+      "action": "Run 'uv init' and update README.md with UV instructions"
+    },
+    {
+      "priority": 2,
+      "project": "unsloth_wip",
+      "category": "mcp_integration",
+      "issues": [
+        "mcp.json not found"
+      ],
+      "action": "Add MCP integration following the standards guide"
+    }
+  ]
+}

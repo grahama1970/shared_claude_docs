@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Get feedback from Gemini on the improved bug hunt results.
+"""
+
+import os
+import sys
+import json
+from pathlib import Path
+from datetime import datetime
+
+def get_gemini_feedback(report_content):
+    """Get feedback from Gemini using direct API."""
+    print("🔍 Getting feedback from Gemini on V3 results...")
+    
+    try:
+        import google.generativeai as genai
+        
+        # Configure Gemini
+        api_key = "AIzaSyDn3iI70uflxg4NzoQ09zH9yVzvBqbnx9c"
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = f"""You previously critiqued our bug hunt report for having a 100% pass rate despite finding bugs. We've now implemented your feedback in V3. Please review the improved report:
+
+{report_content}
+
+Key improvements made based on your feedback:
+1. Tests that find bugs now correctly FAIL (40% pass rate)
+2. Each bug has severity justification
+3. 5 Whys root cause analysis included
+4. Specific test cases with expected outcomes
+5. Business impact assessment for each bug
+6. Test coverage metrics included
+
+Please provide:
+1. Assessment of improvements - did we address your concerns?
+2. Remaining gaps or issues
+3. Are the security bugs correctly prioritized?
+4. Is the root cause analysis sufficient?
+5. Next iteration recommendations
+
+Be thorough but also acknowledge improvements made."""
+
+        response = model.generate_content(prompt)
+        return response.text
+        
+    except Exception as e:
+        return f"Failed to get Gemini feedback: {e}"
+
+def main():
+    """Get AI feedback on V3 bug hunt results."""
+    # Read the latest bug hunt report
+    report_path = Path("002_Bug_Hunt_Report.md")
+    if not report_path.exists():
+        print("Error: No V3 bug hunt report found")
+        return 1
+        
+    report_content = report_path.read_text()
+    
+    # Get Gemini feedback
+    feedback = get_gemini_feedback(report_content[:4000])  # Limit size
+    
+    # Save feedback
+    feedback_path = Path("002_Gemini_Feedback.md")
+    content = f"""# Gemini Feedback on Bug Hunt V3
+
+**Date**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+## Gemini's Assessment
+
+{feedback}
+
+## Action Items Based on Feedback
+
+1. Review Gemini's assessment
+2. Implement any remaining recommendations
+3. Continue iterations until satisfied
+"""
+    
+    feedback_path.write_text(content)
+    print(f"\n✅ Gemini feedback saved to: {feedback_path}")
+    
+    # Print summary
+    print("\n" + "="*80)
+    print("GEMINI FEEDBACK SUMMARY:")
+    print("="*80)
+    print(feedback[:800] + "..." if len(feedback) > 800 else feedback)
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

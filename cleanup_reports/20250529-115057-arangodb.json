@@ -1,0 +1,36 @@
+{
+  "project": "/home/graham/workspace/experiments/arangodb",
+  "name": "arangodb",
+  "type": "database",
+  "timestamp": "20250529-115057",
+  "issues": [
+    "Missing MCP configuration file",
+    "Missing MCP methods: handle_request, handle_response, get_capabilities"
+  ],
+  "warnings": [
+    "README.md missing sections: requirements",
+    "Tests directory exists but contains no test files",
+    "No slash commands documented for Claude project",
+    "MCP dependencies not declared in pyproject.toml",
+    "Some README features may lack implementation",
+    "High technical debt: 9412 TODO/FIXME comments"
+  ],
+  "suggestions": [],
+  "validations": {
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    },
+    "mcp": {
+      "config": null,
+      "methods": false
+    }
+  },
+  "status": "issues"
+}

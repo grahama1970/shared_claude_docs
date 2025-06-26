@@ -1,0 +1,738 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: memvid_bug_hunter_scenarios.py
+Description: Specialized bug hunting scenarios for the memvid visual memory storage module
+
+External Dependencies:
+- cv2: https://opencv.org/
+- qrcode: https://pypi.org/project/qrcode/
+- numpy: https://numpy.org/
+
+Sample Input:
+>>> hunter = MemvidBugHunter()
+>>> bugs = hunter.hunt_all_memvid_bugs()
+
+Expected Output:
+>>> print(bugs)
+[
+    {'description': 'QR code generation fails with Unicode text', 'severity': 'high'},
+    {'description': 'Video codec memory leak on large documents', 'severity': 'critical'}
+]
+"""
+
+import sys
+import time
+import uuid
+from typing import List, Dict, Any
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+sys.path.append('/home/graham/workspace/experiments/memvid/src')
+
+try:
+    import memvid
+    MEMVID_AVAILABLE = True
+except ImportError:
+    MEMVID_AVAILABLE = False
+
+# Import base class
+from granger_bug_hunter import TestScenario
+
+
+class MemvidResilienceScenario(TestScenario):
+    """Test memvid's resilience to edge cases"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Memvid Visual Memory Resilience",
+            level=0,
+            creativity=2,
+            bug_target="QR encoding, video compression, visual data integrity"
+        )
+        
+    def hunt_qr_encoding_bugs(self) -> List[Dict[str, Any]]:
+        """Hunt for QR code encoding edge cases"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return [{'description': 'Memvid not available', 'severity': 'critical'}]
+        
+        # Test various data types
+        test_cases = [
+            # Edge case data
+            {"data": "", "name": "empty_string"},
+            {"data": "a" * 10000, "name": "very_long_text"},
+            {"data": "🎬📸🎥", "name": "emoji_text"},
+            {"data": "Hello\x00World", "name": "null_byte"},
+            {"data": "Line1\nLine2\rLine3", "name": "newlines"},
+            {"data": "<script>alert('xss')</script>", "name": "html_injection"},
+            {"data": "A" * 2953, "name": "qr_limit"},  # QR code limit
+            {"data": {"nested": {"json": "data"}}, "name": "nested_json"},
+        ]
+        
+        for test in test_cases:
+            try:
+                start = time.time()
+                result = memvid.encode_to_qr(test["data"])
+                duration = time.time() - start
+                
+                if duration < 0.001:
+                    bugs.append({
+                        'description': f'QR encoding too fast for {test["name"]}: {duration}s',
+                        'severity': 'medium',
+                        'type': 'performance',
+                        'modules_affected': ['memvid'],
+                    })
+                
+                # Try to decode it back
+                decoded = memvid.decode_from_qr(result)
+                if str(decoded) != str(test["data"]):
+                    bugs.append({
+                        'description': f'QR roundtrip failed for {test["name"]}',
+                        'severity': 'high',
+                        'type': 'data_integrity',
+                        'modules_affected': ['memvid'],
+                    })
+                    
+            except Exception as e:
+                if test["name"] in ["empty_string", "emoji_text"]:
+                    bugs.append({
+                        'description': f'Valid input rejected: {test["name"]} - {e}',
+                        'severity': 'high',
+                        'type': 'validation',
+                        'modules_affected': ['memvid'],
+                    })
+                    
+        return bugs
+    
+    def hunt_video_compression_bugs(self) -> List[Dict[str, Any]]:
+        """Hunt for video compression issues"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        # Test different document sizes and types
+        test_documents = [
+            {"size": 100, "type": "text"},
+            {"size": 10000, "type": "json"},
+            {"size": 1000000, "type": "binary"},
+            {"size": 10000000, "type": "mixed"},
+        ]
+        
+        import psutil
+        process = psutil.Process()
+        initial_memory = process.memory_info().rss / 1024 / 1024
+        
+        for doc in test_documents:
+            try:
+                # Generate test data
+                if doc["type"] == "text":
+                    data = "X" * doc["size"]
+                elif doc["type"] == "json":
+                    data = {"data": "X" * (doc["size"] // 2), "meta": {"size": doc["size"]}}
+                elif doc["type"] == "binary":
+                    data = bytes(range(256)) * (doc["size"] // 256)
+                else:
+                    data = {"text": "X" * (doc["size"] // 2), "binary": bytes(doc["size"] // 2)}
+                
+                # Encode to video
+                video_path = memvid.encode_to_video(data, f"test_{doc['type']}_{doc['size']}")
+                
+                # Check compression ratio
+                video_size = Path(video_path).stat().st_size
+                compression_ratio = doc["size"] / video_size if video_size > 0 else 0
+                
+                if compression_ratio < 0.5:
+                    bugs.append({
+                        'description': f'Poor compression for {doc["type"]}: {compression_ratio:.2f}x',
+                        'severity': 'medium',
+                        'type': 'performance',
+                        'modules_affected': ['memvid'],
+                    })
+                
+                # Check memory usage
+                current_memory = process.memory_info().rss / 1024 / 1024
+                memory_growth = current_memory - initial_memory
+                
+                if memory_growth > doc["size"] / 1024 / 1024 * 2:  # More than 2x data size
+                    bugs.append({
+                        'description': f'Excessive memory use for {doc["size"]} bytes: {memory_growth:.1f}MB',
+                        'severity': 'high',
+                        'type': 'memory',
+                        'modules_affected': ['memvid'],
+                    })
+                    
+            except MemoryError:
+                bugs.append({
+                    'description': f'Out of memory encoding {doc["size"]} bytes',
+                    'severity': 'critical',
+                    'type': 'memory',
+                    'modules_affected': ['memvid'],
+                })
+            except Exception as e:
+                if doc["size"] < 1000000:  # Should handle up to 1MB easily
+                    bugs.append({
+                        'description': f'Failed on reasonable size {doc["size"]}: {e}',
+                        'severity': 'high',
+                        'type': 'stability',
+                        'modules_affected': ['memvid'],
+                    })
+                    
+        return bugs
+    
+    def execute(self) -> List[Dict[str, Any]]:
+        """Execute all resilience tests"""
+        bugs = []
+        bugs.extend(self.hunt_qr_encoding_bugs())
+        bugs.extend(self.hunt_video_compression_bugs())
+        bugs.extend(self.hunt_memory_management_bugs())
+        return bugs
+
+
+class MemvidIntegrationScenario(TestScenario):
+    """Test memvid integration with other Granger modules"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Memvid Integration Testing",
+            level=1,
+            creativity=2,
+            bug_target="Integration with Marker, ArangoDB, temporal tracking"
+        )
+        
+    def hunt_marker_integration_bugs(self) -> List[Dict[str, Any]]:
+        """Test Memvid + Marker visual preservation"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        try:
+            import marker
+            marker_available = True
+        except ImportError:
+            bugs.append({
+                'description': 'Marker not available for integration test',
+                'severity': 'medium',
+                'type': 'integration',
+                'modules_affected': ['memvid', 'marker'],
+            })
+            marker_available = False
+            
+        if marker_available:
+            # Test visual preservation workflow
+            test_pdfs = [
+                "simple_text.pdf",
+                "complex_tables.pdf", 
+                "mixed_content.pdf",
+            ]
+            
+            for pdf in test_pdfs:
+                try:
+                    # Extract with Marker
+                    extracted = marker.extract(pdf)
+                    
+                    # Store in Memvid
+                    video_result = memvid.store_document(
+                        content=extracted.text,
+                        visual_elements=extracted.images,
+                        metadata={"source": pdf}
+                    )
+                    
+                    # Verify preservation
+                    retrieved = memvid.retrieve_document(video_result.id)
+                    
+                    if len(retrieved.visual_elements) != len(extracted.images):
+                        bugs.append({
+                            'description': f'Visual elements lost: {len(extracted.images)} -> {len(retrieved.visual_elements)}',
+                            'severity': 'high',
+                            'type': 'data_loss',
+                            'modules_affected': ['memvid', 'marker'],
+                        })
+                        
+                except AttributeError as e:
+                    bugs.append({
+                        'description': f'API mismatch between Marker and Memvid: {e}',
+                        'severity': 'high',
+                        'type': 'integration',
+                        'modules_affected': ['memvid', 'marker'],
+                    })
+                    
+        return bugs
+    
+    def hunt_arangodb_integration_bugs(self) -> List[Dict[str, Any]]:
+        """Test Memvid + ArangoDB index storage"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        try:
+            from arango import ArangoClient
+            client = ArangoClient(hosts='http://localhost:8529')
+            db = client.db('test')
+            arango_available = True
+        except:
+            bugs.append({
+                'description': 'ArangoDB not available for integration test',
+                'severity': 'medium',
+                'type': 'integration',
+                'modules_affected': ['memvid', 'arangodb'],
+            })
+            arango_available = False
+            
+        if arango_available:
+            # Test index synchronization
+            test_videos = []
+            
+            for i in range(10):
+                try:
+                    # Create video memory
+                    video_id = memvid.create_memory(
+                        content=f"Test document {i}",
+                        tags=["test", f"batch_{i//5}"]
+                    )
+                    test_videos.append(video_id)
+                    
+                    # Store index in ArangoDB
+                    db_result = db.collection('memvid_index').insert({
+                        'video_id': video_id,
+                        'content_hash': memvid.get_content_hash(video_id),
+                        'created_at': time.time(),
+                        'tags': ["test", f"batch_{i//5}"]
+                    })
+                    
+                except Exception as e:
+                    bugs.append({
+                        'description': f'Failed to sync video {i} to ArangoDB: {e}',
+                        'severity': 'high',
+                        'type': 'integration',
+                        'modules_affected': ['memvid', 'arangodb'],
+                    })
+            
+            # Test retrieval consistency
+            for video_id in test_videos[:5]:
+                try:
+                    # Get from Memvid
+                    memvid_data = memvid.retrieve_memory(video_id)
+                    
+                    # Get from ArangoDB
+                    cursor = db.aql.execute(
+                        'FOR doc IN memvid_index FILTER doc.video_id == @vid RETURN doc',
+                        bind_vars={'vid': video_id}
+                    )
+                    arango_data = list(cursor)
+                    
+                    if not arango_data:
+                        bugs.append({
+                            'description': f'Video {video_id} not found in ArangoDB index',
+                            'severity': 'critical',
+                            'type': 'data_consistency',
+                            'modules_affected': ['memvid', 'arangodb'],
+                        })
+                        
+                except Exception as e:
+                    bugs.append({
+                        'description': f'Retrieval mismatch: {e}',
+                        'severity': 'high',
+                        'type': 'integration',
+                        'modules_affected': ['memvid', 'arangodb'],
+                    })
+                    
+        return bugs
+    
+    def execute(self) -> List[Dict[str, Any]]:
+        """Execute all integration tests"""
+        bugs = []
+        bugs.extend(self.hunt_marker_integration_bugs())
+        bugs.extend(self.hunt_arangodb_sync_bugs())
+        return bugs
+
+
+class MemvidTemporalScenario(TestScenario):
+    """Test memvid's temporal tracking capabilities"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Memvid Temporal Evolution Testing",
+            level=2,
+            creativity=3,
+            bug_target="Document versioning, temporal queries, evolution tracking"
+        )
+        
+    def hunt_temporal_tracking_bugs(self) -> List[Dict[str, Any]]:
+        """Test document evolution tracking"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        # Create evolving document
+        doc_id = str(uuid.uuid4())
+        versions = []
+        
+        for version in range(10):
+            try:
+                content = {
+                    "version": version,
+                    "text": f"Document content version {version}",
+                    "timestamp": time.time(),
+                    "changes": ["change_" + str(i) for i in range(version)]
+                }
+                
+                # Store version
+                result = memvid.store_version(
+                    doc_id=doc_id,
+                    content=content,
+                    version=version
+                )
+                versions.append(result)
+                
+                # Small delay to ensure temporal ordering
+                time.sleep(0.1)
+                
+            except Exception as e:
+                bugs.append({
+                    'description': f'Failed to store version {version}: {e}',
+                    'severity': 'high',
+                    'type': 'versioning',
+                    'modules_affected': ['memvid'],
+                })
+        
+        # Test temporal queries
+        try:
+            # Get specific version
+            v5 = memvid.get_version(doc_id, version=5)
+            if v5.get('version') != 5:
+                bugs.append({
+                    'description': 'Version retrieval returned wrong version',
+                    'severity': 'critical',
+                    'type': 'versioning',
+                    'modules_affected': ['memvid'],
+                })
+            
+            # Get version history
+            history = memvid.get_version_history(doc_id)
+            if len(history) != len(versions):
+                bugs.append({
+                    'description': f'Version history incomplete: {len(history)} vs {len(versions)}',
+                    'severity': 'high',
+                    'type': 'versioning',
+                    'modules_affected': ['memvid'],
+                })
+            
+            # Test temporal range query
+            start_time = versions[3]['timestamp']
+            end_time = versions[7]['timestamp']
+            range_versions = memvid.get_versions_in_range(doc_id, start_time, end_time)
+            
+            if len(range_versions) != 5:  # Should get versions 3-7
+                bugs.append({
+                    'description': f'Temporal range query wrong: got {len(range_versions)} versions',
+                    'severity': 'high',
+                    'type': 'temporal_query',
+                    'modules_affected': ['memvid'],
+                })
+                
+        except AttributeError as e:
+            bugs.append({
+                'description': f'Temporal API not implemented: {e}',
+                'severity': 'critical',
+                'type': 'missing_feature',
+                'modules_affected': ['memvid'],
+            })
+            
+        return bugs
+    
+    def hunt_concurrent_version_bugs(self) -> List[Dict[str, Any]]:
+        """Test concurrent version updates"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        doc_id = str(uuid.uuid4())
+        
+        # Concurrent version updates
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = []
+            
+            for i in range(20):
+                future = executor.submit(
+                    memvid.store_version,
+                    doc_id=doc_id,
+                    content=f"Concurrent update {i}",
+                    version=i
+                )
+                futures.append(future)
+            
+            results = []
+            errors = []
+            
+            for future in futures:
+                try:
+                    results.append(future.result())
+                except Exception as e:
+                    errors.append(e)
+            
+            # Check for version conflicts
+            if len(errors) > 0:
+                conflict_errors = [e for e in errors if 'conflict' in str(e).lower()]
+                if len(conflict_errors) == 0:
+                    bugs.append({
+                        'description': 'No conflict detection for concurrent versions',
+                        'severity': 'critical',
+                        'type': 'concurrency',
+                        'modules_affected': ['memvid'],
+                    })
+            
+            # Check version integrity
+            final_versions = memvid.get_version_history(doc_id)
+            unique_versions = set(v.get('version') for v in final_versions)
+            
+            if len(unique_versions) != len(final_versions):
+                bugs.append({
+                    'description': 'Duplicate versions after concurrent updates',
+                    'severity': 'critical',
+                    'type': 'data_integrity',
+                    'modules_affected': ['memvid'],
+                })
+                
+        return bugs
+    
+    def execute(self) -> List[Dict[str, Any]]:
+        """Execute all temporal tests"""
+        bugs = []
+        bugs.extend(self.hunt_versioning_bugs())
+        bugs.extend(self.hunt_temporal_query_bugs())
+        return bugs
+
+
+class MemvidPerformanceScenario(TestScenario):
+    """Test memvid performance under stress"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Memvid Performance and Scale Testing",
+            level=3,
+            creativity=2,
+            bug_target="Memory leaks, compression limits, search performance"
+        )
+        
+    def hunt_memory_leak_bugs(self) -> List[Dict[str, Any]]:
+        """Hunt for memory leaks in video processing"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        import psutil
+        import gc
+        
+        process = psutil.Process()
+        
+        # Baseline
+        gc.collect()
+        baseline_memory = process.memory_info().rss / 1024 / 1024
+        
+        # Stress test with many videos
+        video_ids = []
+        
+        for i in range(50):
+            try:
+                # Create large document
+                large_doc = {
+                    "data": "X" * 100000,  # 100KB
+                    "metadata": {"index": i}
+                }
+                
+                video_id = memvid.create_video_memory(large_doc)
+                video_ids.append(video_id)
+                
+                # Periodic memory check
+                if i % 10 == 0:
+                    gc.collect()
+                    current_memory = process.memory_info().rss / 1024 / 1024
+                    growth = current_memory - baseline_memory
+                    
+                    if growth > 100:  # More than 100MB growth
+                        bugs.append({
+                            'description': f'Memory leak detected: {growth:.1f}MB after {i} videos',
+                            'severity': 'critical',
+                            'type': 'memory_leak',
+                            'modules_affected': ['memvid'],
+                        })
+                        break
+                        
+            except Exception as e:
+                if i < 20:  # Should handle at least 20 videos
+                    bugs.append({
+                        'description': f'Failed after only {i} videos: {e}',
+                        'severity': 'high',
+                        'type': 'scalability',
+                        'modules_affected': ['memvid'],
+                    })
+                    break
+        
+        # Clean up test
+        for video_id in video_ids[:10]:
+            try:
+                memvid.delete_video_memory(video_id)
+            except:
+                pass
+        
+        gc.collect()
+        time.sleep(1)
+        
+        final_memory = process.memory_info().rss / 1024 / 1024
+        if final_memory > baseline_memory + 50:
+            bugs.append({
+                'description': f'Memory not released after cleanup: {final_memory - baseline_memory:.1f}MB retained',
+                'severity': 'high',
+                'type': 'memory_leak',
+                'modules_affected': ['memvid'],
+            })
+            
+        return bugs
+    
+    def hunt_search_performance_bugs(self) -> List[Dict[str, Any]]:
+        """Test semantic search performance"""
+        bugs = []
+        
+        if not MEMVID_AVAILABLE:
+            return bugs
+            
+        # Create searchable corpus
+        corpus_size = 100
+        
+        for i in range(corpus_size):
+            try:
+                content = {
+                    "text": f"Document about {['quantum', 'computing', 'machine', 'learning', 'security'][i % 5]} topic {i}",
+                    "tags": [f"tag_{i % 10}", f"category_{i % 5}"]
+                }
+                memvid.index_document(content)
+            except:
+                pass
+        
+        # Test search performance
+        search_queries = [
+            "quantum computing",
+            "machine learning security",
+            "nonexistent topic xyz",
+            "tag_5",
+            "*",  # Wildcard
+        ]
+        
+        for query in search_queries:
+            try:
+                start = time.time()
+                results = memvid.search(query, limit=10)
+                duration = time.time() - start
+                
+                if duration > 1.0:  # Should be fast even with 100 docs
+                    bugs.append({
+                        'description': f'Slow search for "{query}": {duration:.2f}s',
+                        'severity': 'medium',
+                        'type': 'performance',
+                        'modules_affected': ['memvid'],
+                    })
+                
+                if query == "*" and len(results) < corpus_size:
+                    bugs.append({
+                        'description': f'Wildcard search incomplete: {len(results)}/{corpus_size}',
+                        'severity': 'high',
+                        'type': 'search',
+                        'modules_affected': ['memvid'],
+                    })
+                    
+            except Exception as e:
+                bugs.append({
+                    'description': f'Search failed for "{query}": {e}',
+                    'severity': 'high',
+                    'type': 'search',
+                    'modules_affected': ['memvid'],
+                })
+                
+        return bugs
+    
+    def execute(self) -> List[Dict[str, Any]]:
+        """Execute all performance tests"""
+        bugs = []
+        bugs.extend(self.hunt_memory_leak_bugs())
+        bugs.extend(self.hunt_compression_limit_bugs())
+        bugs.extend(self.hunt_search_performance_bugs())
+        return bugs
+
+
+class MemvidBugHunter:
+    """Orchestrate all memvid bug hunting scenarios"""
+    
+    def __init__(self):
+        self.scenarios = [
+            MemvidResilienceScenario(),
+            MemvidIntegrationScenario(),
+            MemvidTemporalScenario(),
+            MemvidPerformanceScenario(),
+        ]
+        
+    def hunt_all_memvid_bugs(self) -> List[Dict[str, Any]]:
+        """Run all memvid bug hunting scenarios"""
+        all_bugs = []
+        
+        for scenario in self.scenarios:
+            print(f"🔍 Running {scenario.name}...")
+            
+            # Get all methods that start with 'hunt_'
+            hunt_methods = [
+                getattr(scenario, method) 
+                for method in dir(scenario) 
+                if method.startswith('hunt_') and callable(getattr(scenario, method))
+            ]
+            
+            for hunt_method in hunt_methods:
+                try:
+                    bugs = hunt_method()
+                    all_bugs.extend(bugs)
+                    print(f"  Found {len(bugs)} bugs in {hunt_method.__name__}")
+                except Exception as e:
+                    all_bugs.append({
+                        'description': f'Bug hunter crashed in {hunt_method.__name__}: {e}',
+                        'severity': 'critical',
+                        'type': 'test_framework',
+                        'modules_affected': ['test_framework'],
+                    })
+                    
+        return all_bugs
+
+
+def main():
+    """Test the memvid bug hunter"""
+    hunter = MemvidBugHunter()
+    bugs = hunter.hunt_all_memvid_bugs()
+    
+    print(f"\n📊 Memvid Bug Hunt Summary:")
+    print(f"Total bugs found: {len(bugs)}")
+    
+    # Group by severity
+    from collections import Counter
+    severities = Counter(bug.get('severity', 'unknown') for bug in bugs)
+    
+    for severity, count in severities.most_common():
+        print(f"  {severity}: {count}")
+        
+    print("\n✅ Memvid bug hunter module ready")
+    
+    return bugs
+
+
+if __name__ == '__main__':
+    main()

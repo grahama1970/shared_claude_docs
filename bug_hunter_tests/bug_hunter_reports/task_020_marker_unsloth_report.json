@@ -1,0 +1,147 @@
+{
+  "task": "Task #020: Marker-Unsloth Integration",
+  "module": "marker-unsloth-integration",
+  "duration": "0.00s",
+  "tests_run": 6,
+  "tests_passed": 6,
+  "bugs_found": 15,
+  "bug_details": [
+    {
+      "type": "poor_qa_extraction",
+      "severity": "medium",
+      "description": "Q&A pairs extracted without context preservation",
+      "expected": "Include surrounding context in pairs",
+      "actual": "Isolated Q&A loses important context"
+    },
+    {
+      "type": "large_doc_truncation",
+      "severity": "high",
+      "description": "500-page document truncated",
+      "expected": "Split into manageable chunks",
+      "actual": "Truncated at arbitrary limit"
+    },
+    {
+      "type": "no_filter_tuning",
+      "severity": "low",
+      "description": "Quality thresholds not configurable",
+      "expected": "Adjustable thresholds per use case",
+      "actual": "Hard-coded thresholds"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "page_numbers metadata discarded",
+      "expected": "Preserve for training provenance",
+      "actual": "Metadata stripped during conversion"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "extraction_confidence metadata discarded",
+      "expected": "Preserve for training provenance",
+      "actual": "Metadata stripped during conversion"
+    },
+    {
+      "type": "metadata_lost",
+      "severity": "medium",
+      "description": "document_structure metadata discarded",
+      "expected": "Preserve for training provenance",
+      "actual": "Metadata stripped during conversion"
+    },
+    {
+      "type": "inefficient_batching",
+      "severity": "medium",
+      "description": "Batch processing takes 108.0s for 10 docs",
+      "expected": "< 60s",
+      "actual": "108.0s (1.8x slower)"
+    },
+    {
+      "type": "inefficient_batching",
+      "severity": "medium",
+      "description": "Batch processing takes 540.0s for 50 docs",
+      "expected": "< 300s",
+      "actual": "540.0s (1.8x slower)"
+    },
+    {
+      "type": "inefficient_batching",
+      "severity": "medium",
+      "description": "Batch processing takes 1080.0s for 100 docs",
+      "expected": "< 600s",
+      "actual": "1080.0s (1.8x slower)"
+    },
+    {
+      "type": "inefficient_batching",
+      "severity": "medium",
+      "description": "Batch processing takes 5400.0s for 500 docs",
+      "expected": "< 3000s",
+      "actual": "5400.0s (1.8x slower)"
+    },
+    {
+      "type": "batch_memory_spike",
+      "severity": "high",
+      "description": "Memory spike processing 10000 pages",
+      "expected": "Constant memory usage",
+      "actual": "Linear memory growth with batch size"
+    },
+    {
+      "type": "catastrophic_failure",
+      "severity": "high",
+      "description": "format_error causes 100% data loss",
+      "expected": "Graceful degradation",
+      "actual": "Complete batch failure"
+    },
+    {
+      "type": "no_error_recovery",
+      "severity": "high",
+      "description": "No recovery mechanism for format_error",
+      "expected": "Automatic recovery or partial processing",
+      "actual": "Manual intervention required"
+    },
+    {
+      "type": "weak_deduplication",
+      "severity": "medium",
+      "description": "Deduplication only checks exact matches",
+      "expected": "Semantic similarity deduplication",
+      "actual": "Only byte-level comparison"
+    },
+    {
+      "type": "full_reprocessing",
+      "severity": "high",
+      "description": "Reprocesses entire dataset for large updates",
+      "expected": "Incremental processing",
+      "actual": "O(n) processing for any update"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Training Data Formatting",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Quality Filtering",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Metadata Preservation",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Batch Processing Efficiency",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Error Recovery",
+      "passed": true,
+      "bugs": 0
+    },
+    {
+      "test": "Incremental Updates",
+      "passed": true,
+      "bugs": 0
+    }
+  ]
+}

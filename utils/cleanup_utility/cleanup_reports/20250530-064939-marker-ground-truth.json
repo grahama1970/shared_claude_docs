@@ -1,0 +1,39 @@
+{
+  "project": "/home/graham/workspace/experiments/marker-ground-truth",
+  "name": "marker-ground-truth",
+  "type": "dataset",
+  "timestamp": "20250530-064939",
+  "issues": [
+    "Found 1 hardcoded PYTHONPATH entries",
+    "Import validation failed"
+  ],
+  "warnings": [
+    "README.md missing sections: usage, requirements",
+    "pytest not installed",
+    "No slash commands documented for Claude project",
+    "High technical debt: 3227 TODO/FIXME comments"
+  ],
+  "suggestions": [
+    "Consider refactoring large files"
+  ],
+  "validations": {
+    "imports": false,
+    "readme": true,
+    "claude_md": true,
+    "pyproject": true,
+    "claude_test_reporter": true,
+    "src_structure": true,
+    "file_organization": true,
+    "has_tests": true,
+    "slash_commands": {
+      "implemented": true
+    }
+  },
+  "fixes_applied": [
+    "Removed 1 hardcoded PYTHONPATH entries"
+  ],
+  "status": "issues",
+  "git_status": "branch_created",
+  "cleanup_branch": "cleanup-20250530-065015",
+  "git_tag": "pre-cleanup-20250530-065015"
+}

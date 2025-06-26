@@ -1,0 +1,201 @@
+[
+  {
+    "project": "granger_hub",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.11734962463378906,
+    "output": "on3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/granger_hub/tests/core/adapters/test_adapter_framework.py\", line 37\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/core/adapters/test_adapter_framework.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.11s ===============================\n"
+  },
+  {
+    "project": "rl_commons",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.08043599128723145,
+    "output": "============================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/workspace/experiments/rl_commons/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/rl_commons\nconfigfile: pytest.ini\ntestpaths: tests\nplugins: metadata-3.1.1, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 3 items / 3 deselected / 0 selected\n\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n============================ 3 deselected in 0.08s =============================\n"
+  },
+  {
+    "project": "world_model",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.10563516616821289,
+    "output": "ked\n    ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/world_model/tests/test_honeypot.py\", line 29\nE       async def test_fake_db_connection(self):\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/test_honeypot.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.10s ===============================\n"
+  },
+  {
+    "project": "claude-test-reporter",
+    "status": "passed",
+    "passed": 9,
+    "failed": 0,
+    "errors": 0,
+    "total": 9,
+    "duration": 0.04067111015319824,
+    "output": "r::test_get_metrics PASSED\ntests/monitoring/test_hallucination_monitor.py::TestHallucinationMonitor::test_dashboard_generation PASSED\ntests/test_basic.py::test_basic_import \u2705 Basic test passed for claude-test-reporter\nPASSED\ntests/test_basic.py::test_module_structure \u2705 Module structure verified\nPASSED\n\n=============================== warnings summary ===============================\nsrc/claude_test_reporter/core/test_result_verifier.py:36\n  /home/graham/workspace/experiments/claude-test-reporter/src/claude_test_reporter/core/test_result_verifier.py:36: PytestCollectionWarning: cannot collect test class 'TestResultVerifier' because it has a __init__ constructor (from: tests/core/test_test_result_verifier.py)\n    @dataclass\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n========================= 9 passed, 1 warning in 0.04s =========================\n"
+  },
+  {
+    "project": "sparta",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.1199491024017334,
+    "output": "ed\n    ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/sparta/tests/sparta/integration/test_honeypot.py\", line 40\nE       import sys\nE   IndentationError: unexpected indent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/sparta/integration/test_honeypot.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.12s ===============================\n"
+  },
+  {
+    "project": "marker",
+    "status": "failed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "output": "ermcap database;\nusing dumb terminal settings.\n2025-06-07 18:50:06.572 | INFO     | marker.core.utils.embedding_utils:<module>:41 - Transformers library is available for embeddings\nImportError while loading conftest '/home/graham/workspace/experiments/marker/tests/conftest.py'.\ntests/conftest.py:40: in <module>\n    from marker.core.converters.pdf import PdfConverter\nsrc/marker/core/converters/pdf.py:65: in <module>\n    from marker.core.processors.enhanced_camelot import EnhancedTableProcessor\nsrc/marker/core/processors/enhanced_camelot/__init__.py:28: in <module>\n    from marker.core.processors.enhanced_camelot.processor import EnhancedTableProcessor\nsrc/marker/core/processors/enhanced_camelot/processor.py:42: in <module>\n    from marker.core.config.table import (\nE     File \"/home/graham/workspace/experiments/marker/src/marker/core/config/table.py\", line 8\nE       Description: Implementation of table functionality\nE                                   ^^\nE   SyntaxError: invalid syntax\n"
+  },
+  {
+    "project": "arangodb",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 1.024874210357666,
+    "output": "235\n  /home/graham/workspace/experiments/arangodb/.venv/lib/python3.10/site-packages/pydantic/deprecated/class_validators.py:235: PydanticDeprecatedSince20: Pydantic V1 style `@root_validator` validators are deprecated. You should migrate to Pydantic V2 style `@model_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    return root_validator()(*__args)  # type: ignore\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/integration/test_entity_deduplication.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n======================== 13 warnings, 1 error in 1.02s =========================\n"
+  },
+  {
+    "project": "llm_call",
+    "status": "passed",
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "total": 2,
+    "duration": 0.028400659561157227,
+    "output": "ollected 2 items\n\ntests/test_basic.py::test_import PASSED\ntests/test_basic.py::test_python_version PASSED\n\ud83d\udcca Test report generated: docs/reports/test_report_20250607_185012.md\n\n\n=============================== warnings summary ===============================\n.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323\n  /home/graham/workspace/experiments/llm_call/.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n========================= 2 passed, 1 warning in 0.03s =========================\n"
+  },
+  {
+    "project": "unsloth_wip",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.3079526424407959,
+    "output": "in _load_unlocked\n    ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/unsloth_wip/tests/mcp/test_prompts.py\", line 42\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/mcp/test_prompts.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.30s ===============================\n"
+  },
+  {
+    "project": "youtube_transcripts",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.11800622940063477,
+    "output": "ocked\n    ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/youtube_transcripts/tests/agents/test_agents.py\", line 49\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/agents/test_agents.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.12s ===============================\n"
+  },
+  {
+    "project": "darpa_crawl",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 1.914733648300171,
+    "output": "trap>\", line 1050, in _gcd_import\n  File \"<frozen importlib._bootstrap>\", line 1027, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 1006, in _find_and_load_unlocked\n  File \"<frozen importlib._bootstrap>\", line 688, in _load_unlocked\n  File \"/home/graham/workspace/experiments/darpa_crawl/.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py\", line 177, in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n  File \"/home/graham/workspace/experiments/darpa_crawl/.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py\", line 357, in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n  File \"/home/graham/.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py\", line 50, in parse\n    return compile(source, filename, mode, flags,\n  File \"/home/graham/workspace/experiments/darpa_crawl/.venv/lib/python3.10/site-packages/allure_pytest/plugin.py\", line 70\n    from pathlib import Path\n    ^^^^\nSyntaxError: invalid syntax\n"
+  },
+  {
+    "project": "gitget",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 6.328311204910278,
+    "output": "n' in Click 9.0.\n    from click.parser import split_arg_string\n\n.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323\n  /home/graham/workspace/experiments/gitget/.venv/lib/python3.10/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/\n    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/e2e/test_workflows.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 3 warnings, 1 error in 6.33s =========================\n"
+  },
+  {
+    "project": "arxiv-mcp-server",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.1230933666229248,
+    "output": "te-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/mcp-servers/arxiv-mcp-server/tests/performance/test_concurrent_operations.py\", line 87\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/performance/test_concurrent_operations.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.12s ===============================\n"
+  },
+  {
+    "project": "mcp-screenshot",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.05846571922302246,
+    "output": "======================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/workspace/experiments/mcp-screenshot/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'json-report': '1.5.0', 'asyncio': '1.0.0', 'anyio': '4.9.0'}}\nrootdir: /home/graham/workspace/experiments/mcp-screenshot\nconfigfile: pytest.ini\ntestpaths: tests\nplugins: metadata-3.1.1, json-report-1.5.0, asyncio-1.0.0, anyio-4.9.0\nasyncio: mode=auto, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 3 items / 3 deselected / 0 selected\n\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n============================ 3 deselected in 0.06s =============================\n"
+  },
+  {
+    "project": "chat",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.5600771903991699,
+    "output": "2.5/migration/\n    @validator('collection')\n\nbackend/dashboard/models.py:102\n  /home/graham/workspace/experiments/chat/backend/dashboard/models.py:102: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/\n    @validator('type')\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/backend - ModuleNotFoundError: No module named 'numpy'\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n========================= 3 warnings, 1 error in 0.56s =========================\n"
+  },
+  {
+    "project": "annotator",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.06956744194030762,
+    "output": "l:], package, level)\n<frozen importlib._bootstrap>:1050: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1027: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:688: in _load_unlocked\n    ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:186: in exec_module\n    exec(co, module.__dict__)\ntests/active_annotator/ux/conftest.py:18: in <module>\n    from playwright.sync_api import Browser, Page, Playwright\nE   ModuleNotFoundError: No module named 'playwright'\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/active_annotator/ux - ModuleNotFoundError: No module named 'playwright'\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.07s ===============================\n"
+  },
+  {
+    "project": "aider-daemon",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 0.20753693580627441,
+    "output": "  ???\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/aider-daemon/tests/unit/mcp/test_integration.py\", line 132\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/unit/mcp/test_integration.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.21s ===============================\n"
+  },
+  {
+    "project": "runpod_ops",
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "total": 0,
+    "duration": 1.8420159816741943,
+    "output": "n3.10/site-packages/_pytest/assertion/rewrite.py:177: in exec_module\n    source_stat, co = _rewrite_test(fn, self.config)\n.venv/lib/python3.10/site-packages/_pytest/assertion/rewrite.py:357: in _rewrite_test\n    tree = ast.parse(source, filename=strfn)\n../../../.local/share/uv/python/cpython-3.10.11-linux-x86_64-gnu/lib/python3.10/ast.py:50: in parse\n    return compile(source, filename, mode, flags,\nE     File \"/home/graham/workspace/experiments/runpod_ops/tests/runpod_ops/core/test_inference_server.py\", line 59\nE       @pytest.mark.asyncio\nE   IndentationError: unexpected unindent\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n=========================== short test summary info ============================\nERROR tests/runpod_ops/core/test_inference_server.py\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 1.84s ===============================\n"
+  },
+  {
+    "project": "granger-ui",
+    "status": "passed",
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "total": 2,
+    "duration": 0.010923385620117188,
+    "output": "========================= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.4.0, pluggy-1.6.0 -- /home/graham/workspace/granger-ui/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.4.0', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'json-report': '1.5.0', 'asyncio': '1.0.0'}}\nrootdir: /home/graham/workspace/granger-ui\nconfigfile: pytest.ini\ntestpaths: tests\nplugins: metadata-3.1.1, json-report-1.5.0, asyncio-1.0.0\nasyncio: mode=auto, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 2 items\n\ntests/test_basic.py::test_import PASSED\ntests/test_basic.py::test_python_version PASSED\n\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n============================== 2 passed in 0.01s ===============================\n"
+  },
+  {
+    "project": "shared_claude_docs",
+    "status": "passed",
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "total": 2,
+    "duration": 0.020734548568725586,
+    "output": "========= test session starts ==============================\nplatform linux -- Python 3.10.11, pytest-8.3.5, pluggy-1.6.0 -- /home/graham/workspace/shared_claude_docs/.venv/bin/python\ncachedir: .pytest_cache\nmetadata: {'Python': '3.10.11', 'Platform': 'Linux-6.8.0-57-generic-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.5', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'json-report': '1.5.0', 'asyncio': '1.0.0'}}\nrootdir: /home/graham/workspace/shared_claude_docs\nconfigfile: pytest.ini\ntestpaths: tests\nplugins: metadata-3.1.1, json-report-1.5.0, asyncio-1.0.0\nasyncio: mode=auto, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 2 items\n\ntests/test_basic.py::test_import PASSED\ntests/test_basic.py::test_python_version PASSED\n\n--------------------------------- JSON report ----------------------------------\nreport saved to: test_report.json\n============================== 2 passed in 0.02s ===============================\n"
+  }
+]

@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shared-claude-docs"
+version = "0.1.0"
+description = "Centralized documentation and utilities for Claude-based projects"
+readme = "README.md"
+authors = [
+    {name = "Graham", email = "graham@example.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.10.11"
+dependencies = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocs-mermaid2-plugin>=1.0.0",
+    "pymdown-extensions>=10.0",
+    "click>=8.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.0",
+    "rope==1.13.0",
+    "libcst>=1.0.0",
+    "GitPython>=3.1.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.0.0",
+    "watchdog>=3.0.0",
+    "vulture>=2.0",
+    "pipdeptree>=2.0",
+    "pip-audit>=2.0",
+    "toml>=0.10.2",
+    "aiohttp>=3.11.18",
+    "redis>=6.2.0",
+    "cachetools>=2.0.0",
+    "freezegun>=1.5.2",
+    "loguru>=0.7.3",
+    "pandas>=2.2.3",
+    "numpy==1.26.4",  # Pinned to match marker and arangodb
+    "scipy>=1.15.3",
+    "pyarrow>=4.0.0,<20",  # Compatible with unsloth's mlflow requirement
+    "psutil>=7.0.0",
+    "aiofiles>=24.1.0",
+    "diskcache>=5.6.3",
+    "lz4>=4.4.4",
+    "pytest-json-report>=1.5.0",
+    "tiktoken>=0.9.0",
+    "spacy>=3.8.7",
+    "litellm>=1.0.0",
+    "google-generativeai>=0.8.0",
+    "anthropic>=0.39.0",
+    "openai>=1.0.0",
+    "requests>=2.32.0",
+    "llm_call @ git+https://github.com/grahama1970/llm_call.git",
+    "pytest-asyncio>=1.0.0",
+    "arxiv>=2.2.0",
+    # Granger Core Infrastructure
+    "granger_hub @ git+https://github.com/grahama1970/granger_hub.git",
+    "rl_commons @ git+https://github.com/grahama1970/rl_commons.git@master",
+    "claude-test-reporter @ git+https://github.com/grahama1970/claude-test-reporter.git",
+    # Granger Spokes - Data Processing
+    "sparta @ git+https://github.com/grahama1970/SPARTA.git",
+    "marker @ git+https://github.com/grahama1970/marker.git",  # Works with surya-ocr 0.14.5
+    "arangodb @ git+https://github.com/grahama1970/arangodb.git",  # Fixed: numpy now pinned to 1.26.4
+    "youtube_transcripts @ git+https://github.com/grahama1970/youtube-transcripts-search.git",
+    "unsloth @ git+https://github.com/grahama1970/unsloth_wip.git",  # Fixed: removed broken submodule
+    "runpod_ops @ git+https://github.com/grahama1970/runpod_ops.git",  # Enabled for inference support
+    # "ppt @ git+https://github.com/grahama1970/ppt.git",  # For making PowerPoint presentations, TBD
+
+    # Granger MCP Services (these should probably just be spokes -- b/c all of these spoke pacakges are cli, slash commands, and mcps)
+    "arxiv-mcp-server @ git+https://github.com/grahama1970/arxiv-mcp-server.git",
+    "mcp-screenshot @ git+https://github.com/grahama1970/mcp-screenshot.git",
+    # Granger UI Projects
+    # "active-annotator @ git+https://github.com/grahama1970/marker-ground-truth.git",  # Not needed
+    # "aider-chat @ git+https://github.com/grahama1970/aider-daemon.git",  # Not needed
+    # Additional dependencies for module interactions
+    "python-arango>=8.0.0",
+    "youtube-transcript-api",
+    "cryptography",
+    "google-auth-httplib2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+claude-docs = "shared_claude_docs.cli:main"
+validate-projects = "shared_claude_docs.validators:validate_all"
+sync-docs = "shared_claude_docs.sync:sync_documentation"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+shared_claude_docs = [
+    "templates/**/*",
+    "schemas/**/*",
+    "guides/**/*",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "B", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --cov=src/shared_claude_docs"

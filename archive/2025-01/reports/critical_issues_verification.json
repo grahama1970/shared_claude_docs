@@ -1,0 +1,71 @@
+{
+  "timestamp": "2025-06-09T06:11:59.826867",
+  "issues_checked": 6,
+  "status_counts": {
+    "BROKEN": 2,
+    "NEEDS_DATA": 1,
+    "FIXED": 2,
+    "SYSTEMIC": 1
+  },
+  "confidence": 0.33,
+  "issues": [
+    {
+      "issue": "SPARTA 0 CVEs",
+      "status": "BROKEN",
+      "detail": "Returned 0 CVEs",
+      "evidence": []
+    },
+    {
+      "issue": "World Model get_state",
+      "status": "BROKEN",
+      "detail": "Missing method. Available: ['cleanup_old_states', 'current_states', 'detect_anomaly', 'get_memory_usage', 'get_module_state']",
+      "evidence": [
+        "cleanup_old_states",
+        "current_states",
+        "detect_anomaly",
+        "get_memory_usage",
+        "get_module_state",
+        "get_state_count",
+        "predict_next_state",
+        "state_counter",
+        "states",
+        "update_state"
+      ]
+    },
+    {
+      "issue": "Test Reporter API",
+      "status": "NEEDS_DATA",
+      "detail": "Method takes 0 args, but test passed data",
+      "evidence": "() -> str"
+    },
+    {
+      "issue": "GitGet import",
+      "status": "FIXED",
+      "detail": "Import successful",
+      "evidence": "<class 'gitget.RepositoryAnalyzerInteraction'>"
+    },
+    {
+      "issue": "Low real test coverage",
+      "status": "SYSTEMIC",
+      "detail": "Only 6 of 67 scenarios have real tests",
+      "evidence": {
+        "real_tests": [
+          "SPARTA",
+          "ArangoDB",
+          "YouTube",
+          "Marker",
+          "LLM Call",
+          "RL Commons"
+        ],
+        "missing_real_tests": 61
+      }
+    },
+    {
+      "issue": "ArangoDB config",
+      "status": "FIXED",
+      "detail": "Host: http://localhost:8529",
+      "evidence": "http://localhost:8529"
+    }
+  ],
+  "perplexity_verifications": []
+}

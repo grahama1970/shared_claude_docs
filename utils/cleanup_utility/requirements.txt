@@ -1,0 +1,12 @@
+rope>=1.11.0
+toml>=0.10.2
+tqdm>=4.66.1
+pytest>=7.4.0
+pytest-cov>=4.1.0
+vulture>=2.9
+pipdeptree>=2.13.0
+pip-audit>=2.6.1
+isort>=5.12.0
+black>=23.11.0
+mypy>=1.7.0
+pylint>=3.0.0

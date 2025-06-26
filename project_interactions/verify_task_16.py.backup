@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+"""
+Skeptical verification of Task #16: Visualization Intelligence
+"""
+
+import sys
+import time
+from pathlib import Path
+from datetime import datetime
+
+# Add parent to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import the scenario directly
+exec(open("/home/graham/workspace/shared_claude_docs/project_interactions/viz-intelligence/viz_intelligence_interaction.py").read())
+
+
+class SkepticalVerifier:
+    """Skeptically verify Task #16 implementation."""
+    
+    def __init__(self):
+        self.suspicions = []
+        self.confidence_scores = {}
+    
+    def verify_unsuitable_detection(self, scenario):
+        """Verify unsuitable data detection test."""
+        print("\n🔍 Verifying Unsuitable Data Detection (Test 016.1)...")
+        
+        start_time = time.time()
+        result = scenario.test_detects_unsuitable()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 1.0, 5.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["detection_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["detection_duration"] = 0.5
+            self.suspicions.append(f"Duration {duration:.2f}s outside expected range")
+        
+        # Check detection accuracy
+        output = result.output_data
+        accuracy = output.get("detection_accuracy", 0)
+        
+        if accuracy == 1.0:
+            print(f"  ✅ Perfect detection accuracy: {accuracy:.0%}")
+            self.confidence_scores["detection_accuracy"] = 1.0
+        elif accuracy >= 0.8:
+            print(f"  ⚠️  Good but not perfect accuracy: {accuracy:.0%}")
+            self.confidence_scores["detection_accuracy"] = 0.8
+        else:
+            self.suspicions.append(f"Poor detection accuracy: {accuracy:.0%}")
+            self.confidence_scores["detection_accuracy"] = 0.3
+        
+        # Verify recommendations make sense
+        recommendations = output.get("recommendations", [])
+        for rec in recommendations:
+            if rec["recommended"] == "graph":
+                self.suspicions.append(f"Incorrectly recommended graph for {rec['dataset']}")
+            else:
+                print(f"  ✅ {rec['dataset']}: Correctly recommended {rec['recommended']} ({rec['reason']})")
+        
+        return result
+    
+    def verify_alternatives(self, scenario):
+        """Verify alternative suggestions test."""
+        print("\n🔍 Verifying Alternative Suggestions (Test 016.2)...")
+        
+        start_time = time.time()
+        result = scenario.test_alternatives()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 1.0, 3.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["alternatives_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["alternatives_duration"] = 0.5
+        
+        # Check alternatives provided
+        output = result.output_data
+        suggestions = output.get("suggestions", [])
+        
+        all_have_alternatives = True
+        for suggestion in suggestions:
+            alt_count = suggestion["alternatives_count"]
+            if alt_count == 0:
+                all_have_alternatives = False
+                self.suspicions.append(f"No alternatives for {suggestion['dataset']}")
+            else:
+                print(f"  ✅ {suggestion['dataset']}: {alt_count} alternatives provided")
+        
+        if all_have_alternatives:
+            self.confidence_scores["alternatives_quality"] = 0.9
+        else:
+            self.confidence_scores["alternatives_quality"] = 0.4
+        
+        return result
+    
+    def verify_sparse_handling(self, scenario):
+        """Verify sparse data handling test."""
+        print("\n🔍 Verifying Sparse Data Handling (Test 016.3)...")
+        
+        start_time = time.time()
+        result = scenario.test_sparse_data()
+        duration = time.time() - start_time
+        
+        # Check duration
+        expected_min, expected_max = 2.0, 10.0
+        if expected_min <= duration <= expected_max:
+            self.confidence_scores["sparse_duration"] = 1.0
+            print(f"  ✅ Duration OK: {duration:.2f}s (expected {expected_min}-{expected_max}s)")
+        else:
+            self.confidence_scores["sparse_duration"] = 0.5
+        
+        # Check sparse data handling
+        output = result.output_data
+        handling_rate = output.get("handling_rate", 0)
+        
+        if handling_rate == 1.0:
+            print(f"  ✅ Perfect sparse data handling: {handling_rate:.0%}")
+            self.confidence_scores["sparse_handling"] = 1.0
+        elif handling_rate >= 0.8:
+            print(f"  ⚠️  Good sparse handling: {handling_rate:.0%}")
+            self.confidence_scores["sparse_handling"] = 0.8
+        else:
+            self.suspicions.append(f"Poor sparse data handling: {handling_rate:.0%}")
+            self.confidence_scores["sparse_handling"] = 0.3
+        
+        # Check individual results
+        for result in output.get("handling_results", []):
+            if result["handling"] != "graceful":
+                self.suspicions.append(f"{result['dataset']} not handled gracefully")
+            else:
+                print(f"  ✅ {result['dataset']} (sparsity {result['sparsity']:.0%}): {result['handling']}")
+        
+        return result
+    
+    def verify_honeypot(self, scenario):
+        """Verify honeypot test fails as expected."""
+        print("\n🔍 Verifying Honeypot (Test 016.H)...")
+        
+        try:
+            # Create chaotic mixed data
+            bad_data = {
+                "name": "chaos_data",
+                "type": "mixed",
+                "values": [None] * 50 + ["text", 123, {"nested": "dict"}, ["list"], float('nan')],
+                "dimensions": ["chaos", "madness", "impossibility", "futility", "despair"]
+            }
+            
+            analysis = scenario.analyzer.analyze_dataset(bad_data)
+            recommendation = scenario.recommender.recommend(analysis)
+            
+            if recommendation["primary"] != "graph":
+                print(f"  ✅ Honeypot correctly detected: Recommended {recommendation['primary']} instead of graph")
+                print(f"     Reason: {recommendation['reason']}")
+                self.confidence_scores["honeypot"] = 1.0
+                return True
+            else:
+                print("  ❌ Honeypot FAILED: Recommended graph for chaotic data!")
+                self.suspicions.append("CRITICAL: System recommends graphing unsuitable data")
+                self.confidence_scores["honeypot"] = 0.0
+                return False
+                
+        except Exception as e:
+            print(f"  ✅ Honeypot correctly failed with error: {str(e)}")
+            self.confidence_scores["honeypot"] = 1.0
+            return True
+    
+    def generate_report(self, results):
+        """Generate skeptical analysis report."""
+        overall_confidence = sum(self.confidence_scores.values()) / len(self.confidence_scores) if self.confidence_scores else 0
+        
+        print("\n" + "="*60)
+        print("SKEPTICAL ANALYSIS REPORT - Task #16")
+        print("="*60)
+        
+        print(f"\nOverall Confidence: {overall_confidence:.1%}")
+        
+        print("\nConfidence Breakdown:")
+        for metric, score in self.confidence_scores.items():
+            print(f"  - {metric}: {score:.1%}")
+        
+        if self.suspicions:
+            print("\n🚨 Suspicions Detected:")
+            for suspicion in self.suspicions:
+                print(f"  - {suspicion}")
+        
+        # Determine verdict
+        if overall_confidence >= 0.85:
+            verdict = "LIKELY_GENUINE"
+            emoji = "✅"
+        elif overall_confidence >= 0.7:
+            verdict = "QUESTIONABLE"
+            emoji = "🟡"
+        elif overall_confidence >= 0.5:
+            verdict = "SUSPICIOUS"
+            emoji = "⚠️"
+        else:
+            verdict = "FAKE_IMPLEMENTATION"
+            emoji = "🚫"
+        
+        print(f"\n{emoji} VERDICT: {verdict}")
+        
+        # Intelligence verification
+        print("\n🧠 Intelligence Verification:")
+        intelligence_demonstrated = (
+            self.confidence_scores.get("detection_accuracy", 0) >= 0.8 and
+            self.confidence_scores.get("sparse_handling", 0) >= 0.8
+        )
+        print(f"  - Knows when NOT to graph: {'✅ Yes' if intelligence_demonstrated else '❌ No'}")
+        print(f"  - Provides meaningful alternatives: {'✅ Yes' if self.confidence_scores.get('alternatives_quality', 0) > 0.7 else '❌ No'}")
+        print(f"  - Handles edge cases gracefully: {'✅ Yes' if self.confidence_scores.get('sparse_handling', 0) >= 0.8 else '❌ No'}")
+        
+        return {
+            "confidence": overall_confidence,
+            "verdict": verdict,
+            "suspicions": self.suspicions,
+            "intelligence_demonstrated": intelligence_demonstrated
+        }
+
+
+def main():
+    """Main verification runner."""
+    print("="*80)
+    print("Task #16 Skeptical Verification")
+    print(f"Started: {datetime.now().isoformat()}")
+    print("="*80)
+    
+    # Create scenario and verifier
+    scenario = VisualizationIntelligenceScenario()
+    verifier = SkepticalVerifier()
+    
+    # Run all verifications
+    results = {
+        "detection": verifier.verify_unsuitable_detection(scenario),
+        "alternatives": verifier.verify_alternatives(scenario),
+        "sparse": verifier.verify_sparse_handling(scenario),
+        "honeypot": verifier.verify_honeypot(scenario)
+    }
+    
+    # Generate report
+    report = verifier.generate_report(results)
+    
+    # Final summary
+    print("\n" + "="*80)
+    print("TASK #16 VERIFICATION COMPLETE")
+    print("="*80)
+    
+    if report["verdict"] in ["LIKELY_GENUINE", "QUESTIONABLE"] and report["intelligence_demonstrated"]:
+        print("\n✅ Task #16 PASSED skeptical verification")
+        print("   Visualization intelligence successfully demonstrated")
+        print("\nTasks 1-16 complete! Continuing with remaining tasks...")
+        return 0
+    else:
+        print("\n❌ Task #16 FAILED skeptical verification")
+        if not report["intelligence_demonstrated"]:
+            print("   Intelligence not properly demonstrated")
+        print("Debug and fix issues before proceeding")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

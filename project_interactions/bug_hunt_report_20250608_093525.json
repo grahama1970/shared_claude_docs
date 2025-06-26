@@ -1,0 +1,124 @@
+{
+  "success": true,
+  "duration_hours": 0.02,
+  "tests_run": 7,
+  "total_bugs_found": 5,
+  "critical_bugs": 0,
+  "high_bugs": 1,
+  "bugs_by_module": {
+    "granger_hub": 1,
+    "arangodb": 4
+  },
+  "bug_patterns": {},
+  "test_history": [
+    {
+      "scenario": "Security Boundary Testing",
+      "timestamp": "2025-06-08T09:34:21.375471",
+      "bugs_found": 2,
+      "duration": 0.8756387233734131,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Performance and Scale Testing",
+      "timestamp": "2025-06-08T09:34:21.877744",
+      "bugs_found": 0,
+      "duration": 6.4373016357421875e-06,
+      "success": false
+    },
+    {
+      "scenario": "Pipeline State Corruption Testing",
+      "timestamp": "2025-06-08T09:34:24.003101",
+      "bugs_found": 0,
+      "duration": 1.6240708827972412,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Temporal Evolution Testing",
+      "timestamp": "2025-06-08T09:34:24.505186",
+      "bugs_found": 0,
+      "duration": 4.5299530029296875e-06,
+      "success": false
+    },
+    {
+      "scenario": "Memvid Integration Testing",
+      "timestamp": "2025-06-08T09:34:25.006717",
+      "bugs_found": 0,
+      "duration": 5.0067901611328125e-06,
+      "success": false
+    },
+    {
+      "scenario": "Module Resilience Testing",
+      "timestamp": "2025-06-08T09:35:24.105074",
+      "bugs_found": 3,
+      "duration": 58.597038984298706,
+      "success": true
+    },
+    {
+      "scenario": "Memvid Visual Memory Resilience",
+      "timestamp": "2025-06-08T09:35:24.607044",
+      "bugs_found": 0,
+      "duration": 8.58306884765625e-06,
+      "success": false
+    }
+  ],
+  "detailed_bugs": [
+    {
+      "description": "Pipeline data isolation testing not fully implemented",
+      "severity": "medium",
+      "type": "test_coverage",
+      "modules_affected": [
+        "granger_hub",
+        "arangodb"
+      ],
+      "scenario": "Security Boundary Testing",
+      "level": 3,
+      "id": "bf076f5e-e607-40bd-b3ba-7bbda27a2a50",
+      "timestamp": "2025-06-08T09:34:21.375415"
+    },
+    {
+      "description": "Test completed too quickly (0.876s)",
+      "severity": "high",
+      "type": "test_validity",
+      "scenario": "Security Boundary Testing",
+      "level": 3,
+      "id": "3395ac37-f6c5-4f70-a900-e04342d8bab5",
+      "timestamp": "2025-06-08T09:34:21.375459"
+    },
+    {
+      "description": "Poor ArangoDB error for http://localhost:9999: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "926ad5dd-70db-4f24-b37d-8d579c597371",
+      "timestamp": "2025-06-08T09:35:24.104996"
+    },
+    {
+      "description": "Poor ArangoDB error for https://localhost:8529: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "1df1c615-ee47-443c-ad2c-bf9e17e2e1d6",
+      "timestamp": "2025-06-08T09:35:24.105040"
+    },
+    {
+      "description": "Poor ArangoDB error for http://999.999.999.999:8529: Can't connect to host(s) within limit (3)",
+      "severity": "low",
+      "type": "error_handling",
+      "modules_affected": [
+        "arangodb"
+      ],
+      "scenario": "Module Resilience Testing",
+      "level": 0,
+      "id": "f598216f-a68d-45e4-8bd5-f1df38323ff5",
+      "timestamp": "2025-06-08T09:35:24.105062"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "test": {
+    "name": "test",
+    "system_prompt": "Test module",
+    "capabilities": [
+      "testing"
+    ],
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "processed": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

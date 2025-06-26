@@ -1,0 +1,39 @@
+# Prompt configuration with metadata
+prompts:
+  analyze_results:
+    description: "Analyze test execution results"
+    version: "1.0.0"
+    model_requirements:
+      min_tokens: 4096
+      temperature: 0.3
+      supports_json: true
+    variables:
+      required:
+        - immutable_facts
+        - total
+        - passed  
+        - failed
+      optional:
+        - failed_tests
+        - warnings
+        - context
+    tags:
+      - testing
+      - analysis
+      - qa
+    
+  code_review:
+    description: "Review code changes"
+    version: "2.1.0"
+    model_requirements:
+      min_tokens: 8192
+      temperature: 0.2
+    variables:
+      required:
+        - file_path
+        - diff
+        - language
+      optional:
+        - previous_issues
+        - style_guide
+        - security_focus

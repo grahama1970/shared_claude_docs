@@ -1,0 +1,703 @@
+#!/usr/bin/env python3
+
+# Security middleware import
+from granger_security_middleware_simple import GrangerSecurity, SecurityConfig
+
+# Initialize security
+_security = GrangerSecurity()
+
+"""
+Module: ai_model_registry_interaction.py
+Purpose: AI Model Registry for model versioning, performance tracking, and deployment management
+
+This module implements a Level 1 (Pipeline) GRANGER interaction that provides comprehensive
+model lifecycle management, from registration through deployment.
+
+External Dependencies:
+- typing: Type hints for better code clarity
+- enum: Enumeration types for model states
+- dataclasses: Data structure definitions
+- datetime: Time-based operations
+- json: JSON data handling
+- loguru: https://loguru.readthedocs.io/
+
+Example Usage:
+>>> registry = AIModelRegistry()
+>>> model_id = registry.register_model("classifier", ModelType.CLASSIFICATION, "pytorch")
+>>> version = registry.create_version(model_id, "1.0.0", "/models/v1.pt")
+>>> registry.log_performance(model_id, "1.0.0", {"accuracy": 0.95})
+Model performance logged
+"""
+
+from typing import Dict, List, Optional, Any, Set, Tuple
+from enum import Enum
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+import json
+import uuid
+import statistics
+from pathlib import Path
+from collections import defaultdict
+from loguru import logger
+
+
+class ModelType(Enum):
+    """Types of AI/ML models"""
+    CLASSIFICATION = "classification"
+    REGRESSION = "regression"
+    CLUSTERING = "clustering"
+    NLP = "nlp"
+    IMAGE_CLASSIFICATION = "image_classification"
+    OBJECT_DETECTION = "object_detection"
+    TIME_SERIES = "time_series"
+    RECOMMENDATION = "recommendation"
+    REINFORCEMENT_LEARNING = "reinforcement_learning"
+    CUSTOM = "custom"
+    TEXT_CLASSIFICATION = "text_classification"
+
+
+class ModelStatus(Enum):
+    """Model version status"""
+    REGISTERED = "registered"
+    TRAINING = "training"
+    TRAINED = "trained"
+    VALIDATED = "validated"
+    DEPLOYED = "deployed"
+    DEPRECATED = "deprecated"
+    ARCHIVED = "archived"
+
+
+class DeploymentStage(Enum):
+    """Deployment stages"""
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+    CANARY = "canary"
+    SHADOW = "shadow"
+
+
+class DeploymentStrategy(Enum):
+    """Deployment strategies"""
+    BLUE_GREEN = "blue_green"
+    CANARY = "canary"
+    ROLLING = "rolling"
+    RECREATE = "recreate"
+    A_B_TESTING = "a_b_testing"
+
+
+@dataclass
+class ModelMetadata:
+    """Model metadata"""
+    id: str
+    name: str
+    model_type: ModelType
+    framework: str
+    description: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)
+    tags: Set[str] = field(default_factory=set)
+    
+
+@dataclass
+class ModelVersion:
+    """Model version information"""
+    model_id: str
+    version: str
+    path: str
+    status: ModelStatus = ModelStatus.REGISTERED
+    metrics: Dict[str, float] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=datetime.now)
+    tags: Set[str] = field(default_factory=set)
+    
+
+@dataclass
+class PerformanceMetric:
+    """Performance metric entry"""
+    model_id: str
+    version: str
+    metrics: Dict[str, float]
+    environment: str = "default"
+    timestamp: datetime = field(default_factory=datetime.now)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
+
+@dataclass
+class Deployment:
+    """Deployment information"""
+    id: str
+    model_id: str
+    version: str
+    stage: DeploymentStage
+    strategy: DeploymentStrategy = DeploymentStrategy.ROLLING
+    config: Dict[str, Any] = field(default_factory=dict)
+    status: str = "active"
+    created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)
+    
+
+@dataclass
+class Experiment:
+    """Experiment tracking"""
+    id: str
+    name: str
+    description: str = ""
+    created_at: datetime = field(default_factory=datetime.now)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    
+
+@dataclass
+class ExperimentRun:
+    """Individual experiment run"""
+    id: str
+    experiment_id: str
+    parameters: Dict[str, Any]
+    metrics: Dict[str, float] = field(default_factory=dict)
+    artifacts: List[str] = field(default_factory=list)
+    started_at: datetime = field(default_factory=datetime.now)
+    completed_at: Optional[datetime] = None
+
+
+class AIModelRegistry:
+    """AI Model Registry for comprehensive model lifecycle management"""
+    
+    def __init__(self):
+        self.models: Dict[str, ModelMetadata] = {}
+        self.versions: Dict[str, List[ModelVersion]] = {}
+        self.performance_history: Dict[str, List[PerformanceMetric]] = {}
+        self.deployments: Dict[str, Deployment] = {}
+        self.experiments: Dict[str, Experiment] = {}
+        self.experiment_runs: Dict[str, ExperimentRun] = {}
+        self.performance_thresholds: Dict[str, Dict[str, Dict[str, float]]] = {}
+        logger.info("AI Model Registry initialized")
+        
+    def register_model(self, name: str, model_type: ModelType, framework: str,
+                      description: str = "", metadata: Optional[Dict[str, Any]] = None) -> str:
+        """Register a new model"""
+        model_id = f"{name}-{uuid.uuid4().hex[:8]}"
+        
+        model = ModelMetadata(
+            id=model_id,
+            name=name,
+            model_type=model_type,
+            framework=framework,
+            description=description,
+            metadata=metadata or {}
+        )
+        
+        self.models[model_id] = model
+        self.versions[model_id] = []
+        self.performance_history[model_id] = []
+        
+        logger.info(f"Registered model: {model_id} ({name})")
+        return model_id
+        
+    def create_version(self, model_id: str, version: str, path: str,
+                      metrics: Optional[Dict[str, float]] = None,
+                      metadata: Optional[Dict[str, Any]] = None) -> ModelVersion:
+        """Create a new model version"""
+        if model_id not in self.models:
+            raise ValueError(f"Model {model_id} not found")
+            
+        model_version = ModelVersion(
+            model_id=model_id,
+            version=version,
+            path=path,
+            metrics=metrics or {},
+            metadata=metadata or {}
+        )
+        
+        self.versions[model_id].append(model_version)
+        logger.info(f"Created version {version} for model {model_id}")
+        
+        return model_version
+        
+    def get_model(self, model_id: str) -> Optional[ModelMetadata]:
+        """Get model metadata"""
+        return self.models.get(model_id)
+        
+    def get_version(self, model_id: str, version: str) -> Optional[ModelVersion]:
+        """Get specific model version"""
+        if model_id not in self.versions:
+            return None
+            
+        for v in self.versions[model_id]:
+            if v.version == version:
+                return v
+        return None
+        
+    def get_latest_version(self, model_id: str) -> Optional[ModelVersion]:
+        """Get latest version of a model"""
+        if model_id not in self.versions or not self.versions[model_id]:
+            return None
+            
+        return max(self.versions[model_id], key=lambda v: v.created_at)
+        
+    def get_best_version(self, model_id: str, metric: str, 
+                        higher_better: bool = True) -> Optional[ModelVersion]:
+        """Get best performing version by metric"""
+        if model_id not in self.versions or not self.versions[model_id]:
+            return None
+            
+        valid_versions = [v for v in self.versions[model_id] if metric in v.metrics]
+        if not valid_versions:
+            return None
+            
+        return max(valid_versions, key=lambda v: v.metrics[metric] * (1 if higher_better else -1))
+        
+    def list_models(self) -> List[ModelMetadata]:
+        """List all registered models"""
+        return list(self.models.values())
+        
+    def tag_version(self, model_id: str, version: str, tag: str):
+        """Tag a model version"""
+        model_version = self.get_version(model_id, version)
+        if model_version:
+            model_version.tags.add(tag)
+            logger.info(f"Tagged {model_id}:{version} with '{tag}'")
+            
+    def get_version_by_tag(self, model_id: str, tag: str) -> Optional[ModelVersion]:
+        """Get version by tag"""
+        if model_id not in self.versions:
+            return None
+            
+        for v in self.versions[model_id]:
+            if tag in v.tags:
+                return v
+        return None
+        
+    def update_model_metadata(self, model_id: str, metadata: Dict[str, Any]):
+        """Update model metadata"""
+        if model_id in self.models:
+            self.models[model_id].metadata.update(metadata)
+            self.models[model_id].updated_at = datetime.now()
+            
+    def update_version_status(self, model_id: str, version: str, status: ModelStatus):
+        """Update version status"""
+        model_version = self.get_version(model_id, version)
+        if model_version:
+            model_version.status = status
+            logger.info(f"Updated {model_id}:{version} status to {status.value}")
+            
+    # Performance tracking
+    def log_performance(self, model_id: str, version: str, metrics: Dict[str, float],
+                       environment: str = "default", timestamp: Optional[datetime] = None,
+                       check_alerts: bool = False) -> List[str]:
+        """Log performance metrics"""
+        if model_id not in self.models:
+            raise ValueError(f"Model {model_id} not found")
+            
+        metric = PerformanceMetric(
+            model_id=model_id,
+            version=version,
+            metrics=metrics,
+            environment=environment,
+            timestamp=timestamp or datetime.now()
+        )
+        
+        if model_id not in self.performance_history:
+            self.performance_history[model_id] = []
+            
+        self.performance_history[model_id].append(metric)
+        
+        alerts = []
+        if check_alerts:
+            alerts = self._check_performance_alerts(model_id, version, metrics)
+            
+        return alerts
+        
+    def get_performance_history(self, model_id: str, version: str,
+                               environment: Optional[str] = None) -> List[PerformanceMetric]:
+        """Get performance history for a model version"""
+        if model_id not in self.performance_history:
+            return []
+            
+        history = [m for m in self.performance_history[model_id] if m.version == version]
+        
+        if environment:
+            history = [m for m in history if m.environment == environment]
+            
+        return sorted(history, key=lambda m: m.timestamp)
+        
+    def get_performance_stats(self, model_id: str, version: str,
+                            environment: Optional[str] = None) -> Dict[str, Dict[str, float]]:
+        """Get aggregated performance statistics"""
+        history = self.get_performance_history(model_id, version, environment)
+        
+        if not history:
+            return {}
+            
+        stats = {}
+        all_metrics = set()
+        for h in history:
+            all_metrics.update(h.metrics.keys())
+            
+        for metric in all_metrics:
+            values = [h.metrics[metric] for h in history if metric in h.metrics]
+            if values:
+                stats[metric] = {
+                    "count": len(values),
+                    "mean": statistics.mean(values),
+                    "min": min(values),
+                    "max": max(values),
+                    "stddev": statistics.stdev(values) if len(values) > 1 else 0
+                }
+                
+        return stats
+        
+    def compare_versions(self, model_id: str, version1: str, version2: str,
+                        metrics: List[str]) -> Dict[str, Dict[str, float]]:
+        """Compare performance between two versions"""
+        stats1 = self.get_performance_stats(model_id, version1)
+        stats2 = self.get_performance_stats(model_id, version2)
+        
+        comparison = {}
+        for metric in metrics:
+            if metric in stats1 and metric in stats2:
+                v1_mean = stats1[metric]["mean"]
+                v2_mean = stats2[metric]["mean"]
+                
+                comparison[metric] = {
+                    "v1_mean": v1_mean,
+                    "v2_mean": v2_mean,
+                    "improvement": v1_mean - v2_mean,
+                    "percent_change": ((v2_mean - v1_mean) / v1_mean * 100) if v1_mean != 0 else 0
+                }
+                
+        return comparison
+        
+    def set_performance_thresholds(self, model_id: str, version: str,
+                                 thresholds: Dict[str, Dict[str, float]]):
+        """Set performance thresholds for alerting"""
+        if model_id not in self.performance_thresholds:
+            self.performance_thresholds[model_id] = {}
+            
+        self.performance_thresholds[model_id][version] = thresholds
+        
+    def _check_performance_alerts(self, model_id: str, version: str,
+                                metrics: Dict[str, float]) -> List[str]:
+        """Check if metrics violate thresholds"""
+        alerts = []
+        
+        if (model_id in self.performance_thresholds and 
+            version in self.performance_thresholds[model_id]):
+            
+            thresholds = self.performance_thresholds[model_id][version]
+            
+            for metric, value in metrics.items():
+                if metric in thresholds:
+                    if "min" in thresholds[metric] and value < thresholds[metric]["min"]:
+                        alerts.append(f"{metric} ({value}) below minimum threshold ({thresholds[metric]['min']})")
+                    if "max" in thresholds[metric] and value > thresholds[metric]["max"]:
+                        alerts.append(f"{metric} ({value}) above maximum threshold ({thresholds[metric]['max']})")
+                        
+        return alerts
+        
+    def analyze_performance_trends(self, model_id: str, version: str,
+                                 window_hours: int = 24) -> Dict[str, Dict[str, Any]]:
+        """Analyze performance trends over time window"""
+        history = self.get_performance_history(model_id, version)
+        cutoff = datetime.now() - timedelta(hours=window_hours)
+        recent = [h for h in history if h.timestamp >= cutoff]
+        
+        if len(recent) < 2:
+            return {}
+            
+        trends = {}
+        all_metrics = set()
+        for h in recent:
+            all_metrics.update(h.metrics.keys())
+            
+        for metric in all_metrics:
+            values = [(h.timestamp, h.metrics[metric]) for h in recent if metric in h.metrics]
+            if len(values) >= 2:
+                # Simple linear trend
+                first_val = values[0][1]
+                last_val = values[-1][1]
+                change = last_val - first_val
+                
+                if abs(change) < 0.01 * abs(first_val):  # Less than 1% change
+                    trend = "stable"
+                elif change > 0:
+                    trend = "increasing"
+                else:
+                    trend = "decreasing"
+                    
+                trends[metric] = {
+                    "trend": trend,
+                    "change_rate": change,
+                    "first_value": first_val,
+                    "last_value": last_val
+                }
+                
+        return trends
+        
+    # Deployment management
+    def create_deployment(self, model_id: str, version: str, stage: DeploymentStage,
+                        strategy: DeploymentStrategy = DeploymentStrategy.ROLLING,
+                        config: Optional[Dict[str, Any]] = None) -> Deployment:
+        """Create a new deployment"""
+        if model_id not in self.models:
+            raise ValueError(f"Model {model_id} not found")
+            
+        deployment_id = f"deploy-{uuid.uuid4().hex[:8]}"
+        
+        deployment = Deployment(
+            id=deployment_id,
+            model_id=model_id,
+            version=version,
+            stage=stage,
+            strategy=strategy,
+            config=config or {}
+        )
+        
+        self.deployments[deployment_id] = deployment
+        logger.info(f"Created deployment {deployment_id} for {model_id}:{version} to {stage.value}")
+        
+        return deployment
+        
+    def promote_deployment(self, deployment_id: str, target_stage: DeploymentStage) -> Deployment:
+        """Promote deployment to new stage"""
+        if deployment_id not in self.deployments:
+            raise ValueError(f"Deployment {deployment_id} not found")
+            
+        old_deployment = self.deployments[deployment_id]
+        
+        # Create new deployment in target stage
+        new_deployment = self.create_deployment(
+            model_id=old_deployment.model_id,
+            version=old_deployment.version,
+            stage=target_stage,
+            strategy=old_deployment.strategy,
+            config=old_deployment.config
+        )
+        
+        logger.info(f"Promoted {deployment_id} from {old_deployment.stage.value} to {target_stage.value}")
+        return new_deployment
+        
+    def rollback_deployment(self, model_id: str, stage: DeploymentStage,
+                          target_version: str) -> Deployment:
+        """Rollback to a previous version"""
+        # Find current deployment
+        current = None
+        for d in self.deployments.values():
+            if d.model_id == model_id and d.stage == stage and d.status == "active":
+                current = d
+                break
+                
+        if current:
+            current.status = "rolled_back"
+            
+        # Create new deployment with target version
+        return self.create_deployment(model_id, target_version, stage)
+        
+    def get_active_deployments(self, model_id: str) -> List[Deployment]:
+        """Get all active deployments for a model"""
+        return [d for d in self.deployments.values() 
+                if d.model_id == model_id and d.status == "active"]
+                
+    def get_deployment_history(self, model_id: str, stage: DeploymentStage) -> List[Deployment]:
+        """Get deployment history for a model and stage"""
+        deployments = [d for d in self.deployments.values()
+                      if d.model_id == model_id and d.stage == stage]
+        return sorted(deployments, key=lambda d: d.created_at)
+        
+    def log_deployment_metrics(self, deployment_id: str, metrics: Dict[str, float]):
+        """Log deployment metrics"""
+        if deployment_id in self.deployments:
+            deployment = self.deployments[deployment_id]
+            # Store in performance history with deployment tag
+            self.log_performance(
+                deployment.model_id,
+                deployment.version,
+                metrics,
+                environment=f"deployment-{deployment.stage.value}"
+            )
+            
+    def check_deployment_health(self, deployment_id: str) -> Dict[str, Any]:
+        """Check deployment health"""
+        if deployment_id not in self.deployments:
+            return {"status": "unknown", "error": "Deployment not found"}
+            
+        deployment = self.deployments[deployment_id]
+        
+        # Get recent metrics
+        recent_metrics = self.get_performance_history(
+            deployment.model_id,
+            deployment.version,
+            f"deployment-{deployment.stage.value}"
+        )
+        
+        if not recent_metrics:
+            return {"status": "unknown", "error": "No metrics available"}
+            
+        latest = recent_metrics[-1].metrics
+        
+        # Simple health check based on error rate
+        error_rate = latest.get("error_count", 0) / max(latest.get("request_count", 1), 1)
+        
+        if error_rate > 0.1:
+            status = "unhealthy"
+        elif error_rate > 0.05:
+            status = "degraded"
+        else:
+            status = "healthy"
+            
+        return {
+            "status": status,
+            "error_rate": error_rate,
+            "metrics": latest,
+            "last_check": recent_metrics[-1].timestamp
+        }
+        
+    # Experiment tracking
+    def create_experiment(self, name: str, description: str = "",
+                        metadata: Optional[Dict[str, Any]] = None) -> Experiment:
+        """Create a new experiment"""
+        exp_id = f"exp-{uuid.uuid4().hex[:8]}"
+        
+        experiment = Experiment(
+            id=exp_id,
+            name=name,
+            description=description,
+            metadata=metadata or {}
+        )
+        
+        self.experiments[exp_id] = experiment
+        logger.info(f"Created experiment: {exp_id} ({name})")
+        
+        return experiment
+        
+    def create_experiment_run(self, experiment_id: str, 
+                            parameters: Dict[str, Any]) -> ExperimentRun:
+        """Create a new experiment run"""
+        if experiment_id not in self.experiments:
+            raise ValueError(f"Experiment {experiment_id} not found")
+            
+        run_id = f"run-{uuid.uuid4().hex[:8]}"
+        
+        run = ExperimentRun(
+            id=run_id,
+            experiment_id=experiment_id,
+            parameters=parameters
+        )
+        
+        self.experiment_runs[run_id] = run
+        logger.info(f"Created experiment run: {run_id}")
+        
+        return run
+        
+    def log_run_metrics(self, run_id: str, metrics: Dict[str, float]):
+        """Log metrics for an experiment run"""
+        if run_id in self.experiment_runs:
+            self.experiment_runs[run_id].metrics.update(metrics)
+            logger.info(f"Logged metrics for run {run_id}")
+            
+    def complete_run(self, run_id: str):
+        """Mark experiment run as complete"""
+        if run_id in self.experiment_runs:
+            self.experiment_runs[run_id].completed_at = datetime.now()
+            
+    def get_best_run(self, experiment_id: str, metric: str,
+                    higher_better: bool = True) -> Optional[ExperimentRun]:
+        """Get best run from an experiment"""
+        runs = [r for r in self.experiment_runs.values() if r.experiment_id == experiment_id]
+        
+        valid_runs = [r for r in runs if metric in r.metrics]
+        if not valid_runs:
+            return None
+            
+        return max(valid_runs, key=lambda r: r.metrics[metric] * (1 if higher_better else -1))
+
+
+if __name__ == "__main__":
+    # Test with real model registry scenario
+    registry = AIModelRegistry()
+    
+    # Register a text classification model
+    model_id = registry.register_model(
+        name="sentiment-analyzer",
+        model_type=ModelType.TEXT_CLASSIFICATION,
+        framework="transformers",
+        description="BERT-based sentiment analysis for customer reviews"
+    )
+    print(f"✓ Registered model: {model_id}")
+    
+    # Create initial version
+    v1 = registry.create_version(
+        model_id=model_id,
+        version="1.0.0",
+        path="/models/sentiment-v1.0.0.bin",
+        metrics={"accuracy": 0.89, "f1_score": 0.87}
+    )
+    print(f"✓ Created version 1.0.0 with accuracy: {v1.metrics['accuracy']}")
+    
+    # Log performance metrics
+    registry.log_performance(
+        model_id=model_id,
+        version="1.0.0",
+        metrics={
+            "latency_ms": 45.2,
+            "throughput_qps": 150,
+            "memory_mb": 512
+        },
+        environment="production"
+    )
+    print("✓ Logged production performance metrics")
+    
+    # Create improved version
+    v2 = registry.create_version(
+        model_id=model_id,
+        version="2.0.0",
+        path="/models/sentiment-v2.0.0.bin",
+        metrics={"accuracy": 0.94, "f1_score": 0.92}
+    )
+    registry.tag_version(model_id, "2.0.0", "stable")
+    print(f"✓ Created version 2.0.0 with improved accuracy: {v2.metrics['accuracy']}")
+    
+    # Deploy to staging
+    deployment = registry.create_deployment(
+        model_id=model_id,
+        version="2.0.0",
+        stage=DeploymentStage.STAGING,
+        strategy=DeploymentStrategy.CANARY,
+        config={"canary_percentage": 10}
+    )
+    print(f"✓ Deployed to staging with canary strategy")
+    
+    # Run experiment
+    exp = registry.create_experiment(
+        name="hyperparameter-optimization",
+        description="Grid search for optimal learning rate"
+    )
+    
+    # Simulate multiple runs
+    best_accuracy = 0
+    for lr in [0.001, 0.0001, 0.00001]:
+        run = registry.create_experiment_run(
+            experiment_id=exp.id,
+            parameters={"learning_rate": lr, "batch_size": 32}
+        )
+        
+        # Simulate training results
+        accuracy = 0.90 + (0.05 if lr == 0.0001 else 0)
+        registry.log_run_metrics(run.id, {"accuracy": accuracy, "loss": 1-accuracy})
+        registry.complete_run(run.id)
+        
+        if accuracy > best_accuracy:
+            best_accuracy = accuracy
+    
+    print(f"✓ Completed experiment with best accuracy: {best_accuracy}")
+    
+    # Get performance comparison
+    comparison = registry.compare_versions(
+        model_id=model_id,
+        version1="1.0.0",
+        version2="2.0.0",
+        metrics=["accuracy", "f1_score"]
+    )
+    
+    print(f"✓ Version comparison shows {comparison['accuracy']['percent_change']:.1f}% improvement")
+    
+    print("\n✅ AI Model Registry validation passed")

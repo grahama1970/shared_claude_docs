@@ -1,0 +1,17 @@
+Enhanced Cleanup Summary v4 - 2025-05-30 07:26:52
+======================================================================
+Total: 11 | Success: 3 | Failed: 0 | Issues: 8 | Skipped: 0
+Total Fixes Applied: 2
+Git: Tagged: 11 | Branches: 2 | Merged: 0
+======================================================================
+sparta........................ issues......... 2 issues, 0 fixes
+marker........................ issues......... 2 issues, 0 fixes
+arangodb...................... issues......... 2 issues, 0 fixes
+youtube_transcripts........... issues......... 2 issues, 0 fixes
+claude_max_proxy.............. issues......... 3 issues, 1 fixes [BRANCH: cleanup-20250530-072613]
+arxiv-mcp-server.............. issues......... 2 issues, 0 fixes
+claude-module-communicator.... issues......... 3 issues, 1 fixes [BRANCH: cleanup-20250530-072631]
+claude-test-reporter.......... success........ 0 issues, 0 fixes
+unsloth_wip................... success........ 0 issues, 0 fixes
+marker-ground-truth........... success........ 0 issues, 0 fixes
+mcp-screenshot................ issues......... 2 issues, 0 fixes

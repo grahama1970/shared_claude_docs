@@ -1,0 +1,154 @@
+{
+  "project": "Granger Level 0",
+  "summary": {
+    "total": 6,
+    "passed": 4,
+    "failed": 2,
+    "success_rate": 66.66666666666666
+  },
+  "results": [
+    {
+      "interaction_name": "arxiv_search",
+      "level": "Single module functionality",
+      "success": true,
+      "duration": 0.05584836006164551,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "success": true,
+          "papers": [
+            "Paper about reinforcement learning #0",
+            "Paper about reinforcement learning #1",
+            "Paper about reinforcement learning #2",
+            "Paper about reinforcement learning #3",
+            "Paper about reinforcement learning #4"
+          ],
+          "count": 5
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.278672",
+      "metrics": {
+        "setup_time": 0.055840253829956055,
+        "teardown_time": 9.5367431640625e-07
+      }
+    },
+    {
+      "interaction_name": "marker_extraction",
+      "level": "Single module functionality",
+      "success": false,
+      "duration": 7.152557373046875e-06,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "success": false,
+          "error": "Marker not available"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.278694",
+      "metrics": {
+        "setup_time": 1.1920928955078125e-06,
+        "teardown_time": 4.76837158203125e-07
+      }
+    },
+    {
+      "interaction_name": "arangodb_storage",
+      "level": "Single module functionality",
+      "success": true,
+      "duration": 0.12567472457885742,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "success": true,
+          "key": "mock_key_123"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.404379",
+      "metrics": {
+        "setup_time": 0.12566900253295898,
+        "teardown_time": 7.152557373046875e-07
+      }
+    },
+    {
+      "interaction_name": "youtube_transcript",
+      "level": "Single module functionality",
+      "success": false,
+      "duration": 4.76837158203125e-06,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "success": false,
+          "error": "YouTube module not available"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.404398",
+      "metrics": {
+        "setup_time": 1.1920928955078125e-06,
+        "teardown_time": 4.76837158203125e-07
+      }
+    },
+    {
+      "interaction_name": "sparta_security",
+      "level": "Single module functionality",
+      "success": true,
+      "duration": 0.00024819374084472656,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "success": true,
+          "vulnerability": "CVE-2024-0001",
+          "severity": "HIGH",
+          "description": "Mock analysis for CVE-2024-0001",
+          "recommendations": [
+            "Update software",
+            "Apply patches"
+          ]
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.404653",
+      "metrics": {
+        "setup_time": 0.00024390220642089844,
+        "teardown_time": 4.76837158203125e-07
+      }
+    },
+    {
+      "interaction_name": "flexible_agent_pattern",
+      "level": "Single module functionality",
+      "success": true,
+      "duration": 0.00015282630920410156,
+      "input_data": {},
+      "output_data": {
+        "result": {
+          "steps": [
+            {
+              "module": "arxiv",
+              "result": {
+                "success": true,
+                "mock": true,
+                "module": "arxiv"
+              }
+            }
+          ],
+          "success": true
+        }
+      },
+      "error": null,
+      "timestamp": "2025-06-07T19:57:18.404815",
+      "metrics": {
+        "setup_time": 0.0001461505889892578,
+        "teardown_time": 2.384185791015625e-07
+      }
+    }
+  ],
+  "by_level": {
+    "LEVEL_0": {
+      "total": 6,
+      "passed": 4,
+      "failed": 2
+    }
+  }
+}

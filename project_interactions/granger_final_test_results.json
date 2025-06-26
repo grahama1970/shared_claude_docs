@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-06-08T08:50:54.332156",
+  "modules": {
+    "granger_hub": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "rl_commons": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "arangodb": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "youtube_transcripts": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "sparta": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "marker": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "world_model": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "claude_test_reporter": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    },
+    "llm_call": {
+      "status": "PASS",
+      "import": true,
+      "operations": true,
+      "errors": []
+    }
+  },
+  "integration_tests": {
+    "youtube_to_arangodb": {
+      "status": "PASS",
+      "errors": []
+    },
+    "rl_optimization": {
+      "status": "PASS",
+      "errors": []
+    },
+    "test_reporting": {
+      "status": "PASS",
+      "errors": []
+    }
+  },
+  "overall_status": "PASS",
+  "success_rate": "100.0%"
+}

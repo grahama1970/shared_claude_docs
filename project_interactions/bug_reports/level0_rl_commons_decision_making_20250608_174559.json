@@ -1,0 +1,196 @@
+{
+  "test_name": "RL Commons Decision Making",
+  "level": 0,
+  "modules": [
+    "RL Commons",
+    "Test Reporter"
+  ],
+  "timestamp": "20250608_174559",
+  "duration": 0.008609294891357422,
+  "verification": {
+    "verified": false,
+    "reason": "Test Reporter not available",
+    "confidence_score": 0.5,
+    "total_tests": 13,
+    "passed_tests": 10,
+    "failed_tests": 3,
+    "bugs_found": 1,
+    "suspicious_patterns": []
+  },
+  "bugs": [
+    {
+      "bug": "Poor adaptation to reward change",
+      "severity": "HIGH",
+      "timestamp": 1749419159.1881974,
+      "test_level": 0,
+      "modules": [
+        "RL Commons",
+        "Test Reporter"
+      ],
+      "new_optimal_selections": 3,
+      "total": 50
+    }
+  ],
+  "test_results": [
+    {
+      "test": "rl_commons_import",
+      "passed": true,
+      "timestamp": 1749419159.1865098,
+      "duration": 0.00031304359436035156,
+      "details": {}
+    },
+    {
+      "test": "bandit_Simple 3-armed bandit",
+      "passed": true,
+      "timestamp": 1749419159.1867352,
+      "duration": 0.0005385875701904297,
+      "details": {
+        "decisions": {
+          "action_b": 91,
+          "action_a": 7,
+          "action_c": 2
+        },
+        "exploration_rate": 0.13
+      }
+    },
+    {
+      "test": "bandit_High exploration",
+      "passed": true,
+      "timestamp": 1749419159.1868978,
+      "duration": 0.0007011890411376953,
+      "details": {
+        "decisions": {
+          "explore2": 61,
+          "explore1": 39
+        },
+        "exploration_rate": 0.9
+      }
+    },
+    {
+      "test": "bandit_No exploration",
+      "passed": true,
+      "timestamp": 1749419159.1870687,
+      "duration": 0.0008721351623535156,
+      "details": {
+        "decisions": {
+          "exploit1": 100
+        },
+        "exploration_rate": 0.0
+      }
+    },
+    {
+      "test": "bandit_Many actions",
+      "passed": true,
+      "timestamp": 1749419159.1876862,
+      "duration": 0.0014896392822265625,
+      "details": {
+        "decisions": {
+          "action_21": 1,
+          "action_45": 13,
+          "action_43": 1,
+          "action_46": 3,
+          "action_12": 3,
+          "action_42": 18,
+          "action_20": 1,
+          "action_41": 1,
+          "action_24": 18,
+          "action_13": 16,
+          "action_0": 1,
+          "action_14": 2,
+          "action_5": 1,
+          "action_27": 2,
+          "action_49": 13,
+          "action_31": 1,
+          "action_39": 1,
+          "action_38": 1,
+          "action_44": 1,
+          "action_17": 2
+        },
+        "exploration_rate": 0.22
+      }
+    },
+    {
+      "test": "bandit_Empty actions",
+      "passed": false,
+      "timestamp": 1749419159.1876912,
+      "duration": 0.0014946460723876953,
+      "details": {
+        "error": "Actions list cannot be empty"
+      }
+    },
+    {
+      "test": "bandit_Invalid exploration rate",
+      "passed": false,
+      "timestamp": 1749419159.187698,
+      "duration": 0.001501321792602539,
+      "details": {
+        "error": "Exploration rate must be between 0 and 1, got 1.5"
+      }
+    },
+    {
+      "test": "reward_learning",
+      "passed": true,
+      "timestamp": 1749419159.1880178,
+      "duration": 0.0018215179443359375,
+      "details": {
+        "optimal_rate": 0.96
+      }
+    },
+    {
+      "test": "bug_check_1",
+      "passed": false,
+      "timestamp": 1749419159.1881993,
+      "duration": 0.0020029544830322266,
+      "details": {
+        "bug": "Poor adaptation to reward change",
+        "severity": "HIGH",
+        "new_optimal_selections": 3,
+        "total": 50
+      }
+    },
+    {
+      "test": "scaling_10_arms",
+      "passed": true,
+      "timestamp": 1749419159.1884217,
+      "duration": 0.0002155303955078125,
+      "details": {
+        "arms": 10,
+        "duration": 0.0002155303955078125,
+        "decisions_per_second": 463971.6814159292
+      }
+    },
+    {
+      "test": "scaling_50_arms",
+      "passed": true,
+      "timestamp": 1749419159.1889951,
+      "duration": 0.0005693435668945312,
+      "details": {
+        "arms": 50,
+        "duration": 0.0005693435668945312,
+        "decisions_per_second": 175640.87102177556
+      }
+    },
+    {
+      "test": "scaling_100_arms",
+      "passed": true,
+      "timestamp": 1749419159.1898923,
+      "duration": 0.0008940696716308594,
+      "details": {
+        "arms": 100,
+        "duration": 0.0008940696716308594,
+        "decisions_per_second": 111848.10666666667
+      }
+    },
+    {
+      "test": "scaling_500_arms",
+      "passed": true,
+      "timestamp": 1749419159.194741,
+      "duration": 0.0048444271087646484,
+      "details": {
+        "arms": 500,
+        "duration": 0.0048444271087646484,
+        "decisions_per_second": 20642.275702544415
+      }
+    }
+  ]
+}

@@ -1,0 +1,915 @@
+"""
+Module: collaboration_engine_interaction.py
+Purpose: Real-time collaboration system for shared workspaces with operational transformation
+
+External Dependencies:
+- websockets: https://websockets.readthedocs.io/
+- aiofiles: https://github.com/Tinche/aiofiles
+- asyncio: https://docs.python.org/3/library/asyncio.html
+
+Example Usage:
+>>> from collaboration_engine_interaction import CollaborationEngine
+>>> engine = CollaborationEngine()
+>>> session = await engine.create_session("doc123", "user1")
+>>> await engine.broadcast_change(session.id, {"op": "insert", "pos": 0, "text": "Hello"})
+"""
+
+import asyncio
+import json
+import time
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Any, Tuple
+from dataclasses import dataclass, field, asdict
+from enum import Enum
+import hashlib
+from collections import defaultdict, deque
+from loguru import logger
+
+# Level 2 - Parallel Processing for real-time collaboration
+
+
+class OperationType(Enum):
+    """Types of document operations"""
+    INSERT = "insert"
+    DELETE = "delete"
+    FORMAT = "format"
+    CURSOR = "cursor"
+    SELECTION = "selection"
+    COMMENT = "comment"
+    LOCK = "lock"
+    UNLOCK = "unlock"
+
+
+class ConflictResolution(Enum):
+    """Conflict resolution strategies"""
+    TRANSFORM = "transform"  # Operational transformation
+    LAST_WRITE = "last_write"  # Last writer wins
+    MERGE = "merge"  # Three-way merge
+    MANUAL = "manual"  # User decides
+
+
+@dataclass
+class User:
+    """Represents a user in the collaboration system"""
+    id: str
+    name: str
+    color: str
+    cursor_pos: int = 0
+    selection_start: Optional[int] = None
+    selection_end: Optional[int] = None
+    last_seen: float = field(default_factory=time.time)
+    permissions: Set[str] = field(default_factory=lambda: {"read", "write"})
+
+
+@dataclass
+class Operation:
+    """Represents a document operation"""
+    id: str
+    type: OperationType
+    user_id: str
+    timestamp: float
+    version: int
+    data: Dict[str, Any]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary"""
+        return {
+            "id": self.id,
+            "type": self.type.value,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp,
+            "version": self.version,
+            "data": self.data
+        }
+
+
+@dataclass
+class Document:
+    """Represents a collaborative document"""
+    id: str
+    content: str
+    version: int = 0
+    operations: List[Operation] = field(default_factory=list)
+    locks: Dict[str, str] = field(default_factory=dict)  # region -> user_id
+    comments: List[Dict[str, Any]] = field(default_factory=list)
+    
+    def apply_operation(self, op: Operation) -> bool:
+        """Apply an operation to the document"""
+        try:
+            if op.type == OperationType.INSERT:
+                pos = op.data["position"]
+                text = op.data["text"]
+                self.content = self.content[:pos] + text + self.content[pos:]
+                self.version += 1
+                return True
+            elif op.type == OperationType.DELETE:
+                start = op.data["start"]
+                end = op.data["end"]
+                self.content = self.content[:start] + self.content[end:]
+                self.version += 1
+                return True
+            elif op.type == OperationType.COMMENT:
+                self.comments.append({
+                    "id": op.id,
+                    "user_id": op.user_id,
+                    "timestamp": op.timestamp,
+                    "position": op.data["position"],
+                    "text": op.data["text"]
+                })
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Failed to apply operation: {e}")
+            return False
+
+
+@dataclass
+class Session:
+    """Represents a collaboration session"""
+    id: str
+    document_id: str
+    users: Dict[str, User] = field(default_factory=dict)
+    created_at: float = field(default_factory=time.time)
+    active: bool = True
+    
+    def add_user(self, user: User) -> bool:
+        """Add user to session"""
+        if user.id not in self.users:
+            self.users[user.id] = user
+            logger.info(f"User {user.name} joined session {self.id}")
+            return True
+        return False
+    
+    def remove_user(self, user_id: str) -> bool:
+        """Remove user from session"""
+        if user_id in self.users:
+            del self.users[user_id]
+            logger.info(f"User {user_id} left session {self.id}")
+            return True
+        return False
+    
+    def get_active_users(self) -> List[User]:
+        """Get currently active users"""
+        now = time.time()
+        return [u for u in self.users.values() if now - u.last_seen < 30]
+
+
+class OperationalTransform:
+    """Handles operational transformation for conflict resolution"""
+    
+    @staticmethod
+    def transform_insert_insert(op1: Operation, op2: Operation) -> Tuple[Operation, Operation]:
+        """Transform two insert operations"""
+        pos1 = op1.data["position"]
+        pos2 = op2.data["position"]
+        text1 = op1.data["text"]
+        text2 = op2.data["text"]
+        
+        if pos1 < pos2:
+            # op1 happens before op2's position
+            op2_prime = Operation(
+                id=op2.id,
+                type=op2.type,
+                user_id=op2.user_id,
+                timestamp=op2.timestamp,
+                version=op2.version,
+                data={"position": pos2 + len(text1), "text": text2}
+            )
+            return op1, op2_prime
+        elif pos1 > pos2:
+            # op2 happens before op1's position
+            op1_prime = Operation(
+                id=op1.id,
+                type=op1.type,
+                user_id=op1.user_id,
+                timestamp=op1.timestamp,
+                version=op1.version,
+                data={"position": pos1 + len(text2), "text": text1}
+            )
+            return op1_prime, op2
+        else:
+            # Same position - use timestamp to break tie
+            if op1.timestamp < op2.timestamp:
+                op2_prime = Operation(
+                    id=op2.id,
+                    type=op2.type,
+                    user_id=op2.user_id,
+                    timestamp=op2.timestamp,
+                    version=op2.version,
+                    data={"position": pos2 + len(text1), "text": text2}
+                )
+                return op1, op2_prime
+            else:
+                op1_prime = Operation(
+                    id=op1.id,
+                    type=op1.type,
+                    user_id=op1.user_id,
+                    timestamp=op1.timestamp,
+                    version=op1.version,
+                    data={"position": pos1 + len(text2), "text": text1}
+                )
+                return op1_prime, op2
+    
+    @staticmethod
+    def transform_delete_delete(op1: Operation, op2: Operation) -> Tuple[Operation, Operation]:
+        """Transform two delete operations"""
+        start1, end1 = op1.data["start"], op1.data["end"]
+        start2, end2 = op2.data["start"], op2.data["end"]
+        len1 = end1 - start1
+        len2 = end2 - start2
+        
+        if end1 <= start2:
+            # op1 before op2
+            op2_prime = Operation(
+                id=op2.id,
+                type=op2.type,
+                user_id=op2.user_id,
+                timestamp=op2.timestamp,
+                version=op2.version,
+                data={"start": start2 - len1, "end": end2 - len1}
+            )
+            return op1, op2_prime
+        elif end2 <= start1:
+            # op2 before op1
+            op1_prime = Operation(
+                id=op1.id,
+                type=op1.type,
+                user_id=op1.user_id,
+                timestamp=op1.timestamp,
+                version=op1.version,
+                data={"start": start1 - len2, "end": end1 - len2}
+            )
+            return op1_prime, op2
+        else:
+            # Overlapping deletes - complex case
+            new_start1 = min(start1, start2)
+            new_end1 = max(start1, start2)
+            new_start2 = max(start1, start2)
+            new_end2 = min(end1, end2)
+            
+            if new_start2 >= new_end2:
+                # One delete contains the other
+                if start1 < start2:
+                    return op1, Operation(
+                        id=op2.id,
+                        type=op2.type,
+                        user_id=op2.user_id,
+                        timestamp=op2.timestamp,
+                        version=op2.version,
+                        data={"start": start1, "end": start1}  # No-op
+                    )
+                else:
+                    return Operation(
+                        id=op1.id,
+                        type=op1.type,
+                        user_id=op1.user_id,
+                        timestamp=op1.timestamp,
+                        version=op1.version,
+                        data={"start": start2, "end": start2}  # No-op
+                    ), op2
+            
+            return op1, op2  # Fallback
+    
+    @staticmethod
+    def transform(op1: Operation, op2: Operation) -> Tuple[Operation, Operation]:
+        """Transform two operations"""
+        if op1.type == OperationType.INSERT and op2.type == OperationType.INSERT:
+            return OperationalTransform.transform_insert_insert(op1, op2)
+        elif op1.type == OperationType.DELETE and op2.type == OperationType.DELETE:
+            return OperationalTransform.transform_delete_delete(op1, op2)
+        # Add more transformation cases as needed
+        return op1, op2
+
+
+class CollaborationEngine:
+    """Main collaboration engine for real-time document editing"""
+    
+    def __init__(self, storage_dir: str = "./collaboration_data"):
+        self.storage_dir = Path(storage_dir)
+        self.storage_dir.mkdir(exist_ok=True)
+        
+        self.sessions: Dict[str, Session] = {}
+        self.documents: Dict[str, Document] = {}
+        self.operation_queue: Dict[str, deque] = defaultdict(deque)
+        self.websocket_connections: Dict[str, Set[Any]] = defaultdict(set)
+        
+        # Offline sync support
+        self.offline_operations: Dict[str, List[Operation]] = defaultdict(list)
+        
+        logger.info("Collaboration Engine initialized")
+    
+    async def create_session(self, document_id: str, user_id: str, user_name: str = "Anonymous") -> Session:
+        """Create a new collaboration session"""
+        session_id = str(uuid.uuid4())
+        
+        # Create or load document
+        if document_id not in self.documents:
+            self.documents[document_id] = Document(
+                id=document_id,
+                content=""
+            )
+        
+        # Create session
+        session = Session(
+            id=session_id,
+            document_id=document_id
+        )
+        
+        # Add user
+        user = User(
+            id=user_id,
+            name=user_name,
+            color=self._generate_user_color(user_id)
+        )
+        session.add_user(user)
+        
+        self.sessions[session_id] = session
+        logger.info(f"Created session {session_id} for document {document_id}")
+        
+        return session
+    
+    async def join_session(self, session_id: str, user_id: str, user_name: str = "Anonymous") -> Optional[Session]:
+        """Join an existing session"""
+        if session_id not in self.sessions:
+            return None
+        
+        session = self.sessions[session_id]
+        user = User(
+            id=user_id,
+            name=user_name,
+            color=self._generate_user_color(user_id)
+        )
+        
+        if session.add_user(user):
+            await self._broadcast_presence_update(session_id)
+            return session
+        
+        return None
+    
+    async def leave_session(self, session_id: str, user_id: str) -> bool:
+        """Leave a session"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        if session.remove_user(user_id):
+            await self._broadcast_presence_update(session_id)
+            
+            # Clean up empty sessions
+            if not session.users:
+                del self.sessions[session_id]
+                logger.info(f"Removed empty session {session_id}")
+            
+            return True
+        
+        return False
+    
+    async def apply_operation(self, session_id: str, operation: Operation) -> bool:
+        """Apply an operation to a document"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        document = self.documents[session.document_id]
+        
+        # Check permissions
+        user = session.users.get(operation.user_id)
+        if not user or "write" not in user.permissions:
+            logger.warning(f"User {operation.user_id} lacks write permission")
+            return False
+        
+        # Handle conflicts with operational transformation
+        if document.operations:
+            # Get concurrent operations
+            concurrent_ops = [
+                op for op in document.operations
+                if op.version >= operation.version and op.id != operation.id
+            ]
+            
+            # Transform against concurrent operations
+            transformed_op = operation
+            for concurrent_op in concurrent_ops:
+                transformed_op, _ = OperationalTransform.transform(transformed_op, concurrent_op)
+        else:
+            transformed_op = operation
+        
+        # Apply the operation
+        if document.apply_operation(transformed_op):
+            document.operations.append(transformed_op)
+            
+            # Broadcast to all users
+            await self._broadcast_operation(session_id, transformed_op)
+            
+            # Save to disk for persistence
+            await self._save_document(document)
+            
+            return True
+        
+        return False
+    
+    async def update_cursor(self, session_id: str, user_id: str, position: int) -> bool:
+        """Update user cursor position"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        user = session.users.get(user_id)
+        if not user:
+            return False
+        
+        user.cursor_pos = position
+        user.last_seen = time.time()
+        
+        # Broadcast cursor update
+        cursor_op = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.CURSOR,
+            user_id=user_id,
+            timestamp=time.time(),
+            version=0,
+            data={"position": position, "user_name": user.name, "color": user.color}
+        )
+        
+        await self._broadcast_operation(session_id, cursor_op)
+        return True
+    
+    async def update_selection(self, session_id: str, user_id: str, start: int, end: int) -> bool:
+        """Update user selection"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        user = session.users.get(user_id)
+        if not user:
+            return False
+        
+        user.selection_start = start
+        user.selection_end = end
+        user.last_seen = time.time()
+        
+        # Broadcast selection update
+        selection_op = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.SELECTION,
+            user_id=user_id,
+            timestamp=time.time(),
+            version=0,
+            data={
+                "start": start,
+                "end": end,
+                "user_name": user.name,
+                "color": user.color
+            }
+        )
+        
+        await self._broadcast_operation(session_id, selection_op)
+        return True
+    
+    async def acquire_lock(self, session_id: str, user_id: str, region: str) -> bool:
+        """Acquire edit lock on a region"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        document = self.documents[session.document_id]
+        
+        # Check if region is already locked
+        if region in document.locks and document.locks[region] != user_id:
+            return False
+        
+        document.locks[region] = user_id
+        
+        # Broadcast lock acquisition
+        lock_op = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.LOCK,
+            user_id=user_id,
+            timestamp=time.time(),
+            version=0,
+            data={"region": region}
+        )
+        
+        await self._broadcast_operation(session_id, lock_op)
+        return True
+    
+    async def release_lock(self, session_id: str, user_id: str, region: str) -> bool:
+        """Release edit lock on a region"""
+        if session_id not in self.sessions:
+            return False
+        
+        session = self.sessions[session_id]
+        document = self.documents[session.document_id]
+        
+        # Check if user owns the lock
+        if document.locks.get(region) != user_id:
+            return False
+        
+        del document.locks[region]
+        
+        # Broadcast lock release
+        unlock_op = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.UNLOCK,
+            user_id=user_id,
+            timestamp=time.time(),
+            version=0,
+            data={"region": region}
+        )
+        
+        await self._broadcast_operation(session_id, unlock_op)
+        return True
+    
+    async def add_comment(self, session_id: str, user_id: str, position: int, text: str) -> bool:
+        """Add a comment to the document"""
+        if session_id not in self.sessions:
+            return False
+        
+        comment_op = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.COMMENT,
+            user_id=user_id,
+            timestamp=time.time(),
+            version=0,
+            data={"position": position, "text": text}
+        )
+        
+        return await self.apply_operation(session_id, comment_op)
+    
+    async def get_document_history(self, document_id: str, limit: int = 100) -> List[Operation]:
+        """Get document operation history"""
+        if document_id not in self.documents:
+            return []
+        
+        document = self.documents[document_id]
+        return document.operations[-limit:]
+    
+    async def sync_offline_operations(self, session_id: str, user_id: str, operations: List[Dict[str, Any]]) -> List[Operation]:
+        """Sync operations made while offline"""
+        if session_id not in self.sessions:
+            return []
+        
+        synced_operations = []
+        
+        for op_data in operations:
+            operation = Operation(
+                id=op_data.get("id", str(uuid.uuid4())),
+                type=OperationType(op_data["type"]),
+                user_id=user_id,
+                timestamp=op_data.get("timestamp", time.time()),
+                version=op_data.get("version", 0),
+                data=op_data["data"]
+            )
+            
+            if await self.apply_operation(session_id, operation):
+                synced_operations.append(operation)
+        
+        return synced_operations
+    
+    async def merge_conflicts(self, session_id: str, base_version: int, changes: List[Operation]) -> Dict[str, Any]:
+        """Merge conflicting changes"""
+        if session_id not in self.sessions:
+            return {"success": False, "error": "Session not found"}
+        
+        session = self.sessions[session_id]
+        document = self.documents[session.document_id]
+        
+        # Find operations since base version
+        concurrent_ops = [
+            op for op in document.operations
+            if op.version > base_version
+        ]
+        
+        # Transform incoming changes against concurrent operations
+        merged_changes = []
+        conflicts = []
+        
+        for change in changes:
+            transformed_change = change
+            conflict_found = False
+            
+            for concurrent_op in concurrent_ops:
+                # Check for conflicts
+                if self._operations_conflict(transformed_change, concurrent_op):
+                    conflicts.append({
+                        "incoming": transformed_change.to_dict(),
+                        "existing": concurrent_op.to_dict()
+                    })
+                    conflict_found = True
+                    break
+                
+                # Transform
+                transformed_change, _ = OperationalTransform.transform(transformed_change, concurrent_op)
+            
+            if not conflict_found:
+                merged_changes.append(transformed_change)
+        
+        return {
+            "success": True,
+            "merged": [op.to_dict() for op in merged_changes],
+            "conflicts": conflicts,
+            "current_version": document.version
+        }
+    
+    def _generate_user_color(self, user_id: str) -> str:
+        """Generate a consistent color for a user"""
+        # Use hash to generate consistent color
+        hash_value = int(hashlib.md5(user_id.encode()).hexdigest()[:6], 16)
+        hue = hash_value % 360
+        return f"hsl({hue}, 70%, 50%)"
+    
+    def _operations_conflict(self, op1: Operation, op2: Operation) -> bool:
+        """Check if two operations conflict"""
+        # Both are deletes on overlapping regions
+        if op1.type == OperationType.DELETE and op2.type == OperationType.DELETE:
+            start1, end1 = op1.data["start"], op1.data["end"]
+            start2, end2 = op2.data["start"], op2.data["end"]
+            return not (end1 <= start2 or end2 <= start1)
+        
+        # Insert and delete at same position
+        if (op1.type == OperationType.INSERT and op2.type == OperationType.DELETE):
+            pos = op1.data["position"]
+            start, end = op2.data["start"], op2.data["end"]
+            return start <= pos < end
+        
+        return False
+    
+    async def _broadcast_operation(self, session_id: str, operation: Operation):
+        """Broadcast operation to all connected users"""
+        # This would integrate with WebSocket connections
+        message = {
+            "type": "operation",
+            "session_id": session_id,
+            "operation": operation.to_dict()
+        }
+        
+        # In real implementation, send via WebSocket
+        logger.debug(f"Broadcasting operation: {message}")
+    
+    async def _broadcast_presence_update(self, session_id: str):
+        """Broadcast presence update to all users"""
+        if session_id not in self.sessions:
+            return
+        
+        session = self.sessions[session_id]
+        active_users = [
+            {
+                "id": u.id,
+                "name": u.name,
+                "color": u.color,
+                "cursor_pos": u.cursor_pos,
+                "selection": {
+                    "start": u.selection_start,
+                    "end": u.selection_end
+                } if u.selection_start is not None else None
+            }
+            for u in session.get_active_users()
+        ]
+        
+        message = {
+            "type": "presence",
+            "session_id": session_id,
+            "users": active_users
+        }
+        
+        # In real implementation, send via WebSocket
+        logger.debug(f"Broadcasting presence: {message}")
+    
+    async def _save_document(self, document: Document):
+        """Save document to disk"""
+        doc_path = self.storage_dir / f"{document.id}.json"
+        
+        data = {
+            "id": document.id,
+            "content": document.content,
+            "version": document.version,
+            "operations": [op.to_dict() for op in document.operations[-1000:]],  # Keep last 1000 ops
+            "comments": document.comments
+        }
+        
+        doc_path.write_text(json.dumps(data, indent=2))
+        logger.debug(f"Saved document {document.id}")
+    
+    async def _load_document(self, document_id: str) -> Optional[Document]:
+        """Load document from disk"""
+        doc_path = self.storage_dir / f"{document_id}.json"
+        
+        if not doc_path.exists():
+            return None
+        
+        try:
+            data = json.loads(doc_path.read_text())
+            
+            operations = []
+            for op_data in data.get("operations", []):
+                operations.append(Operation(
+                    id=op_data["id"],
+                    type=OperationType(op_data["type"]),
+                    user_id=op_data["user_id"],
+                    timestamp=op_data["timestamp"],
+                    version=op_data["version"],
+                    data=op_data["data"]
+                ))
+            
+            return Document(
+                id=data["id"],
+                content=data["content"],
+                version=data["version"],
+                operations=operations,
+                comments=data.get("comments", [])
+            )
+        except Exception as e:
+            logger.error(f"Failed to load document: {e}")
+            return None
+
+
+# Level 2 integration functions
+async def handle_document_sync(engine: CollaborationEngine, session_id: str) -> Dict[str, Any]:
+    """Handle real-time document synchronization"""
+    if session_id not in engine.sessions:
+        return {"error": "Session not found"}
+    
+    session = engine.sessions[session_id]
+    document = engine.documents[session.document_id]
+    
+    return {
+        "session_id": session_id,
+        "document": {
+            "id": document.id,
+            "content": document.content,
+            "version": document.version,
+            "locks": document.locks,
+            "comments": len(document.comments)
+        },
+        "users": [
+            {
+                "id": u.id,
+                "name": u.name,
+                "color": u.color,
+                "active": time.time() - u.last_seen < 30
+            }
+            for u in session.users.values()
+        ]
+    }
+
+
+async def resolve_conflicts(engine: CollaborationEngine, session_id: str, base_version: int, changes: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Resolve editing conflicts"""
+    operations = []
+    for change in changes:
+        operations.append(Operation(
+            id=change.get("id", str(uuid.uuid4())),
+            type=OperationType(change["type"]),
+            user_id=change["user_id"],
+            timestamp=change.get("timestamp", time.time()),
+            version=change.get("version", base_version),
+            data=change["data"]
+        ))
+    
+    return await engine.merge_conflicts(session_id, base_version, operations)
+
+
+async def track_presence(engine: CollaborationEngine, session_id: str) -> List[Dict[str, Any]]:
+    """Track user presence in real-time"""
+    if session_id not in engine.sessions:
+        return []
+    
+    session = engine.sessions[session_id]
+    return [
+        {
+            "user_id": u.id,
+            "name": u.name,
+            "color": u.color,
+            "cursor_pos": u.cursor_pos,
+            "selection": {
+                "start": u.selection_start,
+                "end": u.selection_end
+            } if u.selection_start is not None else None,
+            "last_seen": u.last_seen,
+            "active": time.time() - u.last_seen < 30
+        }
+        for u in session.users.values()
+    ]
+
+
+if __name__ == "__main__":
+    # Validation with real collaborative editing scenario
+    async def validate():
+        engine = CollaborationEngine()
+        
+        # Create session
+        session = await engine.create_session("test_doc", "user1", "Alice")
+        print(f"Created session: {session.id}")
+        
+        # Join session with second user
+        session2 = await engine.join_session(session.id, "user2", "Bob")
+        assert session2 is not None, "Failed to join session"
+        print(f"User 2 joined session")
+        
+        # Simulate collaborative editing
+        
+        # User 1 inserts text
+        op1 = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.INSERT,
+            user_id="user1",
+            timestamp=time.time(),
+            version=0,
+            data={"position": 0, "text": "Hello "}
+        )
+        
+        result = await engine.apply_operation(session.id, op1)
+        assert result is True, "Failed to apply operation 1"
+        print("User 1 inserted: 'Hello '")
+        
+        # User 2 inserts text
+        op2 = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.INSERT,
+            user_id="user2",
+            timestamp=time.time(),
+            version=1,
+            data={"position": 6, "text": "World!"}
+        )
+        
+        result = await engine.apply_operation(session.id, op2)
+        assert result is True, "Failed to apply operation 2"
+        print("User 2 inserted: 'World!'")
+        
+        # Check document content
+        doc = engine.documents[session.document_id]
+        assert doc.content == "Hello World!", f"Expected 'Hello World!', got '{doc.content}'"
+        print(f"Document content: '{doc.content}'")
+        
+        # Test cursor tracking
+        await engine.update_cursor(session.id, "user1", 5)
+        await engine.update_cursor(session.id, "user2", 12)
+        
+        # Test selection
+        await engine.update_selection(session.id, "user1", 0, 5)
+        
+        # Test comments
+        await engine.add_comment(session.id, "user1", 0, "Great start!")
+        
+        # Test presence tracking
+        presence = await track_presence(engine, session.id)
+        assert len(presence) == 2, f"Expected 2 users, got {len(presence)}"
+        print(f"Active users: {len(presence)}")
+        
+        # Test conflict resolution
+        # Simulate concurrent edits
+        concurrent_op1 = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.INSERT,
+            user_id="user1",
+            timestamp=time.time(),
+            version=2,
+            data={"position": 5, "text": " Beautiful"}
+        )
+        
+        concurrent_op2 = Operation(
+            id=str(uuid.uuid4()),
+            type=OperationType.INSERT,
+            user_id="user2",
+            timestamp=time.time() + 0.1,
+            version=2,
+            data={"position": 5, "text": " Wonderful"}
+        )
+        
+        # Apply first operation
+        await engine.apply_operation(session.id, concurrent_op1)
+        
+        # Second operation should be transformed
+        await engine.apply_operation(session.id, concurrent_op2)
+        
+        # Both texts should be in the document
+        assert " Beautiful" in doc.content, "First concurrent edit missing"
+        assert " Wonderful" in doc.content, "Second concurrent edit missing"
+        print(f"After concurrent edits: '{doc.content}'")
+        
+        # Test offline sync
+        offline_ops = [
+            {
+                "type": "insert",
+                "data": {"position": 0, "text": "[Offline] "},
+                "timestamp": time.time() - 60
+            }
+        ]
+        
+        synced = await engine.sync_offline_operations(session.id, "user1", offline_ops)
+        assert len(synced) == 1, "Failed to sync offline operations"
+        print(f"Synced {len(synced)} offline operations")
+        
+        # Test document history
+        history = await engine.get_document_history(session.document_id)
+        assert len(history) > 0, "No history found"
+        print(f"Document has {len(history)} operations in history")
+        
+        # Clean up
+        await engine.leave_session(session.id, "user1")
+        await engine.leave_session(session.id, "user2")
+        
+        print("\nCollaboration Engine validation passed")
+    
+    asyncio.run(validate())
