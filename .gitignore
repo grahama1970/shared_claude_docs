@@ -27,6 +27,8 @@ MANIFEST
 venv/
 ENV/
 env/
+*_venv/
+marker-pdf-analysis/marker_venv/
 
 # PyCharm
 .idea/
@@ -85,3 +87,6 @@ logs/
 
 # MkDocs
 site/
+
+# External repositories
+repos/
